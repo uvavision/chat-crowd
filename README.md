@@ -1,10 +1,9 @@
-Flask-SocketIO-Chat
+chat-crowd
 ===================
 
-A simple chat application that demonstrates how to structure a Flask-SocketIO application.
-
-To run this application install the requirements in a virtual environment, run `python run.py` and visit `http://localhost:5000` on one or more browser tabs.
-
-If you prefer, you can also start the server using the Flask cli:
-
-    $ FLASK_APP=run.py flask run
+How to run?
+1) create a virtual environment with Python 3.6
+2) `pip install -r requirements.txt`
+3) `cd main`
+4) `python run.py`
+5) visit `http://localhost:8080`.
