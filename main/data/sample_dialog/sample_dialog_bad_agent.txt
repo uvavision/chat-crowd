@@ -1,0 +1,7 @@
+user: Hi, I am looking for rental apartment.
+YOU: Hey, how you doing? Where are you from?	(Avoid unnecessary chitchat.)
+user: I'm good, Michigan.
+YOU: Please tell me your preferences on location and price range.
+user: So, preferably midtown Manhattan or Brooklyn Heights and under $800
+YOU: There are no apartments that match those criteria. Sorry! I can't help you.	(Please help modify search criteria to explore other options.)
+user: Okay. Thanks, bye.

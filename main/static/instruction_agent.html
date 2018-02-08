@@ -1,0 +1,110 @@
+<html>
+<head>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="section">
+      <!--
+      <div><h5>Overview</h5></div>
+      [[overview]]
+      -->
+      <div class="teal-text"><h5>Task Descriptions</h5></div>
+      <div class="row">
+  <div class="col">
+    <ul>
+      <li>There is a simple quiz for the first-time participants. It is mainly for preparing you for the task. After you login (or pass the quiz), you will see the chat interface (left) and the search tool (right). </li>
+      <li>  <div class="card">
+          <div class="card-image">
+            <img src="https://s3.amazonaws.com/crowdflower-make-cloud/images%2F1509417190321-agent-ui-offline.png" alt="login"/>
+          <!-- <img src="img/ui-agent-woz.png" alt="ui"/> -->
+          </div>
+        </div>
+      </li>
+    </ul>
+    <ol>
+      <li>Review the chat history in area [1]. As shown in the example, you should be able to fill out the search form [2] with the current criteria
+        (Please note that for certain field such as "neighborhood", you need to select from the auto-complete options). </li>
+      <li>The search results show in two expandable parts,
+        <ul>
+          <li>the list of apartment info [3A] and the total of search results.</li>
+          <li>some additional information [3B] to the search results, i.e., count by features.  </li>
+        </ul>
+      </li>
+      <li>You can type your response in [4] and press <b>Enter</b> to submit chat.</li>
+      <li>Please only end the conversation after confirming with the other user. </li>
+      <li><span class="red-text">IMPORTANT</span> Click [6] and obtain the confirmation code to complete the task via CrowdFlower interface. Otherwise, we cannot reward you.</li>
+    </ol>
+  </div>
+</div>
+
+      <div class="teal-text"><h5>How to do a good job?</h5></div>
+      <div class="row center">
+  <table class="striped left-align" style="table-layout:fixed">
+    <thead>
+      <tr>
+          <th><span class="blue-text">Do's</span></th>
+          <th><span class="red-text">Dont's</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Please use the search tool to look for the information based on user's intent.</td>
+        <td>Do NOT forge information in your response to user.</td>
+      </tr>
+      <tr>
+        <td>Please confirm or clarify with user about requests if necessary. </td>
+        <td>When the request is not in task scope, e.g., "I prefer new building",
+          please tell the user that the building year information is not available. </td>
+      </tr>
+      <tr>
+        <td>Please explain why you suggest certain things if necessary.</td>
+        <td>Don't change the search criteria without informing the user.</td>
+      </tr>
+      <tr>
+        <td>Please make your response relevant, succint and useful to address the user' requests.</td>
+        <td>Don't involve inconsequential conversations or any personal information.</td>
+      </tr>
+      <tr>
+        <td>Try to have a conversation in the range of 10~15 utterances (if you say 5 lines and they say 5 lines that is 10 utterances total).</td>
+        <td>Don't write a few lines and end the conversation.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+      <div class="row left-align">
+        <div class="col s6">
+          <div><div class="collection-header"><b>A <span class="blue-text">Good</span> Example</b></div><div class="collection-item"><b>user</b>: Hi, I am looking for rental apartment. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: Hi! Please tell me your preferences on location. <span class="blue-text">(Asking for preferences.)</span></div>
+<div class="collection-item"><b>user</b>: So, preferably midtown Manhattan or Brooklyn Heights. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: Good news. There are 20 apartments available in midtown Manhattan. <span class="blue-text">(Use the search tool and share user the results.)</span></div>
+<div class="collection-item"><b>user</b>: OK. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: What is your price range and how many bedrooms are you looking for? <span class="blue-text">(Asking for additional preferences to narrow down the search.)</span></div>
+<div class="collection-item"><b>user</b>: one-bed, between $1500 and $2900. prefer big windows. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: Sorry that we cannot search by "big windows". Now searching one-bedroom apartments for you between $1499 and $2999. <span class="blue-text">(Telling the user what you can do.)</span></div>
+<div class="collection-item"><b>user</b>: Oh OK thanks. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: I think this one would be a good fit for you: 1600 BROADWAY, #3917 (Midtown, Manhattan) $2800; studio; 1 s, 592 square feet. <span class="blue-text">(Suggesting an apartment.)</span></div>
+<div class="collection-item"><b>user</b>: Actually I think I might want something a little cheaper than that. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: Okay, how about this one: 5 BRYANT PARK #2613 (Midtown, Manhattan) $2500; studio; 1 bath <span class="blue-text">(Adjusting to new information.)</span></div>
+<div class="collection-item"><b>user</b>: That looks great, thanks! </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: You're welcome. Anything else I can help with! </div>
+<div class="collection-item"><b>user</b>: Not now. Thanks. Bye! </div>
+</div>
+        </div>
+        <div class="col s6">
+          <div><div class="collection-header"><b>A <span class="red-text">Bad</span> Example</b></div><div class="collection-item"><b>user</b>: Hi, I am looking for rental apartment. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: Hey, how you doing? Where are you from? <span class="red-text">(Avoid unnecessary chitchat.)</span></div>
+<div class="collection-item"><b>user</b>: I'm good, Michigan. </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: Please tell me your preferences on location and price range. </div>
+<div class="collection-item"><b>user</b>: So, preferably midtown Manhattan or Brooklyn Heights and under $800 </div>
+<div class="collection-item"><b class="blue-text">YOU</b>: There are no apartments that match those criteria. Sorry! I can't help you. <span class="red-text">(Please help modify search criteria to explore other options.)</span></div>
+<div class="collection-item"><b>user</b>: Okay. Thanks, bye. </div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

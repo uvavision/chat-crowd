@@ -1,0 +1,681 @@
+<html>
+  <head>
+    <base href="/">
+    <title>Chat as {{role}}</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/materialize-tags.css')}}" rel="stylesheet">
+
+    <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/cp.css')}}" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/app.css')}}" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <!-- <script type="text/javascript" src="//code.jquery.com/jquery-1.6.2.min.js"></script> -->
+
+    <script type="text/javascript" charset="utf-8">
+        var socket;
+        $(document).ready(function(){
+            socket = io('http://' + document.domain + ':' + location.port + '/chat', {
+              'forceNew':true,
+              'reconnection': true,
+              'reconnectionDelay': 100,
+              'reconnectionDelayMax' : 5000,
+              'reconnectionAttempts': Infinity,
+              'transports': ['websocket']
+            });
+            socket.on('reconnect_attempt', () => {
+              socket.io.opts.transports = ['polling', 'websocket'];
+            });
+            socket.on('connect', function(data) {
+              socket.emit('joined', {});
+            });
+            socket.on('status', function(data) {
+              Api.sendRequest(data.msg, data.role, data.mode);
+            });
+            socket.on('message', function(data) {
+                if (data.role != "{{role}}") {
+                  $.titleAlert("📈 New Message from " + data.role + '!', { requireBlur:false, stopOnFocus:true, duration:0, interval:500 });
+                }
+                Api.sendRequest(data.msg, data.role, data.mode);
+            });
+            socket.on('left', function(data) {
+                socket.emit('left', {});
+            });
+
+            $('#textInput').keypress(function(e) {
+                var code = e.keyCode || e.which;
+                if (code == 13) {
+                    var text = $('#textInput').val();
+                    var now = new Date(Date.now());
+                    var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                    $('#textInput').val("");
+                    socket.emit('text', {msg:text, t:t});
+                    // socket.emit('bot', {msg:text, t:t});
+                }
+            });
+            $('#textInput1').keypress(function(e) {
+                var code = e.keyCode || e.which;
+                if (code == 13) {
+                    var text = $('#textInput1').val();
+                    var now = new Date(Date.now());
+                    var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                    $('#textInput1').val("");
+                    $('#textInput1').timedDisable(3);
+                    socket.emit('text', {msg:text, t:t});
+                }
+            });
+            $('#search').click(function() {
+              $('#progressbar1').show();
+              $("#result").empty();
+              $("#rcount").empty();
+              <!--$("#rcount1").empty();-->
+              $("#more").empty();
+              $("#post-search").hide();
+              $("#pre-search").show();
+            });
+
+        });
+        function left_room() {
+            socket.emit('text', {msg:"#END"});
+        }
+        function end_task() {
+          window.location.href = "{{ url_for('main.end') }}";
+            <!--socket.emit('left', {}, function() {-->
+                <!--socket.disconnect();-->
+                <!--window.location.href = "{{ url_for('main.end') }}";-->
+            <!--});-->
+        }
+    </script>
+
+    <script type=text/javascript>
+      var searchreq;
+      $(function() {
+        $('#search').bind('click', function() {
+          var mbeds = [];
+          $('#beds :selected').each(function(i, selected){
+            mbeds[i] = $(selected).val();
+          });
+          searchreq = $.getJSON('/_lookup', {
+            price_low: $('#price_low').val(),
+            price_high: $('#price_high').val(),
+            baths: $('#baths').val(),
+            beds: mbeds,
+            neighborhood: $('#neighborhood').val(),
+            <!--transport: $('#transport').val(),-->
+            <!--amenity: $('#amenity').val(),-->
+            borough: $('#borough').val(),
+            year_low: $('#year_low').val(),
+            year_high: $('#year_high').val()
+          }, function(data) {
+            $("#result").html(data.result);
+            $("#rcount").html(data.count);
+            <!--$("#rcount1").html(data.count1);-->
+            $("#more").html(data.more);
+            $.ajax({
+                success: function(){
+                    $("#progressbar1").hide();
+                    $("#progressbar2").hide();
+                    $("#pre-search").hide();
+                    $("#post-search").show();
+                    copyFull();
+                    copyPhone();
+                }
+            });
+          });
+          return false;
+        });
+      });
+    </script>
+
+    <script>
+        function clearForm(form) {
+            var $f = $(form);
+            // $('selected').material_select();
+            var answer  = document.getElementById("copyAnswer");
+            if(answer != null) {
+              answer.innerHTML = '';
+            }
+            var $f = $f.find(':input').not(':button, :submit, :reset, :hidden');
+            $f.val('').attr('value','').removeAttr('checked').removeAttr('selected');
+            $('select').material_select();
+
+            var mts_attrs = document.getElementById("domain_form").getElementsByTagName("span");
+            for (var i = 0; i < mts_attrs.length; i++) {
+                //omitting undefined null check for brevity
+                if (mts_attrs[i].id.lastIndexOf('mts_', 0) === 0) {
+                    mts_attrs[i].innerHTML = '';
+                }
+            }
+
+            // $(':selected').each(function(i, selected){
+            //   $(selected).val('').attr('value','').removeAttr('checked').removeAttr('selected');
+            // });
+            $(':selected').each(function(i, selected){
+              $(selected).removeAttr('checked').removeAttr('selected');
+            });
+            $('select').material_select();
+            searchreq.abort();
+            $("#progressbar1").hide();
+            $("#progressbar2").hide();
+            $("#result").empty();
+            $("#rcount").empty();
+            <!--$("#rcount1").empty();-->
+            $("#more").empty();
+            $("#post-search").hide();
+            $("#pre-search").show();
+        }
+    </script>
+
+    <!-- MTS get begin -->
+    <script type=text/javascript>
+      $(function() {
+        $('#mts_get').bind('click', function() {
+          var mbeds = [];
+          $("#progressbar2").show();
+          $('#beds :selected').each(function(i, selected){
+            mbeds[i] = $(selected).val();
+          });
+          searchreq = $.getJSON('/woz/mts/get', {}, function(data) {
+            $("#user_utterance").html(data.user_utterance);
+            $("#mts_response").html(data.mts_utterance);
+            $("#mts_price_low").html(data.price_low);
+            $("#price_high").html(data.price_high);
+            $("#mts_beds").html(data.beds);
+            $("#mts_baths").html(data.baths);
+            $("#mts_neighborhood").html(data.neighborhood);
+            <!-- $('#neighborhood').val(data.neighborhood); -->
+            $("#mts_borough").html(data.borough);
+            <!--$("#mts_transport").html(data.transport);-->
+            <!--$("#mts_amenity").html(data.amenity);-->
+            $("#mts_year_low").html(data.year_low);
+            $("#mts_year_high").html(data.year_high);
+            $.ajax({
+                success: function(){
+                    $("#progressbar2").hide();
+                    $("#pre-search").hide();
+                    searchreq = $.getJSON('/_lookup', {
+                      price_low: $('#mts_price_low').val(),
+                      price_high: $('#mts_price_high').val(),
+                      baths: $('#mts_baths').val(),
+                      beds: $("#mts_beds").val(),
+                      neighborhood: $('#mts_neighborhood').val(),
+                      <!--transport: $('#mts_transport').val(),-->
+                      <!--amenity: $('#mts_amenity').val(),-->
+                      borough: $('#mts_borough').val(),
+                      year_low: $('#mts_year_low').val(),
+                      year_high: $('#mts_year_high').val()
+                    }, function(data) {
+                      $("#result").html(data.result);
+                      $("#rcount").html(data.count);
+                      <!--$("#rcount1").html(data.count1);-->
+                      $("#more").html(data.more);
+                      $.ajax({
+                          success: function(){
+                              $("#progressbar1").hide();
+                              $("#progressbar2").hide();
+                              $("#pre-search").hide();
+                              $("#post-search").show();
+                              copyFull();
+                              copyPhone();
+                          }
+                      });
+                    });
+                }
+            });
+          });
+          return false;
+        });
+      });
+    </script>
+    <!-- MTS get end -->
+    <!-- MTS post begin -->
+    <script type=text/javascript>
+      $(function() {
+        $('#mts_post').bind('click', function() {
+          $("#progressbar2").show();
+          var mbeds = [];
+          $('#beds :selected').each(function(i, selected){
+            mbeds[i] = $(selected).val();
+          });
+          searchreq = $.getJSON('/woz/mts/post', {
+            price_low: $('#price_low').val(),
+            price_high: $('#price_high').val(),
+            baths: $('#baths').val(),
+            beds: mbeds,
+            neighborhood: $('#neighborhood').val(),
+            borough: $('#borough').val(),
+            <!--transport: $('#transport').val(),-->
+            <!--amenity: $('#amenity').val(),-->
+            year_low: $('#year_low').val(),
+            year_high: $('#year_high').val()
+          }, function(data) {
+            $("#mts_response").html(data.mts_utterance);
+            $("#mts_price_low").html(data.price_low);
+            $("#mts_price_high").html(data.price_high);
+            $("#mts_beds").html(data.beds);
+            $("#mts_baths").html(data.baths);
+            $("#mts_neighborhood").html(data.neighborhood);
+            $("#mts_borough").html(data.borough);
+            <!--$("#mts_transport").html(data.transport);-->
+            $("#mts_year_low").html(data.year_low);
+            $("#mts_year_high").html(data.year_high);
+            $.ajax({
+                success: function(){
+                    $("#progressbar2").hide();
+                }
+            });
+          });
+          return false;
+        });
+      });
+    </script>
+    <!-- MTS post end -->
+  </head>
+
+  <body>
+    <div id="contentParent" class="responsive-columns-wrapper">
+      {% if mode !='test' %}
+          <div id="chat-column-holder" class="responsive-column content-column">
+          {% if role == "agent" %}
+            <div class="bg-header teal lighten-5">
+          {%  else %}
+            <div class="bg-header blue lighten-5">
+          {% endif %}
+              Welcome
+              <b>{{username}}</b>! You will play the role of <b>{{role}}</b> in <b>{{mode}}</b>. <b>Now chat!</b>
+              <div>
+                Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
+              </div>
+            </div>
+          <div class="chat-column">
+            <div id="scrollingChat"></div>
+            <div class="input-field inputOutline">
+              <i class="material-icons prefix">textsms</i>
+              <input id="textInput" placeholder="Type here... (Press Enter to submit)"></input>
+            </div>
+            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>
+          </div>
+        </div>
+      {% endif %}
+
+      <div>
+        {% if role == 'agent' and mode == 'test' %}
+        <div class="lpadding">
+          <blockquote><h5 class="blue-text">Quiz</h5><div class="blue-grey lighten-5">Answer the questions with <b>a single number</b> - the total of the search results. e.g.,
+            <div class="row center">
+                <div class="col m8 blue-text"><label>Question</label><br>{{lst_q_data[0][0]}}</div>
+                <div class="col m4 blue-text"><label>Answer</label><br>{{lst_q_data[0][1]}}</div>
+                <hr>
+            </div>
+
+          </div>
+          </blockquote>
+
+          <form class="col m12"  method="POST">
+            <ol>
+              <li>
+                <div class="input-field col m8 ">
+                  {{lst_q_data[1][0]}}
+                </div>
+                <div class="input-field col m4">
+                  {{ form_test.r1()}}
+                  <label for="r1">Answer with the total number of the search results</label>
+                </div>
+              </li>
+              <li>
+                <div class="input-field col m8">
+                  {{lst_q_data[2][0]}}
+                </div>
+                <div class="input-field col m4">
+                  {{ form_test.r2()}}
+                <label for="r2">Answer with the total number of the search results</label>
+              </div>
+              </li>
+              <li>
+                <div class="input-field col m8">
+                  {{lst_q_data[3][0]}}
+                </div>
+                <div class="input-field col m4">
+                  {{ form_test.r3()}}
+                  <label for="r3">Answer with the total number of the search results</label>
+                </div>
+              </li>
+              <div class="input-field col m6">
+                  {{ form_test.submit(class_="btn blue") }}
+              </div>
+            </ol>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+      {% if role == 'user' %}
+      <div id="payload-column" class="fixed-column content-column">
+        {% if mode != 'test' %}
+        <div class="row">
+          <div class="col m12">
+            <div class="card ">
+              <div class="card-content blue-text">
+                <span class="red-text tooltipped" data-position="below" data-delay="50"
+                data-tooltip="Please use the given search criteria in your task; but it does not need to limit to those. You can always change it through the conversation when necessary." > &#9432;</span>
+                <span class="card-title blue-text"><b> See below for the initial preferences</b></span>
+                <div class="collection">
+                  <ul>
+                    {% for k, v in filters %}
+                      <li class="collection-item">{{k.replace('_', ' ')}}: <span class="blue-text">{{v}}</span></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="row">
+          <div class="col m12">
+            <div class="card">
+              <div class="card-content">
+                <span class="card-title"><b>Information about NYC Neighborhood</b></span>
+              </div>
+              <div class="card-action">
+                <label for="neighborhood" class="blue-text">NYC neighborhood, e.g. Williamsburg, Upper West Side, Tribeca, East Village, Soho, Chinatown...</label>
+                <section id="neighborhood-typeahead" class="example">
+                  <input class="typehead-input" placeholder="type for autocomplete ..."
+                  value="">
+                 </input>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role == 'agent' %}
+      <div id="payload-column" class="fixed-column content-column">
+        <div class="card-panel grey darken-3 white-text"> <a href="{{ url_for('main.kbv') }}" target="_blank">CLICK </a>to view <b>{{domain.upper()}}</b> Knowledge Base</div>
+        <div class="card-panel white lighten-5">
+          {% if mode == 'h+b' %}
+            <div class="row">
+              <form>
+                <b>Virtual Agent (VA) response </b><button id="copyBlock">Click to copy</button>
+                <span id="copyAnswer" class="blue-text"></span><input class="tooltipped" type='button' value='Reset' name="reset" data-position="top" data-delay="50"
+                data-tooltip="Clear/reset response/input" onclick="return clearForm(this.form);">
+                <textarea id="mts_response" class="materialize-textarea blue-text" value=""></textarea>
+                <!--
+                <br>
+                <textarea id="user_utterance" class="materialize-textarea" value="?">previous user input</textarea>
+              -->
+                <button id="mts_get" class="btn tooltipped" data-position="top" data-delay="50"
+                data-tooltip="Pull response data from Virtual Agent">Pull&#8592;VA</button>
+                <button id="mts_post" class="btn tooltipped" data-position="top" data-delay="50"
+                data-tooltip="Push annotation data to Virtual Agent">Push&#8594;VA</button>
+
+            </form>
+            <div class="progress" id="progressbar2">
+              <div class="indeterminate"></div>
+            </div>
+            </div>
+
+          {% endif %}
+
+          <form class="col m12" method="POST" id="domain_form">
+            <div class="row">
+              <div style="text-align:center"><b><u class="teal-text">{{domain.upper()}} Information Search Tool</u></b></div>
+              <div class="input-field col m6">
+                {{ form.beds()}}
+                <label for="beds">Number of bedrooms: <span id="mts_beds" class='red-text'></span> </label>
+              </div>
+              <div class="input-field col m6">
+                {{ form.baths()}}
+                <label for="baths">Number of bathrooms: <span id="mts_baths" class='red-text'></span></label>
+              </div>
+              <div class="input-field col m6">
+
+                {{ form.price_low(class_="validate", placeholder="from: e.g., 2800") }}
+                <label for="price_low">Price Low: <span id="mts_price_low" class='red-text'></span></label>
+              </div>
+              <div class="input-field col m6">
+
+                {{ form.price_high(class_="validate", placeholder="to: e.g., 3800")}}
+                <label for="price_high">Price High: <span id="mts_price_high" class='red-text'></span></label>
+              </div>
+              <div class="col m12">
+                <label for="neighborhood">Select the neighborhood (e.g., Tribeca) <span id="mts_neighborhood" class='red-text'></span></label>
+
+                <section id="neighborhood-typeahead" class="example">
+                  {{ form.neighborhood(class_="typehead-input")}}
+                </section>
+              </div>
+              <div class="col m12">
+                <label for="borough">Select the borough/area (e.g., Queens, Manhattan) <span id="mts_borough" class='red-text'></span></label>
+
+                <section id="borough-typeahead" class="example">
+                  {{ form.borough(class_="typehead-input")}}
+                </section>
+              </div>
+              <div class="col m6">
+                <label for="year_low">Year Low</label>
+                  <div id="mts_year_low" class='red-text'></div>
+                  {{ form.year_low(class_="validate", placeholder="from: e.g., 1990")}}
+              </div>
+              <div class="col m6">
+                <label for="year_high">Year High</label>
+                  <div id="mts_year_high" class='red-text'></div>
+                  {{ form.year_high(class_="validate", placeholder="from: e.g., 2017")}}
+              </div>
+              <!--
+              <div class="col m12">
+                <label for="amenity">Select the amenities (e.g.,  gym, washer)</label>
+                <div id="mts_amenity" class='red-text'></div>
+                <section id="amenity-typeahead" class="example">
+                  {{ form.amenity(class_="typehead-input") }}
+                </section>
+              </div>
+              <div class="col m12">
+                <label for="transport">Select the transportation (subway and railway)</label>
+                <div id="mts_transport" class='red-text'></div>
+                <section id="transport-typeahead" class="example">
+                    {{ form.transport(class_="typehead-input")}}
+                </section>
+              </div>
+              -->
+              <div>
+                {{ form.submit(class_="btn teal  btn-primary") }}
+                <input type='button' value='Reset' name="reset" id="reset" class="btn teal tooltipped" data-position="top" data-delay="50"
+                data-tooltip="Clear/reset the form" onclick="return clearForm(this.form);">
+              </div>
+              <div class="progress" id="progressbar1">
+                <div class="indeterminate"></div>
+              </div>
+            </div>
+          </form>
+        </div>
+          <ul class="collapsible collapsible-accordion disable-color" data-collapsible="accordion" id="pre-search">
+            <li>
+              <div class="collapsible-header tooltipped" data-position="top" data-delay="50"
+              data-tooltip="detailed information about apartments">
+                 <i class="material-icons">view_list</i>Show search results
+              </div>
+            </li>
+            <li>
+              <div class="collapsible-header tooltipped" data-position="bottom" data-delay="50"
+              data-tooltip="information for recommendating when there are too many/few results">
+                <i class="material-icons">info_outline</i>Show more information</div>
+            </li>
+          </ul>
+          <ul class="collapsible collapsible-accordion noshow" data-collapsible="accordion" id="post-search">
+            <li>
+              <div class="collapsible-header active">
+                 <span class="badge" data-badge-caption="results" ></span>
+                 <i class="material-icons">view_list</i></span>
+                 <span class="teal-text teal-darken-2">Show search results (total: <span id="rcount"></span>)</span></div>
+               <div class="collapsible-body"><div id='result'></div></div>
+            </li>
+            <li>
+              <div class="collapsible-header">
+                <span class="badge" data-badge-caption="results"></span>
+                <i class="material-icons">info_outline</i>
+                <span class="teal-text teal-darken-2">Show more information</span></div>
+              <div class="collapsible-body"><span><div id='more'></div></span></div>
+            </li>
+          </ul>
+      </div>
+      {% endif %}
+
+
+      {% if role == 'user' and mode == 'test' %}
+        <div>
+          <div class="lpadding"><blockquote><h5>Quiz</h5>Please submit your answers the following two questions. If you pass the quiz, your task will begin.
+            </blockquote>
+          </div>
+          <form class="col s12" method='POST'>
+            <ol>
+              <li>
+                <div class="input-field row s6">
+                  <div for="neighborhood"> Select all neighborhood that are in NYC.
+                    You can use the simple tool (<a href="https://jqueryui.com/autocomplete/" target="_blank">autocomplete</a>) on the left. If the name matches an autocompleted name,
+                    it is in NYC. Otherwise, it is not.</div>
+                  {{ form_test.neighborhood()}}
+                </div>
+              </li>
+              <li>
+                <div class="input-field row s6">
+                  <div for="rental">Select all necessary information people usually consider when looking for rental apartments. </div>
+                  {{ form_test.rental()}}
+                </div>
+              </li>
+            {{ form_test.submit(class_="btn blue") }}
+          </form>
+        </div>
+      {% endif %}
+
+
+      <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+      <script src="{{url_for('static', filename='js/common.js')}}"></script>
+      <script src="{{url_for('static', filename='js/api.js')}}"></script>
+      <script src="{{url_for('static', filename='js/conversation.js')}}"></script>
+      <script src="{{url_for('static', filename='js/payload.js')}}"></script>
+      <script src="{{url_for('static', filename='js/global.js')}}"></script>
+
+      <script src="{{url_for('static', filename='js/jquery.titlealert.js')}}"></script>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/typeahead.bundle.min.js"></script>
+
+      <script src="{{url_for('static', filename='js/materialize-tags.min.js')}}"></script>
+      <script src="{{url_for('static', filename='js/app.js')}}" type="text/javascript"></script>
+      <script src="{{url_for('static', filename='js/init.js')}}" type="text/javascript"></script>
+      <script src="{{url_for('static', filename='js/cp.js')}}" type="text/javascript"></script>
+
+      <script>document.getElementById("user_utterance").disabled = true;</script>
+
+      <script>
+        $(document).ready(function () {
+            $('select').material_select();
+            $('select').change(function(){
+                var newValuesArr = [],
+                    select = $(this),
+                    ul = select.prev();
+                ul.children('li').toArray().forEach(function (li, i) {
+                    if ($(li).hasClass('active')) {
+                        newValuesArr.push(select.children('option').toArray()[i].value);
+                    }
+                });
+                select.val(newValuesArr);
+            });
+          });
+      </script>
+
+      <script>
+      $.fn.timedDisable = function(time) {
+       if (time == null) {
+         time = 5;
+       }
+       var seconds = Math.ceil(time); // Calculate the number of seconds
+       return $(this).each(function() {
+         $(this).attr('disabled', 'disabled');
+         var disabledElem = $(this);
+         var originalText = this.innerHTML; // Remember the original text content
+        //  var originalText = "";
+         // append the number of seconds to the text
+         disabledElem.val('Please wait for ' + seconds + 's');
+         disabledElem.text( originalText + ' (' + seconds + 's)');
+
+         // do a set interval, using an interval of 1000 milliseconds
+         //     and clear it after the number of seconds counts down to 0
+         var interval = setInterval(function() {
+           seconds = seconds - 1;
+           // decrement the seconds and update the text
+           disabledElem.val('Please wait for ' + seconds + 's');
+           disabledElem.text( originalText + ' (' + seconds + 's)');
+           if (seconds === 0) { // once seconds is 0...
+             disabledElem.removeAttr('disabled')
+               .text(originalText); //reset to original text
+             disabledElem.val('');
+             clearInterval(interval); // clear interval
+           }
+         }, 1000);
+       });
+     };
+     $(function() {
+       $('#textInput1').timedDisable(3); // disable input box for n seconds
+     });
+    //  document.getElementById("").disabled = true;
+     $(function() {
+       $('#end_task').timedDisable(10);
+     });
+      </script>
+
+      <script>
+        // disable back button
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+        });
+        // window.onbeforeunload = function() { return "Your work will be lost."; };
+      </script>
+
+      <script type='text/javascript'>
+        function goodbye(e) {
+            if(!e) e = window.event;
+            //e.cancelBubble is supported by IE - this will kill the bubbling process.
+            e.cancelBubble = true;
+            e.returnValue = 'You sure you want to leave?'; //This is displayed on the dialog
+
+            //e.stopPropagation works in Firefox.
+            if (e.stopPropagation) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }
+        window.onbeforeunload=goodbye;
+      </script>
+
+      <script>
+        var textarea = document.getElementById("mts_response");
+        var answer  = document.getElementById("copyAnswer");
+        var copy    = document.getElementById("copyBlock");
+        copy.addEventListener('click', function(e) {
+
+           // Select some text (you could also create a range)
+           textarea.select();
+
+           // Use try & catch for unsupported browser
+           try {
+
+               // The important part (copy selected text)
+               var ok = document.execCommand('copy');
+               if (ok) answer.innerHTML = 'Copied!';
+               else    answer.innerHTML = 'Unable to copy!';
+           } catch (err) {
+               answer.innerHTML = 'Unsupported Browser!';
+           }
+        });
+      </script>
+  </body>
+  </html>

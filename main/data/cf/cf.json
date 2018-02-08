@@ -1,0 +1,14 @@
+{
+  "account": [{
+        "key": "EryJhbCbXnzucFZGo4ih",
+        "endpoint_url": "https://api.crowdflower.com/v1/"
+    }
+  ],
+  "task":[
+    {
+      "base_reward_agent":0.55,
+      "base_reward_user":0.40
+    }
+  ],
+  "workerid":"43135460"
+}

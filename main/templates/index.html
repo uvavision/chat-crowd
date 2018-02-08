@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <title>Chat Login</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+        <link href="{{url_for('static', filename='css/materialize.css')}}" type="text/css" rel="stylesheet">
+        <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
+        <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script src="//cdn.transifex.com/live.js"></script>
+    </head>
+    <body>
+      <div class="container">
+        <h5>Welcome!</h5>
+        <div>
+        {% if role == 'user' %}
+          <h2> Click <a href="{{url_for('static', filename='instruction_user.html')}}" target="_blank">here</a> for instructions.</h2>
+        {% elif role == 'agent' and mode == 'mts' %}
+            <h2> Click <a href="{{url_for('static', filename='instruction_mts.html')}}" target="_blank">here</a> for instructions.</h2>
+        {% elif role == 'agent' %}
+          <h2> Click <a href="{{url_for('static', filename='instruction_agent.html')}}" target="_blank">here</a> for instructions.</h2>
+        {% endif %}
+      </div>
+        <blockquote>
+          Please fill the form below and click "start" to move on to the next step.<br>
+          If this is your first time doing this task, there will be a simple quiz. <br>
+          Once you pass the quiz, you will enter the conversation. <br>
+          Have fun contributing!
+        </blockquote>
+
+        <form method="POST">
+          {{ form.hidden_tag() }}
+          <label for="workerid">What is your ID for your registered account (e.g., CrowdFlower)?</label>
+          <div class='red-text'>{% for error in form.workerid.errors %}{{ error }}{% endfor %}</div>
+          {{ form.workerid() }}
+
+          <label for="username">What name would you like to use for the chat?</label>
+          <div class='red-text'>{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+          {{ form.username() }}
+
+          {% if is_debug %}
+          <label for="task_id" >What is your Task ID (debug)?</label>
+            {{ form.task_id() }}
+          <div class='red-text'>{% for error in form.task_id.errors %}{{ error }}{% endfor %}</div>
+            <!-- {{ form.task_id(disabled=True) }} -->
+          {% endif %}
+          <div>
+            <label for="mode">
+              ROLE:
+              {% for subfield in form.role %}
+                <tr>
+                  {% if is_debug %}
+                    <td>{{subfield()}}</td>
+                    {% else %}
+                    <td>{{subfield(disabled=True)}}</td>
+                    {% endif %}
+                    <td>{{subfield.label()}}</td>
+                </tr>
+              {% endfor %}
+            </label>
+          </div>
+          <div>
+            <label for="mode">
+              MODE:
+              {% for subfield in form.mode %}
+                <tr>
+                  {% if is_debug %}
+                    <td>{{subfield()}}</td>
+                    {% else %}
+                    <td>{{subfield(disabled=True)}}</td>
+                    {% endif %}
+                    <td>{{subfield.label()}}</td>
+                </tr>
+              {% endfor %}
+            </label>
+          </div>
+          <div>
+          {{ form.submit(class_="btn btn-primary") }}
+          </div>
+        </form>
+      </div>
+      </body>
+      <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+      <script>if (!window.jQuery) { document.write('<script src="bin/jquery-2.1.1.min.js"><\/script>'); }
+      </script>
+      <script src={{url_for('static', filename='js/materialize.js')}}></script>
+
+</html>

@@ -1,0 +1,5 @@
+_unit_id,_created_at,_id,_started_at,_tainted,_channel,_trust,_worker_id,_country,_region,_city,_ip,confirmation_code,confirmation_code_gold,role,task_id,task_url
+1386604431,9/20/2017 14:31:57,2851225553,9/20/2017 14:31:21,false,cf_internal,1,43885291,USA,NY,Ossining,129.34.20.19,1-DZG94EZB,,agent,BZE49GZD-1,http://woz.mybluemix.net/login?role=agent&taskid=BZE49GZD-1
+1386604432,9/20/2017 14:33:05,2851228597,9/20/2017 14:31:57,false,cf_internal,1.0,43885291,USA,NY,Ossining,129.34.20.19,1-LqKG8jOX,,user,XOj8GKqL-1,http://woz.mybluemix.net/login?role=user&taskid=XOj8GKqL-1
+1386604433,9/20/2017 14:33:34,2851229942,9/20/2017 14:33:05,false,cf_internal,1.0,43885291,USA,NY,Ossining,129.34.20.19,3-8DmM0oly,,agent,ylo0MmD8-3,http://woz.mybluemix.net/login?role=agent&taskid=ylo0MmD8-3
+1386604434,9/20/2017 14:31:21,2851223764,9/20/2017 14:30:34,false,cf_internal,1.0,43885291,USA,NY,Ossining,129.34.20.19,3-mX6X9SBi,,user,iBS9X6Xm-3,http://woz.mybluemix.net/login?role=user&taskid=iBS9X6Xm-3

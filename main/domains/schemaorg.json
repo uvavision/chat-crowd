@@ -1,0 +1,15 @@
+{
+  "rental-apartments":{
+    "price":{"expectedValues": ["Number"], "uri": "schema.org/price"},
+    "year_built": {"expectedValues": ["Number"], "uri": "schema.org/copyrightYear"},
+    "apartment_number": {"expectedValues": ["Text"], "uri": "schema.org/copyrightYear"},
+
+    "beds": {"expectedValues": ["Number"], "uri": "schema.org/numberOfRooms"},
+    "baths": {"expectedValues": ["Text"], "uri": "schema.org/postalCode"}
+  },
+  "restaurants":{
+    "review_count":{"expectedValues": ["Integer"], "uri": "schema.org/reviewCount"},
+    "stars":{"expectedValues": ["Number", "Text"], "uri": "schema.org/starRating"},
+    "postal_code": {"expectedValues": ["Text"], "uri": "schema.org/postalCode"}
+  }
+}

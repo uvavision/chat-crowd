@@ -1,0 +1,11 @@
+<div class="col s12 m7">
+  <div class="card-panel orange accent-1">
+    <h5>When you are ready, click here
+    <a class="clicked validates-clicked" target="_blank" href="{{task_url}}"> to start the task.</a></h5>
+  </div>
+  <div>
+    <cml:instructions><span class="red-text">IMPORTANT: please enter the code that you get from the end of the task.</span></cml:instructions>
+    <cml:text label="confirmation code" id="code" validates="required" gold="true"/>
+    <cml:gold src="confirmation" strict="true" />
+  </div>
+</div>

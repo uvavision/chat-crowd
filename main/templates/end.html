@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <base href="/">
+        <title>Thank you!</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+    </head>
+    <body>
+      <div class="container">
+        <div class="section">
+          {% if task_url_next %}
+           <div>
+            <p> Congratulations! You have successfully submitted your task. </p>
+            <p> We thank you for your participation!</p>
+           </div>
+           <div class="card white">
+             <p>Like our tasks?  Please participate another one! </p>
+             <p> So far you have completed <b class="deep-purple-text">{{n_task}}</b> tasks. Current total reward: <b class="deep-purple-text">${{current_reward}}</b>.
+               Estimated total reward after next task: <b class="deep-purple-text">${{estimated_reward}}</b>.
+             </p>
+             <span class="card yellow lighten-2">
+               <a href="{{task_url_next}}" target="_blank"><b>Click HERE to start</b> </a> </span>
+            </div>
+          {% elif code %}
+             <span class="red-text">
+               <h4>PLEASE COPY <b class='blue-text'>{{code}}</b>
+               to the Crowdflower form to get rewarded.</h4>
+             </span>
+          {% else %}
+              <span class="red-text">
+                <p>We thank you for your participation! </p>
+                <p>Unfortunately, you did not pass our test. You are welcome to read our task description carefully and try again.</p>
+              </span>
+          {% endif %}
+
+          <blockquote class="col s4">Please provide us some feedback for the task! If you run into any issue with the task, let me know too. Thank you!</blockquote>
+          <form class=" col s10" method="POST">
+              {{ form.feedback(class_="materialize-textarea white")}}
+              {{ form.submit() }} <h6 class='teal-text'>{{message}}</h6>
+          </form>
+        </div>
+      </div>
+    </body>
+</html>
