@@ -78,7 +78,7 @@ def create_app(debug=False):
 
     from .core import main as main_blueprint
     from .viz.kbv import gen_visual_data
-    gen_visual_data()
+    # gen_visual_data()
     app.register_blueprint(main_blueprint)
     socketio.init_app(app)
     return app

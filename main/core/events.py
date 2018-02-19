@@ -10,8 +10,35 @@ from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, MODE_BOT,
 from .data import (insert_crowd, insert_chatdata, get_chatdata)
 from .mts_api import get_mts_cid, get_mts_response
 import time
+import json
+import os
+from multiprocessing import Queue
+
+# with open('')
+# print(os.getcwd())
+cocoidQueue = Queue()
+room2cocoid = dict()
+with open('main/data/instances_tinycoco_all_2014_pretty.json', 'r') as f:
+    tinycoco = json.load(f)
+    cocoid2cocourl = {entry['id']: entry['coco_url'] for entry in tinycoco['images']}
+    labelid2labelname = {category['id']: category['name'] for category in tinycoco['categories']}
+    cocoid2boxanno = {}
+    for anno in tinycoco['annotations']:
+        cocoid = anno['image_id']
+        box = anno['bbox']
+        if cocoid not in cocoid2boxanno:
+            cocoid2boxanno[cocoid] = []
+        cocoid2boxanno[cocoid].append({"left": box[0], "top": box[1], "width": box[2], "height": box[3],
+                                       "label": labelid2labelname[anno['category_id']]})
+    for key in cocoid2cocourl.keys():
+        cocoidQueue.put(key)
+    # print(cocoid2boxanno[list(cocoid2cocourl.keys())[0]])
+    # print(cocoidQueue)
 
 
+# tinycoco = json.loads()
+
+canvas_token = '#CANVAS-'
 def get_message(role, text):
     if role == AGENT:
         return '<div><b class="blue-text">{0}: </b>{1}</div>'.format(role, text)
@@ -49,6 +76,20 @@ def joined(message):
     for ele in history:
         emit('status', {MSG: get_message(ele[ROLE], ele[MSG]),
                         ROLE: ele[ROLE]}, room=session[TASK_ID])
+
+    room = session[TASK_ID]
+    if room not in room2cocoid:
+        room2cocoid[room] = cocoidQueue.get()
+    print(room2cocoid)
+    coco_url = cocoid2cocourl[room2cocoid[room]]
+    boxanno = cocoid2boxanno[room2cocoid[room]]
+    emit('coco_image_anno', {"coco_url": coco_url, "boxanno": boxanno}, room=session[TASK_ID])
+    for ele in reversed(history):
+        if ele['role'] == 'agent' and ele['msg'].startswith(canvas_token):
+            canvas_data = ele['msg'][len(canvas_token):]
+            emit('latest_canvas', {MSG: str(canvas_data), ROLE: ele[ROLE]}, room=session[TASK_ID])
+            break
+
     '''
     is_other_logged, username_other = get_role_other(role_other, taskid,
                                                      is_debug)
@@ -74,17 +115,21 @@ def text(message):
         insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human'})
         emit('message', {MSG: get_message(role, msg), ROLE: role, MODE: mode},
              room=session.get(TASK_ID))
-        sleep(1)
-        if mode == MODE_BOT:
-            if CONTEXT_ID in session:
-                context_id = session[CONTEXT_ID]
-            else:
-                context_id = get_mts_cid()
-                session[CONTEXT_ID] = context_id
-            _, response = get_mts_response(context_id, msg)
-            insert_chatdata(db_chat, session, {MSG: response, 'author': 'bot', ROLE: AGENT})
-            emit('message', {MSG: get_message('agent', response), ROLE: 'agent', MODE: mode},
-                 room=session.get(TASK_ID))
+        if role == 'agent':
+            assert msg.startswith(canvas_token)
+            emit('latest_canvas', {MSG: msg[len(canvas_token):], ROLE: role}, room=session[TASK_ID])
+        # sleep(1)
+        # if mode == MODE_BOT:
+        #     if CONTEXT_ID in session:
+        #         context_id = session[CONTEXT_ID]
+        #     else:
+        #         context_id = get_mts_cid()
+        #         session[CONTEXT_ID] = context_id
+        #     _, response = get_mts_response(context_id, msg)
+        #     insert_chatdata(db_chat, session, {MSG: response, 'author': 'bot', ROLE: AGENT})
+        #     emit('message', {MSG: get_message('agent', response), ROLE: 'agent', MODE: mode},
+        #          room=session.get(TASK_ID))
+
 
 
 @socketio.on('left', namespace='/chat')

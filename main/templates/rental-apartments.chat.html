@@ -2,7 +2,7 @@
   <head>
     <base href="/">
     <title>Chat as {{role}}</title>
-
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
     <link href="{{url_for('static', filename='css/materialize-tags.css')}}" rel="stylesheet">
 
@@ -16,6 +16,17 @@
     <!-- <script type="text/javascript" src="//code.jquery.com/jquery-1.6.2.min.js"></script> -->
 
     <script type="text/javascript" charset="utf-8">
+        function set_message_turn(role) {
+            var message_turn = document.getElementById('message_turn');
+              if (role == 'agent')
+                message_turn.innerHTML = 'instruction';
+              else
+                message_turn.innerHTML = 'canvas';
+        }
+        function get_message_turn() {
+          var message_turn = document.getElementById('message_turn');
+          return message_turn.innerHTML;
+        }
         var socket;
         $(document).ready(function(){
             socket = io('http://' + document.domain + ':' + location.port + '/chat', {
@@ -33,28 +44,36 @@
               socket.emit('joined', {});
             });
             socket.on('status', function(data) {
+              set_message_turn(data.role);
               Api.sendRequest(data.msg, data.role, data.mode);
             });
             socket.on('message', function(data) {
                 if (data.role != "{{role}}") {
                   $.titleAlert("📈 New Message from " + data.role + '!', { requireBlur:false, stopOnFocus:true, duration:0, interval:500 });
                 }
+                set_message_turn(data.role);
                 Api.sendRequest(data.msg, data.role, data.mode);
+{#              var scrollingChat = document.querySelector('#scrollingChat');#}
+{#              scrollingChat.scrollTop = 1000000;#}
             });
             socket.on('left', function(data) {
                 socket.emit('left', {});
             });
 
             $('#textInput').keypress(function(e) {
-                var code = e.keyCode || e.which;
-                if (code == 13) {
-                    var text = $('#textInput').val();
-                    var now = new Date(Date.now());
-                    var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-                    $('#textInput').val("");
-                    socket.emit('text', {msg:text, t:t});
+                  var code = e.keyCode || e.which;
+                  if (code == 13) {
+                    if (get_message_turn() === 'canvas') {
+                      alert('please wait for the canvas...');
+                    } else {
+                      var text = $('#textInput').val();
+                      var now = new Date(Date.now());
+                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                      $('#textInput').val("");
+                      socket.emit('text', {msg: text, t: t});
+                    }
                     // socket.emit('bot', {msg:text, t:t});
-                }
+                  }
             });
             $('#textInput1').keypress(function(e) {
                 var code = e.keyCode || e.which;
@@ -292,269 +311,38 @@
             </div>
           <div class="chat-column">
             <div id="scrollingChat"></div>
-            <div class="input-field inputOutline">
-              <i class="material-icons prefix">textsms</i>
-              <input id="textInput" placeholder="Type here... (Press Enter to submit)"></input>
-            </div>
-            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>
+              {% if role == "user" %}
+                  <div class="input-field inputOutline">
+                      <i class="material-icons prefix">textsms</i>
+                      <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
+                  </div>
+              {% elif role == "agent" %}
+                  <div>
+                      <button class="btn red lighten-1" id="submit_canvas" href="#" value="">
+                          submit canvas
+                      </button>
+                  </div>
+              {% endif %}
+
+          <div><span>waiting for </span><span id="message_turn">instruction</span><span>...</span></div>
+{#            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>#}
           </div>
         </div>
-      {% endif %}
-
-      <div>
-        {% if role == 'agent' and mode == 'test' %}
-        <div class="lpadding">
-          <blockquote><h5 class="blue-text">Quiz</h5><div class="blue-grey lighten-5">Answer the questions with <b>a single number</b> - the total of the search results. e.g.,
-            <div class="row center">
-                <div class="col m8 blue-text"><label>Question</label><br>{{lst_q_data[0][0]}}</div>
-                <div class="col m4 blue-text"><label>Answer</label><br>{{lst_q_data[0][1]}}</div>
-                <hr>
-            </div>
-
-          </div>
-          </blockquote>
-
-          <form class="col m12"  method="POST">
-            <ol>
-              <li>
-                <div class="input-field col m8 ">
-                  {{lst_q_data[1][0]}}
-                </div>
-                <div class="input-field col m4">
-                  {{ form_test.r1()}}
-                  <label for="r1">Answer with the total number of the search results</label>
-                </div>
-              </li>
-              <li>
-                <div class="input-field col m8">
-                  {{lst_q_data[2][0]}}
-                </div>
-                <div class="input-field col m4">
-                  {{ form_test.r2()}}
-                <label for="r2">Answer with the total number of the search results</label>
+          {% if role == "agent" %}
+              <div><p>Drag and draw in the canvas:</p>
+                  <div id="bbox_annotator"></div>
               </div>
-              </li>
-              <li>
-                <div class="input-field col m8">
-                  {{lst_q_data[3][0]}}
-                </div>
-                <div class="input-field col m4">
-                  {{ form_test.r3()}}
-                  <label for="r3">Answer with the total number of the search results</label>
-                </div>
-              </li>
-              <div class="input-field col m6">
-                  {{ form_test.submit(class_="btn blue") }}
-              </div>
-            </ol>
-          </form>
-        </div>
-        {% endif %}
-      </div>
-      {% if role == 'user' %}
-      <div id="payload-column" class="fixed-column content-column">
-        {% if mode != 'test' %}
-        <div class="row">
-          <div class="col m12">
-            <div class="card ">
-              <div class="card-content blue-text">
-                <span class="red-text tooltipped" data-position="below" data-delay="50"
-                data-tooltip="Please use the given search criteria in your task; but it does not need to limit to those. You can always change it through the conversation when necessary." > &#9432;</span>
-                <span class="card-title blue-text"><b> See below for the initial preferences</b></span>
-                <div class="collection">
-                  <ul>
-                    {% for k, v in filters %}
-                      <li class="collection-item">{{k.replace('_', ' ')}}: <span class="blue-text">{{v}}</span></li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-        {% endif %}
-        <div class="row">
-          <div class="col m12">
-            <div class="card">
-              <div class="card-content">
-                <span class="card-title"><b>Information about NYC Neighborhood</b></span>
-              </div>
-              <div class="card-action">
-                <label for="neighborhood" class="blue-text">NYC neighborhood, e.g. Williamsburg, Upper West Side, Tribeca, East Village, Soho, Chinatown...</label>
-                <section id="neighborhood-typeahead" class="example">
-                  <input class="typehead-input" placeholder="type for autocomplete ..."
-                  value="">
-                 </input>
-                </section>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if role == 'agent' %}
-      <div id="payload-column" class="fixed-column content-column">
-        <div class="card-panel grey darken-3 white-text"> <a href="{{ url_for('main.kbv') }}" target="_blank">CLICK </a>to view <b>{{domain.upper()}}</b> Knowledge Base</div>
-        <div class="card-panel white lighten-5">
-          {% if mode == 'h+b' %}
-            <div class="row">
-              <form>
-                <b>Virtual Agent (VA) response </b><button id="copyBlock">Click to copy</button>
-                <span id="copyAnswer" class="blue-text"></span><input class="tooltipped" type='button' value='Reset' name="reset" data-position="top" data-delay="50"
-                data-tooltip="Clear/reset response/input" onclick="return clearForm(this.form);">
-                <textarea id="mts_response" class="materialize-textarea blue-text" value=""></textarea>
-                <!--
-                <br>
-                <textarea id="user_utterance" class="materialize-textarea" value="?">previous user input</textarea>
-              -->
-                <button id="mts_get" class="btn tooltipped" data-position="top" data-delay="50"
-                data-tooltip="Pull response data from Virtual Agent">Pull&#8592;VA</button>
-                <button id="mts_post" class="btn tooltipped" data-position="top" data-delay="50"
-                data-tooltip="Push annotation data to Virtual Agent">Push&#8594;VA</button>
-
-            </form>
-            <div class="progress" id="progressbar2">
-              <div class="indeterminate"></div>
-            </div>
-            </div>
-
           {% endif %}
-
-          <form class="col m12" method="POST" id="domain_form">
-            <div class="row">
-              <div style="text-align:center"><b><u class="teal-text">{{domain.upper()}} Information Search Tool</u></b></div>
-              <div class="input-field col m6">
-                {{ form.beds()}}
-                <label for="beds">Number of bedrooms: <span id="mts_beds" class='red-text'></span> </label>
+          {% if role == "user" %}
+              <div><p>coco image with annotation:</p>
+                  <canvas id="coco_image_anno"></canvas>
               </div>
-              <div class="input-field col m6">
-                {{ form.baths()}}
-                <label for="baths">Number of bathrooms: <span id="mts_baths" class='red-text'></span></label>
-              </div>
-              <div class="input-field col m6">
-
-                {{ form.price_low(class_="validate", placeholder="from: e.g., 2800") }}
-                <label for="price_low">Price Low: <span id="mts_price_low" class='red-text'></span></label>
-              </div>
-              <div class="input-field col m6">
-
-                {{ form.price_high(class_="validate", placeholder="to: e.g., 3800")}}
-                <label for="price_high">Price High: <span id="mts_price_high" class='red-text'></span></label>
-              </div>
-              <div class="col m12">
-                <label for="neighborhood">Select the neighborhood (e.g., Tribeca) <span id="mts_neighborhood" class='red-text'></span></label>
-
-                <section id="neighborhood-typeahead" class="example">
-                  {{ form.neighborhood(class_="typehead-input")}}
-                </section>
-              </div>
-              <div class="col m12">
-                <label for="borough">Select the borough/area (e.g., Queens, Manhattan) <span id="mts_borough" class='red-text'></span></label>
-
-                <section id="borough-typeahead" class="example">
-                  {{ form.borough(class_="typehead-input")}}
-                </section>
-              </div>
-              <div class="col m6">
-                <label for="year_low">Year Low</label>
-                  <div id="mts_year_low" class='red-text'></div>
-                  {{ form.year_low(class_="validate", placeholder="from: e.g., 1990")}}
-              </div>
-              <div class="col m6">
-                <label for="year_high">Year High</label>
-                  <div id="mts_year_high" class='red-text'></div>
-                  {{ form.year_high(class_="validate", placeholder="from: e.g., 2017")}}
-              </div>
-              <!--
-              <div class="col m12">
-                <label for="amenity">Select the amenities (e.g.,  gym, washer)</label>
-                <div id="mts_amenity" class='red-text'></div>
-                <section id="amenity-typeahead" class="example">
-                  {{ form.amenity(class_="typehead-input") }}
-                </section>
-              </div>
-              <div class="col m12">
-                <label for="transport">Select the transportation (subway and railway)</label>
-                <div id="mts_transport" class='red-text'></div>
-                <section id="transport-typeahead" class="example">
-                    {{ form.transport(class_="typehead-input")}}
-                </section>
-              </div>
-              -->
-              <div>
-                {{ form.submit(class_="btn teal  btn-primary") }}
-                <input type='button' value='Reset' name="reset" id="reset" class="btn teal tooltipped" data-position="top" data-delay="50"
-                data-tooltip="Clear/reset the form" onclick="return clearForm(this.form);">
-              </div>
-              <div class="progress" id="progressbar1">
-                <div class="indeterminate"></div>
-              </div>
-            </div>
-          </form>
-        </div>
-          <ul class="collapsible collapsible-accordion disable-color" data-collapsible="accordion" id="pre-search">
-            <li>
-              <div class="collapsible-header tooltipped" data-position="top" data-delay="50"
-              data-tooltip="detailed information about apartments">
-                 <i class="material-icons">view_list</i>Show search results
-              </div>
-            </li>
-            <li>
-              <div class="collapsible-header tooltipped" data-position="bottom" data-delay="50"
-              data-tooltip="information for recommendating when there are too many/few results">
-                <i class="material-icons">info_outline</i>Show more information</div>
-            </li>
-          </ul>
-          <ul class="collapsible collapsible-accordion noshow" data-collapsible="accordion" id="post-search">
-            <li>
-              <div class="collapsible-header active">
-                 <span class="badge" data-badge-caption="results" ></span>
-                 <i class="material-icons">view_list</i></span>
-                 <span class="teal-text teal-darken-2">Show search results (total: <span id="rcount"></span>)</span></div>
-               <div class="collapsible-body"><div id='result'></div></div>
-            </li>
-            <li>
-              <div class="collapsible-header">
-                <span class="badge" data-badge-caption="results"></span>
-                <i class="material-icons">info_outline</i>
-                <span class="teal-text teal-darken-2">Show more information</span></div>
-              <div class="collapsible-body"><span><div id='more'></div></span></div>
-            </li>
-          </ul>
-      </div>
+          {% endif %}
       {% endif %}
-
-
-      {% if role == 'user' and mode == 'test' %}
-        <div>
-          <div class="lpadding"><blockquote><h5>Quiz</h5>Please submit your answers the following two questions. If you pass the quiz, your task will begin.
-            </blockquote>
-          </div>
-          <form class="col s12" method='POST'>
-            <ol>
-              <li>
-                <div class="input-field row s6">
-                  <div for="neighborhood"> Select all neighborhood that are in NYC.
-                    You can use the simple tool (<a href="https://jqueryui.com/autocomplete/" target="_blank">autocomplete</a>) on the left. If the name matches an autocompleted name,
-                    it is in NYC. Otherwise, it is not.</div>
-                  {{ form_test.neighborhood()}}
-                </div>
-              </li>
-              <li>
-                <div class="input-field row s6">
-                  <div for="rental">Select all necessary information people usually consider when looking for rental apartments. </div>
-                  {{ form_test.rental()}}
-                </div>
-              </li>
-            {{ form_test.submit(class_="btn blue") }}
-          </form>
-        </div>
-      {% endif %}
-
 
       <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bbox_annotator.js') }}"></script>
 
       <script src="{{url_for('static', filename='js/common.js')}}"></script>
       <script src="{{url_for('static', filename='js/api.js')}}"></script>
@@ -572,7 +360,79 @@
       <script src="{{url_for('static', filename='js/init.js')}}" type="text/javascript"></script>
       <script src="{{url_for('static', filename='js/cp.js')}}" type="text/javascript"></script>
 
-      <script>document.getElementById("user_utterance").disabled = true;</script>
+{#      <script>document.getElementById("user_utterance").disabled = true;</script>#}
+
+        {% if role == "agent" %}
+            <script>
+              $(document).ready(function () {
+                var canvas = document.createElement('canvas');
+                canvas.setAttribute("id", "scratch");
+                canvas.setAttribute("width", "600");
+                canvas.setAttribute("height", "500");
+                canvas.setAttribute("style", "border:3px solid #d3d3d3;");
+                var ctx = canvas.getContext("2d");
+                ctx.lineWidth = 4;
+                ctx.setLineDash([5, 3]);
+                ctx.strokeStyle = "gray";
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+                var annotator = new BBoxAnnotator({
+                  url: canvas.toDataURL("image/png"),
+                  input_method: "text",
+                  labels: ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "sofa", "pottedplant", "bed", "diningtable", "toilet", "tvmonitor", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush"],
+                  onchange: function (annotation) {
+                  }
+                });
+                $("#submit_canvas").click(function (e) {
+                  if (get_message_turn() === "instruction") {
+                    alert("please wait for the instruction....");
+                  } else {
+                    if (annotator.entries.length == 0) {
+                      alert("You haven't drawn anything!");
+                    } else {
+                      var now = new Date(Date.now());
+                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                      var text = JSON.stringify(annotator.entries);
+                      socket.emit('text', {msg: "#CANVAS-".concat(text), t: t});
+                    }
+                  }
+                });
+
+                socket.on('latest_canvas', function (data) {
+                  if (annotator.entries.length > 0) {
+                    annotator.clear_all();
+                  }
+                  canvas_data = JSON.parse(data['msg']);
+                  canvas_data.forEach(function (entry) {
+                    annotator.add_entry(entry);
+                  });
+{#                  var scrollingChat = document.querySelector('#scrollingChat');#}
+{#                  scrollingChat.scrollTop = 1000000;#}
+                });
+
+
+              });
+
+            </script>
+        {% elif role == "user" %}
+            <script>
+              $(document).ready(function () {
+                socket.on('coco_image_anno', function (data) {
+                  var canvas = document.getElementById("coco_image_anno");
+                  var ctx = canvas.getContext('2d');
+                  var img = new Image();
+                  img.src = data['coco_url'];
+                  img.onload = function () {
+                    //canvas.width = img.width;
+                    canvas.width = 600;
+                    var scale = canvas.width / img.width;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    Common.drawCanvasData(ctx, data['boxanno'], scale);
+                  };
+                });
+              });
+            </script>
+        {% endif %}
 
       <script>
         $(document).ready(function () {

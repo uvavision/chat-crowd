@@ -7,7 +7,8 @@ var Common = (function() {
   return {
     buildDomElement: buildDomElementFromJson,
     fireEvent: fireEvent,
-    listForEach: listForEach
+    listForEach: listForEach,
+    drawCanvasData: drawCanvasData
   };
 
   // Take in JSON object and build a DOM element out of it
@@ -77,4 +78,32 @@ var Common = (function() {
       callback.call(null, list[i]);
     }
   }
+
+    /// expand with color, background etc.
+  function drawTextBG(ctx, txt, font, x, y) {
+
+      ctx.save();
+      ctx.font = font;
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = 'rgba(255, 165, 0, 0.5)';
+
+      var width = ctx.measureText(txt).width;
+      ctx.fillRect(x, y, width, parseInt(font, 10));
+
+      ctx.fillStyle = '#000';
+      ctx.fillText(txt, x, y);
+
+      ctx.restore();
+  }
+
+    function drawCanvasData(ctx, canvas_data, scale) {
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+        canvas_data.forEach(function (box_anno) {
+            bbox = [box_anno['left'], box_anno['top'], box_anno['width'], box_anno['height']];
+            ctx.rect(bbox[0] * scale, bbox[1] * scale, (bbox[2]) * scale, (bbox[3]) * scale);
+            ctx.stroke();
+            drawTextBG(ctx, box_anno['label'], '15px arial', bbox[0] * scale, bbox[1] * scale);
+        });
+    }
+
 }());

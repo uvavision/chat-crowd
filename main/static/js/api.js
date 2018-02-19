@@ -46,8 +46,8 @@ var Api = (function() {
       // dialogId = role;
     } else {
       payload.userMsg = text
+      Api.setRequestPayload(JSON.stringify(payload));
     }
-
 
     // Built http request
     if(mode == "bot") {
@@ -64,12 +64,12 @@ var Api = (function() {
     }
 
 
-    var params = JSON.stringify(payload);
-    // Stored in variable (publicly visible through Api.getRequestPayload)
-    // to be used throughout the application
-    if (Object.getOwnPropertyNames(payload).length !== 0) {
-      Api.setRequestPayload(params);
-    }
+    // var params = JSON.stringify(payload);
+    // // Stored in variable (publicly visible through Api.getRequestPayload)
+    // // to be used throughout the application
+    // if (Object.getOwnPropertyNames(payload).length !== 0) {
+    //   Api.setRequestPayload(params);
+    // }
 
     // Send request
     http.send(params);

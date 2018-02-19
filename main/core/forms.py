@@ -17,7 +17,7 @@ class MultiCheckboxField(SelectMultipleField):
 class LoginForm(FlaskForm):
     workerid = StringField('worderid', id='workerid', validators=[Required()], default="test123")
     username = StringField('username', id="username", validators=[Required()])
-    task_id = StringField('task_id', id="task_id", validators=[Required()], default="test123")
+    task_id = StringField('task_id', id="task_id", validators=[Required()], default="test12345")
     role = RadioField('role', choices=[('agent', 'agent'), ('user', 'user')],
                       validators=[Required()])
     mode = RadioField('mode', choices=[('bot', 'bot'), ('human', 'chat'),

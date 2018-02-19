@@ -151,6 +151,7 @@ var ConversationPanel = (function() {
     return null;
   }
 
+
   // Constructs new DOM element from a message payload
   function buildMessageDomElements(newPayload, isUser) {
     var textArray = isUser ? newPayload.userMsg : newPayload.systemMsg;
@@ -160,7 +161,45 @@ var ConversationPanel = (function() {
     var messageArray = [];
 
     textArray.forEach(function(currentText) {
+
       if (currentText) {
+        html = $.parseHTML(currentText);
+        var msg_data = html[0].lastChild.data;
+        if (msg_data.startsWith('#CANVAS-')) {
+          canvas_data = JSON.parse(msg_data.slice('#CANVAS-'.length));
+          var canvas = document.createElement('canvas');
+          var scale = 0.8;
+          canvas.setAttribute("width", (600 * scale).toString());
+          canvas.setAttribute("height", (500 * scale).toString());
+          canvas.setAttribute("style", "border:3px solid #d3d3d3;");
+          var ctx = canvas.getContext("2d");
+          ctx.lineWidth = 4;
+          ctx.setLineDash([5, 3]);
+          ctx.strokeStyle = "gray";
+          ctx.strokeRect(0, 0, canvas.width, canvas.height);
+          ctx.setLineDash([]);
+          Common.drawCanvasData(ctx, canvas_data, scale);
+          leafNodes = [
+            {
+              'tagName': 'p',
+              'text': html[0].firstChild.outerHTML
+            },
+            {
+              'tagName': 'img',
+              'attributes': [{'name': 'src', 'value': canvas.toDataURL("image/png")},
+                {'name': 'data', 'value': JSON.stringify(canvas_data)},
+                {'name': 'height', 'value': "400"},
+                {'name': 'width', 'value': "480"},
+              ]
+            }
+          ];
+        } else {
+          var leafNodes = [{
+            // <p>{messageText}</p>
+            'tagName': 'p',
+            'text': currentText.replace(/\n/g, "<br>")
+          }];
+        }
         var messageJson = {
           // <div class='segments'>
           'tagName': 'div',
@@ -173,18 +212,13 @@ var ConversationPanel = (function() {
               // <div class='message-inner'>
               'tagName': 'div',
               'classNames': ['message-inner'],
-              'children': [{
-                // <p>{messageText}</p>
-                'tagName': 'p',
-                'text': currentText.replace(/\n/g, "<br>")
-              }]
+              'children': leafNodes
             }]
           }]
         };
         messageArray.push(Common.buildDomElement(messageJson));
       }
     });
-
     return messageArray;
   }
 
@@ -197,11 +231,11 @@ var ConversationPanel = (function() {
     var scrollingChat = document.querySelector('#scrollingChat');
 
     // Scroll to the latest message sent by the user
-    var scrollEl = scrollingChat.querySelector(settings.selectors.fromUser
+    var scrollElAgent = scrollingChat.querySelector(settings.selectors.fromAgent
             + settings.selectors.latest);
-    if (scrollEl) {
-      scrollingChat.scrollTop = scrollEl.offsetTop;
-    }
+    var scrollElUser = scrollingChat.querySelector(settings.selectors.fromUser
+            + settings.selectors.latest);
+    scrollingChat.scrollTop = Math.max(scrollElUser.offsetTop, scrollElAgent.offsetTop);
   }
 
   // Handles the submission of input
