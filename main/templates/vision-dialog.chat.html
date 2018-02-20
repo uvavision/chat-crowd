@@ -19,7 +19,7 @@
         var use_message_turn = false;
         function set_message_turn(role) {
             var message_turn = document.getElementById('message_turn');
-              if (role == 'agent')
+              if (role == 'painter')
                 message_turn.innerHTML = 'instruction';
               else
                 message_turn.innerHTML = 'canvas';
@@ -303,7 +303,7 @@
     <div id="contentParent" class="responsive-columns-wrapper">
       {% if mode !='test' %}
           <div id="chat-column-holder" class="responsive-column content-column">
-          {% if role == "agent" %}
+          {% if role == "painter" %}
             <div class="bg-header teal lighten-5">
           {%  else %}
             <div class="bg-header blue lighten-5">
@@ -316,12 +316,12 @@
             </div>
           <div class="chat-column">
             <div id="scrollingChat"></div>
-              {% if role == "user" %}
+              {% if role == "instructor" %}
                   <div class="input-field inputOutline">
                       <i class="material-icons prefix">textsms</i>
                       <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
                   </div>
-              {% elif role == "agent" %}
+              {% elif role == "painter" %}
                   <div class="input-field inputOutline">
                       <i class="material-icons prefix">textsms</i>
                       <input id="textInput" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
@@ -337,12 +337,12 @@
 {#            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>#}
           </div>
         </div>
-          {% if role == "agent" %}
+          {% if role == "painter" %}
               <div><p>Drag and draw in the canvas:</p>
                   <div id="bbox_annotator"></div>
               </div>
           {% endif %}
-          {% if role == "user" %}
+          {% if role == "instructor" %}
               <div><p>coco image with annotation:</p>
                   <canvas id="coco_image_anno"></canvas>
               </div>
@@ -371,7 +371,7 @@
 
 {#      <script>document.getElementById("user_utterance").disabled = true;</script>#}
 
-        {% if role == "agent" %}
+        {% if role == "painter" %}
             <script>
               $(document).ready(function () {
                 var canvas = document.createElement('canvas');
@@ -426,7 +426,7 @@
               });
 
             </script>
-        {% elif role == "user" %}
+        {% elif role == "instructor" %}
             <script>
               $(document).ready(function () {
                 socket.on('coco_image_anno', function (data) {

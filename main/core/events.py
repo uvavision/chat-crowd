@@ -17,7 +17,7 @@ from multiprocessing import Queue
 canvas_token = '#CANVAS-'
 def get_message(role, text):
     if role == AGENT:
-        return '<div><b class="blue-text">{0}: </b>{1}</div>'.format(role, text)
+        return '<div><b>{0}: </b>{1}</div>'.format(role, text)
     else:
         return "<b>{0}: </b>{1}".format(role, text)
 
@@ -62,7 +62,7 @@ def joined(message):
         emit('coco_image_anno', {}, room=session[TASK_ID])
 
     for ele in reversed(history):
-        if ele['role'] == 'agent' and ele['msg'].startswith(canvas_token):
+        if ele['role'] == AGENT and ele['msg'].startswith(canvas_token):
             canvas_data = ele['msg'][len(canvas_token):]
             emit('latest_canvas', {MSG: str(canvas_data), ROLE: ele[ROLE]}, room=session[TASK_ID])
             break
@@ -92,7 +92,7 @@ def text(message):
         insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human'})
         emit('message', {MSG: get_message(role, msg), ROLE: role, MODE: mode},
              room=session.get(TASK_ID))
-        if role == 'agent':
+        if role == AGENT:
             if msg.startswith(canvas_token):
                 emit('latest_canvas', {MSG: msg[len(canvas_token):], ROLE: role}, room=session[TASK_ID])
         # sleep(1)

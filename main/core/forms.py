@@ -18,10 +18,9 @@ class LoginForm(FlaskForm):
     workerid = StringField('worderid', id='workerid', validators=[Required()], default="test123")
     username = StringField('username', id="username", validators=[Required()])
     task_id = StringField('task_id', id="task_id", validators=[Required()], default="57870")
-    role = RadioField('role', choices=[('agent', 'agent'), ('user', 'user')],
+    role = RadioField('role', choices=[('instructor', 'instructor'), ('painter', 'painter')],
                       validators=[Required()])
-    mode = RadioField('mode', choices=[('bot', 'bot'), ('human', 'chat'),
-                      ('h+b', 'h+b')], validators=[Required()])
+    mode = RadioField('mode', choices=[('chat', 'chat'), ('qa', 'qa')], validators=[Required()])
     submit = SubmitField('Start', id='login')
 
 
