@@ -315,53 +315,60 @@
   </head>
 
   <body>
+  {% if role == "agent" %}
+    <div class="center-align bg-header teal lighten-5">
+  {%  else %}
+    <div class="center-align bg-header blue lighten-5">
+  {% endif %}
+      Welcome
+      <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
+      <div>
+        Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
+      </div>
+    </div>
     <div id="contentParent" class="responsive-columns-wrapper">
+    <div><p></p></div>
+    <div><p></p></div>
+    <div><p></p></div>
+    <div><p></p></div>
+        {% if role == "agent" %}
+                  <div class="center-align">
+                      <p>Drag and draw in the canvas:</p>
+                      <div id="bbox_annotator"></div>
+                  </div>
+      {% endif %}
+      {% if role == "user" %}
+              <div class="center-align"><p>coco image with annotation:</p>
+                  <canvas id="coco_image_anno"></canvas>
+              </div>
+      {% endif %}
       {% if mode !='test' %}
           <div id="chat-column-holder" class="responsive-column content-column">
-          {% if role == "agent" %}
-            <div class="bg-header teal lighten-5">
-          {%  else %}
-            <div class="bg-header blue lighten-5">
-          {% endif %}
-              Welcome
-              <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
-              <div>
-                Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
-              </div>
-            </div>
-          <div class="chat-column">
-            <div id="scrollingChat"></div>
-              {% if role == "user" %}
-                  <div class="input-field inputOutline">
-                      <i class="material-icons prefix">textsms</i>
-                      <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
-                  </div>
-              {% elif role == "agent" %}
-                  <div class="input-field inputOutline">
-                      <i class="material-icons prefix">textsms</i>
-                      <input id="textInput" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
-                  </div>
-                  <div class="input-field">
-                      <button class="btn red lighten-1" id="submit_canvas" href="#" value="">
-                          submit canvas
-                      </button>
-                  </div>
-              {% endif %}
+              <div class="center-align"><p>Interactive Drawing History</p></div>
+              <div class="chat-column">
+                <div id="scrollingChat"></div>
+                  {% if role == "user" %}
+                      <div class="input-field inputOutline">
+                          <i class="material-icons prefix">textsms</i>
+                          <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
+                      </div>
+                  {% elif role == "agent" %}
+                      <div class="input-field inputOutline">
+                          <i class="material-icons prefix">textsms</i>
+                          <input id="textInput" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
+                      </div>
+                      <div class="input-field">
+                          <button class="btn red lighten-1" id="submit_canvas" href="#" value="">
+                              submit canvas
+                          </button>
+                      </div>
+                  {% endif %}
 
 {#          <div><span>waiting for </span><span id="message_turn">instruction</span><span>...</span></div>#}
 {#            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>#}
           </div>
         </div>
-          {% if role == "agent" %}
-              <div><p>Drag and draw in the canvas:</p>
-                  <div id="bbox_annotator"></div>
-              </div>
-          {% endif %}
-          {% if role == "user" %}
-              <div><p>coco image with annotation:</p>
-                  <canvas id="coco_image_anno"></canvas>
-              </div>
-          {% endif %}
+
       {% endif %}
 
       <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
