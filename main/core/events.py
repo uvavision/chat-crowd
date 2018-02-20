@@ -16,10 +16,11 @@ from multiprocessing import Queue
 
 canvas_token = '#CANVAS-'
 def get_message(role, text):
+    role_name = {AGENT: 'painter', USER: 'instructor'}[role]
     if role == AGENT:
-        return '<div><b>{0}: </b>{1}</div>'.format(role, text)
+        return '<div><b>{0}: </b>{1}</div>'.format(role_name, text)
     else:
-        return "<b>{0}: </b>{1}".format(role, text)
+        return "<b>{0}: </b>{1}".format(role_name, text)
 
 
 @socketio.on('disconnect', namespace='/chat')

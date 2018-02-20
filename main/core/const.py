@@ -1,5 +1,5 @@
-AGENT = "painter"
-USER = "instructor"
+AGENT = "agent"
+USER = "user"
 
 MODE_WOZ_HUMAN = 'chat'
 MODE_WOZ_MTS = 'h+b'

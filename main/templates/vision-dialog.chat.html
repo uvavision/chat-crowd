@@ -1,7 +1,7 @@
 <html>
   <head>
     <base href="/">
-    <title>Chat as {{role}}</title>
+    <title>Chat as {{role_name}}</title>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
     <link href="{{url_for('static', filename='css/materialize-tags.css')}}" rel="stylesheet">
@@ -19,7 +19,7 @@
         var use_message_turn = false;
         function set_message_turn(role) {
             var message_turn = document.getElementById('message_turn');
-              if (role == 'painter')
+              if (role == 'agent')
                 message_turn.innerHTML = 'instruction';
               else
                 message_turn.innerHTML = 'canvas';
@@ -303,25 +303,25 @@
     <div id="contentParent" class="responsive-columns-wrapper">
       {% if mode !='test' %}
           <div id="chat-column-holder" class="responsive-column content-column">
-          {% if role == "painter" %}
+          {% if role == "agent" %}
             <div class="bg-header teal lighten-5">
           {%  else %}
             <div class="bg-header blue lighten-5">
           {% endif %}
               Welcome
-              <b>{{username}}</b>! You will play the role of <b>{{role}}</b> in <b>{{mode}}</b>. <b>Now chat!</b>
+              <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b>. <b>Now chat!</b>
               <div>
                 Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
               </div>
             </div>
           <div class="chat-column">
             <div id="scrollingChat"></div>
-              {% if role == "instructor" %}
+              {% if role == "user" %}
                   <div class="input-field inputOutline">
                       <i class="material-icons prefix">textsms</i>
                       <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
                   </div>
-              {% elif role == "painter" %}
+              {% elif role == "agent" %}
                   <div class="input-field inputOutline">
                       <i class="material-icons prefix">textsms</i>
                       <input id="textInput" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
@@ -337,12 +337,12 @@
 {#            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>#}
           </div>
         </div>
-          {% if role == "painter" %}
+          {% if role == "agent" %}
               <div><p>Drag and draw in the canvas:</p>
                   <div id="bbox_annotator"></div>
               </div>
           {% endif %}
-          {% if role == "instructor" %}
+          {% if role == "user" %}
               <div><p>coco image with annotation:</p>
                   <canvas id="coco_image_anno"></canvas>
               </div>
@@ -371,7 +371,7 @@
 
 {#      <script>document.getElementById("user_utterance").disabled = true;</script>#}
 
-        {% if role == "painter" %}
+        {% if role == "agent" %}
             <script>
               $(document).ready(function () {
                 var canvas = document.createElement('canvas');
@@ -426,7 +426,7 @@
               });
 
             </script>
-        {% elif role == "instructor" %}
+        {% elif role == "user" %}
             <script>
               $(document).ready(function () {
                 socket.on('coco_image_anno', function (data) {

@@ -239,8 +239,9 @@ def chat():
                 insert_chatdata(db_chat, session,
                                 {PRE_DEFINED_TASK: d_pre_task})
         filters = sorted(d_pre_task.items())
+    role_name = {AGENT: 'painter', USER: 'instructor'}[role]
     return render_template(CHAT_HTML, domain=DOMAIN, form=form,
-                           mode=mode, room=room,
+                           mode=mode, room=room, role_name=role_name,
                            role=role, username=username, filters=filters)
 
 
@@ -286,15 +287,16 @@ def test():
             return redirect(url_for('.chat'))
         else:
             return redirect(url_for('.end'))
+    role_name = {AGENT: 'painter', USER: 'instructor'}[role]
     if role == USER:
         form_test = TestFormUser()
-        return render_template(CHAT_HTML, form=form, mode='test',
+        return render_template(CHAT_HTML, form=form, mode='test', role_name=role_name,
                                form_test=form_test, role=role, room=room)
     if role == AGENT:
         form_test = TestFormAgent()
         if 'rcount' in session and 'lst_q_data' in session:
             return render_template(CHAT_HTML, form=form, form_test=form_test,
-                                   username=username, room=room,
+                                   username=username, room=room, role_name=role_name,
                                    role=role, lst_q_data=session['lst_q_data'])
         session['rcount'] = []
         room = session[TASK_ID]
