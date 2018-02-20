@@ -22,9 +22,9 @@
       ]
     }
   ],
-  "domain-name": "rental-apartments",
+  "domain-name": "vision-dialog",
   "domain-db": {
-    "db-name": "rental-apartments",
+    "db-name": "layout",
     "coll_domain_data": "data",
     "coll_chat_data": "chatdata",
     "coll_chat_data_test": "testchatdata",
