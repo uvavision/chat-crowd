@@ -29,6 +29,7 @@
           return message_turn.innerHTML;
         }
         var socket;
+        var contributed = false;
         $(document).ready(function(){
             socket = io('http://' + document.domain + ':' + location.port + '/chat', {
               'forceNew':true,
@@ -56,6 +57,12 @@
                 }
                 if (use_message_turn) {
                   set_message_turn(data.role);
+                }
+                if (!contributed) {
+                  if (data.role == "user")
+                    contributed = true;
+                  if (data.role == "agent" && data.msg.includes("#CANVAS-"))
+                    contributed = true;
                 }
                 Api.sendRequest(data.msg, data.role, data.mode);
 {#              var scrollingChat = document.querySelector('#scrollingChat');#}
@@ -106,7 +113,15 @@
             socket.emit('text', {msg:"#END"});
         }
         function end_task() {
-          window.location.href = "{{ url_for('main.end') }}";
+          if (contributed) {
+            window.location.href = "{{ url_for('main.end') }}";
+          } else {
+            if ("{{role}}" === "agent")
+              alert("please contribute at least one canvas");
+            if ("{{role}}" === "user")
+              alert("please contribute at least one instruction");
+          }
+
             <!--socket.emit('left', {}, function() {-->
                 <!--socket.disconnect();-->
                 <!--window.location.href = "{{ url_for('main.end') }}";-->
@@ -394,11 +409,15 @@
                 var latest_canvas_data;
                 var canvas_submitted = false;
                 $("#submit_canvas").click(function (e) {
+                  if (canvas_submitted) {
+                    alert("you can only submit canvas once");
+                    return;
+                  }
                   if (use_message_turn && get_message_turn() === "instruction") {
                     alert("please wait for the instruction....");
                   } else {
-                    if (annotator.entries.length == 0) {
-                      alert("You haven't drawn anything!");
+                    if (annotator.entries.length == 0 || JSON.stringify(latest_canvas_data) === JSON.stringify(annotator.entries)) {
+                      alert("You didn't draw anything!");
                     } else {
                       var now = new Date(Date.now());
                       var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
@@ -417,9 +436,7 @@
                   canvas_data.forEach(function (entry) {
                     annotator.add_entry(entry);
                   });
-                  latest_canvas_data = annotator.entries;
-{#                  var scrollingChat = document.querySelector('#scrollingChat');#}
-{#                  scrollingChat.scrollTop = 1000000;#}
+                  latest_canvas_data = annotator.entries.slice(0);
                 });
 
 
