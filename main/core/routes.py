@@ -161,6 +161,7 @@ def login():
     session[TASK_ID] = task_id
     form.role.data = role
     form.task_id.data = task_id
+    form.mode.data = mode
     if form.validate_on_submit():
         _init_login_by_form(form)
         workerid = session[WORKER_ID]
