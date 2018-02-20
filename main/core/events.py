@@ -93,8 +93,8 @@ def text(message):
         emit('message', {MSG: get_message(role, msg), ROLE: role, MODE: mode},
              room=session.get(TASK_ID))
         if role == 'agent':
-            assert msg.startswith(canvas_token)
-            emit('latest_canvas', {MSG: msg[len(canvas_token):], ROLE: role}, room=session[TASK_ID])
+            if msg.startswith(canvas_token):
+                emit('latest_canvas', {MSG: msg[len(canvas_token):], ROLE: role}, room=session[TASK_ID])
         # sleep(1)
         # if mode == MODE_BOT:
         #     if CONTEXT_ID in session:

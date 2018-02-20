@@ -74,7 +74,7 @@ def insert_crowd(db_chat, session):
 def get_chatdata(db_chat, session):
     task_id = session.get(TASK_ID)
     history = []
-    for r in db_chat.find({TASK_ID: task_id, MSG: {"$exists": 1}}).sort("$natural", 1):
+    for r in db_chat.find({TASK_ID: task_id, MSG: {"$exists": 1}}).sort("timestamp", 1):
         history.append({ROLE: r[ROLE], MSG: r[MSG], TURN: r[TURN]})
     return history
 
@@ -86,7 +86,7 @@ def get_coco_anno_data(db_coco_anno, session):
     except ValueError as e:
         return None
     annos = []
-    r = db_coco_anno.find({'cocoid': task_id}).sort("$natural", 1)
+    r = db_coco_anno.find({'cocoid': task_id})
     if r.count() == 0:
         return None
     assert r.count() == 1

@@ -16,6 +16,7 @@
     <!-- <script type="text/javascript" src="//code.jquery.com/jquery-1.6.2.min.js"></script> -->
 
     <script type="text/javascript" charset="utf-8">
+        var use_message_turn = false;
         function set_message_turn(role) {
             var message_turn = document.getElementById('message_turn');
               if (role == 'agent')
@@ -44,14 +45,18 @@
               socket.emit('joined', {});
             });
             socket.on('status', function(data) {
-              set_message_turn(data.role);
+              if (use_message_turn) {
+                set_message_turn(data.role);
+              }
               Api.sendRequest(data.msg, data.role, data.mode);
             });
             socket.on('message', function(data) {
                 if (data.role != "{{role}}") {
                   $.titleAlert("📈 New Message from " + data.role + '!', { requireBlur:false, stopOnFocus:true, duration:0, interval:500 });
                 }
-                set_message_turn(data.role);
+                if (use_message_turn) {
+                  set_message_turn(data.role);
+                }
                 Api.sendRequest(data.msg, data.role, data.mode);
 {#              var scrollingChat = document.querySelector('#scrollingChat');#}
 {#              scrollingChat.scrollTop = 1000000;#}
@@ -63,7 +68,7 @@
             $('#textInput').keypress(function(e) {
                   var code = e.keyCode || e.which;
                   if (code == 13) {
-                    if (get_message_turn() === 'canvas') {
+                    if (use_message_turn && get_message_turn() === 'canvas') {
                       alert('please wait for the canvas...');
                     } else {
                       var text = $('#textInput').val();
@@ -317,14 +322,18 @@
                       <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
                   </div>
               {% elif role == "agent" %}
-                  <div>
+                  <div class="input-field inputOutline">
+                      <i class="material-icons prefix">textsms</i>
+                      <input id="textInput" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
+                  </div>
+                  <div class="input-field">
                       <button class="btn red lighten-1" id="submit_canvas" href="#" value="">
                           submit canvas
                       </button>
                   </div>
               {% endif %}
 
-          <div><span>waiting for </span><span id="message_turn">instruction</span><span>...</span></div>
+{#          <div><span>waiting for </span><span id="message_turn">instruction</span><span>...</span></div>#}
 {#            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>#}
           </div>
         </div>
@@ -383,7 +392,7 @@
                   }
                 });
                 $("#submit_canvas").click(function (e) {
-                  if (get_message_turn() === "instruction") {
+                  if (use_message_turn && get_message_turn() === "instruction") {
                     alert("please wait for the instruction....");
                   } else {
                     if (annotator.entries.length == 0) {
