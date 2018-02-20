@@ -79,6 +79,21 @@ def get_chatdata(db_chat, session):
     return history
 
 
+def get_coco_anno_data(db_coco_anno, session):
+    task_id = session.get(TASK_ID)
+    try:
+        task_id = int(task_id)
+    except ValueError as e:
+        return None
+    annos = []
+    r = db_coco_anno.find({'cocoid': task_id}).sort("$natural", 1)
+    if r.count() == 0:
+        return None
+    assert r.count() == 1
+    r0 = r[0]
+    return {"url": r0['url'], "boxes": r0["boxes"], "captions": r0["captions"]}
+
+
 def get_predefined_task(db_chat, session):
     task_id = session.get(TASK_ID)
     for r in db_chat.find({TASK_ID: task_id,

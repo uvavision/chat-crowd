@@ -29,7 +29,9 @@
     "coll_chat_data": "chatdata",
     "coll_chat_data_test": "testchatdata",
     "coll_cf_data": "chatcf",
-    "coll_cf_data_test": "testchatcf"
+    "coll_cf_data_test": "testchatcf",
+    "coll_coco_anno": "coco_anno",
+    "coll_coco_anno_test": "test_coco_anno"
   },
   "app-name": "woz-crowd",
   "description": "woz via crowd sourcing",

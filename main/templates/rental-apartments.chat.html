@@ -420,15 +420,19 @@
                   var canvas = document.getElementById("coco_image_anno");
                   var ctx = canvas.getContext('2d');
                   var img = new Image();
-                  img.src = data['coco_url'];
-                  img.onload = function () {
-                    //canvas.width = img.width;
-                    canvas.width = 600;
-                    var scale = canvas.width / img.width;
-                    canvas.height = img.height * scale;
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    Common.drawCanvasData(ctx, data['boxanno'], scale);
-                  };
+                  if ('url' in data && 'boxes' in data) {
+                      img.src = data['url'];
+                      img.onload = function () {
+                          //canvas.width = img.width;
+                          canvas.width = 600;
+                          var scale = canvas.width / img.width;
+                          canvas.height = img.height * scale;
+                          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                          Common.drawCanvasData(ctx, JSON.parse(data['boxes']), scale);
+                      };
+                  } else {
+                      alert("unable to load image based on taskid");
+                  }
                 });
               });
             </script>

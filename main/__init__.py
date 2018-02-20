@@ -39,6 +39,8 @@ coll_chat = cli[mockdb][config["domain-db"]["coll_chat_data"]]
 coll_chat_test = cli[mockdb][config["domain-db"]["coll_chat_data_test"]]
 coll_crowd = cli[mockdb][config["domain-db"]["coll_cf_data"]]
 coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
+coll_coco_anno = cli[mockdb][config["domain-db"]["coll_coco_anno"]]
+coll_coco_anno_test = cli[mockdb][config["domain-db"]["coll_coco_anno_test"]]
 
 MTS_API_URL = config["mts-api"]["mts-endpoint"]
 MTS_API_CID = config["mts-api"]["mts-api-cid"]
@@ -68,6 +70,11 @@ def get_chat_db(is_debug=True):
     if is_debug:
         return coll_chat_test
     return coll_chat
+
+def get_coco_anno_db(is_debug=True):
+    if is_debug:
+        return coll_coco_anno_test
+    return coll_coco_anno
 
 
 def create_app(debug=False):

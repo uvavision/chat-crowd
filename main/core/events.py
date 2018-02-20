@@ -3,40 +3,16 @@ from flask_socketio import emit, join_room, leave_room
 from eventlet import sleep
 import datetime
 from .. import socketio
-from .. import get_crowd_db, get_chat_db
+from .. import get_crowd_db, get_chat_db, get_coco_anno_db
 from .data import MSG, TURN
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, MODE_BOT,
                     CONTEXT_ID)
-from .data import (insert_crowd, insert_chatdata, get_chatdata)
+from .data import (insert_crowd, insert_chatdata, get_chatdata, get_coco_anno_data)
 from .mts_api import get_mts_cid, get_mts_response
 import time
 import json
 import os
 from multiprocessing import Queue
-
-# with open('')
-# print(os.getcwd())
-cocoidQueue = Queue()
-room2cocoid = dict()
-with open('main/data/instances_tinycoco_all_2014_pretty.json', 'r') as f:
-    tinycoco = json.load(f)
-    cocoid2cocourl = {entry['id']: entry['coco_url'] for entry in tinycoco['images']}
-    labelid2labelname = {category['id']: category['name'] for category in tinycoco['categories']}
-    cocoid2boxanno = {}
-    for anno in tinycoco['annotations']:
-        cocoid = anno['image_id']
-        box = anno['bbox']
-        if cocoid not in cocoid2boxanno:
-            cocoid2boxanno[cocoid] = []
-        cocoid2boxanno[cocoid].append({"left": box[0], "top": box[1], "width": box[2], "height": box[3],
-                                       "label": labelid2labelname[anno['category_id']]})
-    for key in cocoid2cocourl.keys():
-        cocoidQueue.put(key)
-    # print(cocoid2boxanno[list(cocoid2cocourl.keys())[0]])
-    # print(cocoidQueue)
-
-
-# tinycoco = json.loads()
 
 canvas_token = '#CANVAS-'
 def get_message(role, text):
@@ -77,13 +53,14 @@ def joined(message):
         emit('status', {MSG: get_message(ele[ROLE], ele[MSG]),
                         ROLE: ele[ROLE]}, room=session[TASK_ID])
 
-    room = session[TASK_ID]
-    if room not in room2cocoid:
-        room2cocoid[room] = cocoidQueue.get()
-    print(room2cocoid)
-    coco_url = cocoid2cocourl[room2cocoid[room]]
-    boxanno = cocoid2boxanno[room2cocoid[room]]
-    emit('coco_image_anno', {"coco_url": coco_url, "boxanno": boxanno}, room=session[TASK_ID])
+    db_coco_anno = get_coco_anno_db(session[DEBUG])
+    anno = get_coco_anno_data(db_coco_anno, session)
+    if anno:
+        boxes = anno['boxes'].replace("'", '"')
+        emit('coco_image_anno', {"url": anno['url'], "boxes": boxes}, room=session[TASK_ID])
+    else:
+        emit('coco_image_anno', {}, room=session[TASK_ID])
+
     for ele in reversed(history):
         if ele['role'] == 'agent' and ele['msg'].startswith(canvas_token):
             canvas_data = ele['msg'][len(canvas_token):]
