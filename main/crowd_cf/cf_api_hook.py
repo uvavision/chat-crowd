@@ -5,8 +5,8 @@ import crowdflower
 from .. import APP_DATA
 
 API_URL = 'https://api.crowdflower.com/v1/'
-API_KEY = "EryJhbCbXnzucFZGo4ih"   # "EryJhbCbXnzucFZGo4ih"
-job_id = "1004773"  # chat data agent
+API_KEY = "YOUR_API_KEY"
+job_id = "YOUR_JOB_ID"  
 CML = open(os.path.join(APP_DATA, 'templates/confirmation.cml')).read()
 data_json = os.path.join(APP_DATA, 'cf/data.json')
 

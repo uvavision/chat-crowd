@@ -8,11 +8,9 @@ from collections import Counter, defaultdict
 import copy
 import operator
 
-from .const import (USERNAME, WORKER_ID, ROLE, TASK_ID, MSG, FEEDBACK, TURN,
-                    TS, PRE_DEFINED_TASK, TEST, STRING, INTEGER, FLOAT, MODE,
-                    USER, AGENT)
+from .const import (USERNAME, WORKER_ID, USER, AGENT, ROLE, TASK_ID, MSG,
+                    FEEDBACK, TURN, MODE, TS, TEST)
 from .utils import randomword
-from .metadata_processor import metadata_valuetype
 from .. import APP_URL, coll_data, get_crowd_db, DOMAIN
 UPPER_TIMES = 2
 
@@ -109,33 +107,33 @@ def update_crowd(db_crowd, r_id, session):
     db_crowd.update({'_id': r_id}, {'$set': r})
 
 
-def build_query(d_input):
-    lst_single_value, lst_multiple_value = metadata_valuetype()
-    OP_MAP = {'low': '$gte', 'high': '$lte'}
-    d_query = {}
-    for field, data_type in lst_single_value:
-        if field not in d_input or not d_input[field]:
-            continue
-        val = d_input[field]
-        if field.endswith('_low') or field.endswith('_high'):
-            key, _range = field.rsplit('_', 1)
-            d_query[key] = {OP_MAP[_range]: val}
-    for field, data_type in lst_multiple_value:
-        if field not in d_input or not d_input[field]:
-            continue
-        lst_v = d_input[field]
-        lst_v = lst_v if type(lst_v) == list else [lst_v]
-        if len(lst_v) == 0:
-            continue
-        if data_type in [STRING]:
-            d_query[field] = {'$in': lst_v}
-        elif data_type in [INTEGER]:
-            if 0 in lst_v:
-                lst_v += [np.nan, 0.5]  # bed - 5, 6
-            d_query[field] = {'$in': lst_v}
-        elif data_type in [FLOAT]:
-            d_query[field] = {"$gte": d_input[field]}
-    return d_query
+# def build_query(d_input):
+#     lst_single_value, lst_multiple_value = metadata_valuetype()
+#     OP_MAP = {'low': '$gte', 'high': '$lte'}
+#     d_query = {}
+#     for field, data_type in lst_single_value:
+#         if field not in d_input or not d_input[field]:
+#             continue
+#         val = d_input[field]
+#         if field.endswith('_low') or field.endswith('_high'):
+#             key, _range = field.rsplit('_', 1)
+#             d_query[key] = {OP_MAP[_range]: val}
+#     for field, data_type in lst_multiple_value:
+#         if field not in d_input or not d_input[field]:
+#             continue
+#         lst_v = d_input[field]
+#         lst_v = lst_v if type(lst_v) == list else [lst_v]
+#         if len(lst_v) == 0:
+#             continue
+#         if data_type in [STRING]:
+#             d_query[field] = {'$in': lst_v}
+#         elif data_type in [INTEGER]:
+#             if 0 in lst_v:
+#                 lst_v += [np.nan, 0.5]  # bed - 5, 6
+#             d_query[field] = {'$in': lst_v}
+#         elif data_type in [FLOAT]:
+#             d_query[field] = {"$gte": d_input[field]}
+#     return d_query
 
 
 def is_pass_test(db_crowd, worker_id, role):

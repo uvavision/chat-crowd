@@ -1,9 +1,8 @@
 AGENT = "agent"
 USER = "user"
 
-MODE_WOZ_HUMAN = 'chat'
-MODE_WOZ_MTS = 'h+b'
-MODE_BOT = "bot"
+MODE_WOZ_CHAT = 'chat'
+MODE_WOZ_QA = 'qa'
 
 DEBUG = "is_debug"
 TASK_ID = "task_id"
@@ -30,20 +29,7 @@ LTE = "<="
 GTE = ">="
 
 
-NAME = 'Name'
-# http://schema.org/docs/full.html
-DATA_TYPE = 'DataType'
-STRING = 'String'
-TEXT = 'Text'
-BOOLEAN = 'Boolean'
-NUMBER = 'Number'
-FLOAT = 'Float'
-INTEGER = 'Integer'
-HAS_RANGE = 'has_range'
-HAS_VALUES = 'has_values'
-IS_SELECT = 'is_select'
-IS_MULTIPLE = 'is_multiple'
+# NAME = 'Name'
+
 
 MESSAGE = "Thank you for your feedback!"
-
-TOP_N = 20
