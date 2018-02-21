@@ -5,10 +5,8 @@ import datetime
 from .. import socketio
 from .. import get_crowd_db, get_chat_db, get_coco_anno_db
 from .data import MSG, TURN
-from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, MODE_BOT,
-                    CONTEXT_ID)
+from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, CONTEXT_ID)
 from .data import (insert_crowd, insert_chatdata, get_chatdata, get_coco_anno_data)
-from .mts_api import get_mts_cid, get_mts_response
 import time
 import json
 import os
@@ -96,18 +94,6 @@ def text(message):
         if role == AGENT:
             if msg.startswith(canvas_token):
                 emit('latest_canvas', {MSG: msg[len(canvas_token):], ROLE: role}, room=session[TASK_ID])
-        # sleep(1)
-        # if mode == MODE_BOT:
-        #     if CONTEXT_ID in session:
-        #         context_id = session[CONTEXT_ID]
-        #     else:
-        #         context_id = get_mts_cid()
-        #         session[CONTEXT_ID] = context_id
-        #     _, response = get_mts_response(context_id, msg)
-        #     insert_chatdata(db_chat, session, {MSG: response, 'author': 'bot', ROLE: AGENT})
-        #     emit('message', {MSG: get_message('agent', response), ROLE: 'agent', MODE: mode},
-        #          room=session.get(TASK_ID))
-
 
 
 @socketio.on('left', namespace='/chat')
