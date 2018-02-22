@@ -169,6 +169,11 @@
                           <i class="material-icons prefix">textsms</i>
                           <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
                       </div>
+                      <div class="input-field">
+                          <button class="btn red lighten-1" id="finish_drawing" href="#" value="">
+                              finished drawing & submit task
+                          </button>
+                      </div>
                   {% elif role == "agent" %}
                       <div class="input-field inputOutline">
                           <i class="material-icons prefix">textsms</i>
@@ -289,6 +294,13 @@
                   }
                 });
               });
+
+            $("#finish_drawing").click(function (e) {
+              var now = new Date(Date.now());
+              var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+              socket.emit('text', {msg: "#END", t: t});
+              window.location.href = "{{ url_for('main.end') }}";
+            });
             </script>
         {% endif %}
 
