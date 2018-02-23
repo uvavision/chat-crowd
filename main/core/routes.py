@@ -71,7 +71,7 @@ def login():
             return redirect(url_for('.chat'))
         # else:
         #     return redirect(url_for('.test'))
-    return render_template('index.html', form=form, role=session[ROLE],
+    return render_template('index.html', form=form, role=role,
                            mode=mode, room=room, is_debug=is_debug)
 
 
