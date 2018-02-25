@@ -18,6 +18,7 @@
       }
       options.input_method || (options.input_method = "text");
       this.update_pointer = true;
+      this.move = false;
       this.start_from_scratch = true;
       this.image_frame = image_frame;
       this.border_width = options.border_width || 4;
@@ -64,7 +65,7 @@
           if (typeof options.labels === "string") {
             options.labels = [options.labels];
           }
-          this.label_input = $('<input class="label_input" placeholder="Enter object name..." size="50%" name="label" ' + 'type="text" value>');
+          this.label_input = $('<input class="label_input" placeholder="Enter object name... (Press Enter to submit)" size="50%" name="label" ' + 'type="text" value>');
           this.label_box.append(this.label_input);
           this.label_input.autocomplete({
             source: options.labels || [''],
@@ -103,6 +104,7 @@
     start(pageX, pageY) {
       this.start_from_scratch = true;
       this.update_pointer = true;
+      this.move = false;
       this.pointer = this.crop(pageX, pageY);
       this.offset = this.pointer;
       this.refresh();
@@ -113,9 +115,10 @@
       };
     }
 
-    start_with_existing(entry, update_pointer) {
+    start_with_existing(entry, update_pointer, move) {
       this.start_from_scratch = false;
       this.update_pointer = update_pointer;
+      this.move = move;
     //  TODO use existing label
       this.offset = {x: entry.left, y: entry.top};
       this.pointer = {x: entry.left + entry.width, y: entry.top + entry.height};
@@ -131,10 +134,19 @@
     // When a selection updates.
     update_rectangle(pageX, pageY) {
       // console.log("this.update_pointer: " + this.update_pointer);
-      if (this.update_pointer) {
-        this.pointer = this.crop(pageX, pageY);
-      } else {
+      if (this.move) {
+        var width = this.pointer.x - this.offset.x;
+        var height = this.pointer.y - this.offset.y;
         this.offset = this.crop(pageX, pageY);
+        this.offset.y -= height;
+        this.pointer = this.crop(pageX, pageY);
+        this.pointer.x += width;
+      } else {
+        if (this.update_pointer) {
+          this.pointer = this.crop(pageX, pageY);
+        } else {
+          this.offset = this.crop(pageX, pageY);
+        }
       }
       return this.refresh();
     }
@@ -332,7 +344,7 @@
 
     // Add a new entry.
     add_entry(entry) {
-      var annotator, box_element, close_button, se_resize_button, nw_resize_button, text_box;
+      var annotator, box_element, close_button, se_resize_button, nw_resize_button, move_button, text_box;
       this.entries.push(entry);
       box_element = $('<div class="annotated_bounding_box"></div>');
       // box_element.appendTo(this.image_frame).css({
@@ -447,6 +459,29 @@
         "line-height": "16px",
         "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
       });
+
+      move_button = $('<div></div>').appendTo(box_element).css({
+        "position": "absolute",
+        "bottom": "-8px",
+        "left": "-8px",
+        "width": "16px",
+        "height": "0",
+        "padding": "16px 0 0 0",
+        "overflow": "hidden",
+        "color": "#fff",
+        "background-color": "#030",
+        "border": "2px solid #fff",
+        "-moz-border-radius": "18px",
+        "-webkit-border-radius": "18px",
+        "border-radius": "18px",
+        "cursor": "move",
+        "-moz-user-select": "none",
+        "-webkit-user-select": "none",
+        "user-select": "none",
+        "text-align": "center",
+        "pointer-events":"auto"
+      });
+
       text_box = $('<div></div>').appendTo(box_element).css({
         "position": "absolute",
         "top": "2px",
@@ -479,6 +514,15 @@
         return annotator.hit_menuitem = false;
       }));
 
+      move_button.hover((function(e) {
+        if (annotator.status !== 'hold') {
+          return annotator.hit_menuitem = true;
+        }
+      }), (function(e) {
+        return annotator.hit_menuitem = false;
+      }));
+
+
       se_resize_button.mousedown(function(e) {
         // return annotator.hit_menuitem = true;
         if (annotator.status !== "hold") {
@@ -488,7 +532,7 @@
           index = clicked_box.prevAll(".annotated_bounding_box").length;
           clicked_box.detach();
           entry = annotator.entries.splice(index, 1)[0];
-          annotator.selector.start_with_existing(entry, true);
+          annotator.selector.start_with_existing(entry, true, false);
           annotator.status = 'hold';
         }
       });
@@ -501,7 +545,20 @@
           index = clicked_box.prevAll(".annotated_bounding_box").length;
           clicked_box.detach();
           entry = annotator.entries.splice(index, 1)[0];
-          annotator.selector.start_with_existing(entry, false);
+          annotator.selector.start_with_existing(entry, false, false);
+          annotator.status = 'hold';
+        }
+      });
+      move_button.mousedown(function(e) {
+        // return annotator.hit_menuitem = true;
+        if (annotator.status !== "hold") {
+          annotator.hit_menuitem = true;
+          var clicked_box, index;
+          clicked_box = se_resize_button.parent(".annotated_bounding_box");
+          index = clicked_box.prevAll(".annotated_bounding_box").length;
+          clicked_box.detach();
+          entry = annotator.entries.splice(index, 1)[0];
+          annotator.selector.start_with_existing(entry, false, true);
           annotator.status = 'hold';
         }
       });
@@ -517,6 +574,12 @@
           annotator.status = 'free';
         }
       });
+      move_button.mousemove(function (e) {
+        if (annotator.status !== 'hold') {
+          annotator.hit_menuitem = false;
+          annotator.status = 'free';
+        }
+      });
       se_resize_button.mouseup(function (e) {
         if (annotator.status !== 'hold') {
           annotator.hit_menuitem = false;
@@ -524,6 +587,12 @@
         }
       });
       nw_resize_button.mouseup(function (e) {
+        if (annotator.status !== 'hold') {
+          annotator.hit_menuitem = false;
+          annotator.status = 'free';
+        }
+      });
+      move_button.mouseup(function (e) {
         if (annotator.status !== 'hold') {
           annotator.hit_menuitem = false;
           annotator.status = 'free';
