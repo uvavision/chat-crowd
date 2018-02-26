@@ -65,7 +65,7 @@
           if (typeof options.labels === "string") {
             options.labels = [options.labels];
           }
-          this.label_input = $('<input class="label_input" placeholder="Enter object name... (Press Enter to submit)" size="50%" name="label" ' + 'type="text" value>');
+          this.label_input = $('<input class="label_input" placeholder="Type object name... (choose one from suggestions)" size="50%" name="label" ' + 'type="text" value>');
           this.label_box.append(this.label_input);
           this.label_input.autocomplete({
             source: options.labels || [''],
