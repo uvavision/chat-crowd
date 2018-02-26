@@ -15,7 +15,8 @@ from .. import SORTING_KEY, SORTING_ORDER, TEXT4DEBUG
 def _init_login_by_form(form):
     session.clear()
     session[WORKER_ID] = form.workerid.data
-    session[USERNAME] = form.username.data
+    # session[USERNAME] = form.username.data
+    session[USERNAME] = "username_default"
     session[TASK_ID] = form.task_id.data
     session[ROLE] = form.role.data
     session[ROOM] = form.task_id.data

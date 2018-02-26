@@ -34,9 +34,9 @@
           <div class='red-text'>{% for error in form.workerid.errors %}{{ error }}{% endfor %}</div>
           {{ form.workerid() }}
 
-          <label for="username">What name would you like to use for the chat?</label>
-          <div class='red-text'>{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
-          {{ form.username() }}
+{#          <label for="username" >What name would you like to use for the chat?</label>#}
+{#          <div class='red-text'>{% for error in form.username.errors %}{{ error }}{% endfor %}</div>#}
+{#          {{ form.username() }}#}
 
           {% if is_debug %}
           <label for="task_id" >What is your Task ID (debug)?</label>
