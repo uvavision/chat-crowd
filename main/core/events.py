@@ -56,8 +56,12 @@ def joined(message):
     anno = get_coco_anno_data(db_coco_anno, session)
     if anno:
         boxes = anno['boxes'].replace("'", '"')
+        boxes_data = json.loads(boxes)
+        labels = list(set([anno['label'] for anno in boxes_data]))
+        emit('coco_image_labels', {"labels": str(labels).replace("'", '"')}, room=session[TASK_ID])
         emit('coco_image_anno', {"url": anno['url'], "boxes": boxes}, room=session[TASK_ID])
     else:
+        emit('coco_image_labels', {"labels": ""}, room=session[TASK_ID])
         emit('coco_image_anno', {}, room=session[TASK_ID])
 
     for ele in reversed(history):

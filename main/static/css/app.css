@@ -60,10 +60,11 @@ div.padding {
 }
 
 .bg-header {
-  /*background: #f1f1fa;*/
+  background: #f1f1fa;
   color: #667189;
   padding: 0.5rem;
   font-size: 1rem;
+  text-align: center;
 }
 
 #view-change-button {

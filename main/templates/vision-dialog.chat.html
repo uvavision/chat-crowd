@@ -3,7 +3,8 @@
     <base href="/">
     <title>Chat as {{role_name}}</title>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{#    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">#}
     <link href="{{url_for('static', filename='css/materialize-tags.css')}}" rel="stylesheet">
 
     <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
@@ -133,9 +134,9 @@
 
   <body>
   {% if role == "agent" %}
-    <div class="center-align bg-header teal lighten-5">
+    <div class="center-align bg-header teal lighten-5 align-center">
   {%  else %}
-    <div class="center-align bg-header blue lighten-5">
+    <div class="center-align bg-header blue lighten-5 align-center">
   {% endif %}
       Welcome
       <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
@@ -230,7 +231,7 @@
                 ctx.strokeRect(0, 0, canvas.width, canvas.height);
                 var annotator = new BBoxAnnotator({
                   url: canvas.toDataURL("image/png"),
-                  input_method: "text",
+                  input_method: "select",
                   labels: ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "sofa", "pottedplant", "bed", "diningtable", "toilet", "tvmonitor", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush"],
                   onchange: function (annotation) {
                   }
@@ -268,6 +269,9 @@
                   latest_canvas_data = annotator.entries.slice(0);
                 });
 
+                socket.on('coco_image_labels', function (data) {
+                  annotator.update_labels(JSON.parse(data['labels']));
+                });
 
               });
 

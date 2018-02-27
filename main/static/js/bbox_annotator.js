@@ -65,7 +65,7 @@
           if (typeof options.labels === "string") {
             options.labels = [options.labels];
           }
-          this.label_input = $('<input class="label_input" placeholder="Type object name... (choose one from suggestions)" size="50%" name="label" ' + 'type="text" value>');
+	  this.label_input = $('<input class="label_input" placeholder="Type object name... (choose one from suggestions)" size="50%" name="label" ' + 'type="text" value>');
           this.label_box.append(this.label_input);
           this.label_input.autocomplete({
             source: options.labels || [''],
@@ -123,6 +123,7 @@
       this.offset = {x: entry.left, y: entry.top};
       this.pointer = {x: entry.left + entry.width, y: entry.top + entry.height};
       this.label_input.val(entry.label);
+      this.label_input.attr("label", entry.label);
       this.refresh();
       this.selector.show();
       $('body').css('cursor', 'crosshair');
@@ -138,9 +139,10 @@
         var width = this.pointer.x - this.offset.x;
         var height = this.pointer.y - this.offset.y;
         this.offset = this.crop(pageX, pageY);
-        this.offset.y -= height;
+        this.offset.x -= width*0.5;
         this.pointer = this.crop(pageX, pageY);
-        this.pointer.x += width;
+        this.pointer.x += width*0.5;
+        this.pointer.y += height;
       } else {
         if (this.update_pointer) {
           this.pointer = this.crop(pageX, pageY);
@@ -167,7 +169,11 @@
       this.label_box.hide();
       this.selector.hide();
       data = this.rectangle();
-      data.label = $.trim(this.label_input.val().toLowerCase());
+      var label  = this.label_input.val();
+      if (!label) {
+        label = this.label_input.attr('label');
+      }
+      data.label = $.trim(label.toLowerCase());
       if (options.input_method !== 'fixed') {
         this.label_input.val('');
       }
@@ -305,8 +311,8 @@
         switch (annotator.status) {
           case 'input':
             data = selector.finish(options);
-            // if (data.label) {
-            if (options.labels.includes(data.label)) {
+            if (data.label) {
+            // if (options.labels.includes(data.label)) {
               annotator.add_entry(data);
               if (annotator.onchange) {
                 annotator.onchange(annotator.entries);
@@ -361,52 +367,28 @@
       });
       // this.image_frame.prepend(box_element);
       box_element.appendTo(this.image_frame);
-      close_button = $('<div></div>').appendTo(box_element).css({
+      close_button = $('<div class="fa fa-times-circle"></div>').appendTo(box_element).css({
         "position": "absolute",
-        "top": "-8px",
+        "top": "-10px",
         "right": "-8px",
         "width": "16px",
-        "height": "0",
-        "padding": "16px 0 0 0",
+        "height": "16px",
         "overflow": "hidden",
-        "color": "#fff",
-        "background-color": "#030",
-        "border": "2px solid #fff",
-        "-moz-border-radius": "18px",
-        "-webkit-border-radius": "18px",
-        "border-radius": "18px",
+        "color": "#000",
         "cursor": "pointer",
         "-moz-user-select": "none",
-        "-webkit-user-select": "none",
         "user-select": "none",
         "text-align": "center",
         "pointer-events":"auto"
       });
-      $("<div></div>").appendTo(close_button).html('&#215;').css({
-        "display": "block",
-        "text-align": "center",
-        "width": "16px",
-        "position": "absolute",
-        "top": "-2px",
-        "left": "0",
-        "font-size": "16px",
-        "line-height": "16px",
-        "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
-      });
       se_resize_button = $('<div></div>').appendTo(box_element).css({
         "position": "absolute",
         "bottom": "-8px",
-        "right": "-8px",
+        "right": "-5px",
         "width": "16px",
-        "height": "0",
-        "padding": "16px 0 0 0",
+        "height": "16px",
         "overflow": "hidden",
-        "color": "#fff",
-        "background-color": "#030",
-        "border": "2px solid #fff",
-        "-moz-border-radius": "18px",
-        "-webkit-border-radius": "18px",
-        "border-radius": "18px",
+        "color": "#000",
         "cursor": "se-resize",
         "-moz-user-select": "none",
         "-webkit-user-select": "none",
@@ -414,13 +396,14 @@
         "text-align": "center",
         "pointer-events":"auto"
       });
-      $("<div></div>").appendTo(se_resize_button).html('&#8600').css({
+      $("<div></div>").appendTo(se_resize_button).html('&#8690').css({
         "display": "block",
         "text-align": "center",
         "width": "16px",
         "position": "absolute",
-        "top": "-2px",
-        "left": "0",
+        // "top": "-2px",
+        // "left": "0",
+        "font-weight": "bold",
         "font-size": "16px",
         "line-height": "16px",
         "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
@@ -428,18 +411,13 @@
 
       nw_resize_button = $('<div></div>').appendTo(box_element).css({
         "position": "absolute",
-        "top": "-8px",
-        "left": "-8px",
+        "top": "-3px",
+        "left": "-4px",
         "width": "16px",
-        "height": "0",
-        "padding": "16px 0 0 0",
+        "height": "16px",
         "overflow": "hidden",
-        "color": "#fff",
-        "background-color": "#030",
-        "border": "2px solid #fff",
-        "-moz-border-radius": "18px",
-        "-webkit-border-radius": "18px",
-        "border-radius": "18px",
+        "color": "#000",
+         // "background-color": "#ccc",
         "cursor": "nw-resize",
         "-moz-user-select": "none",
         "-webkit-user-select": "none",
@@ -448,35 +426,36 @@
         "pointer-events":"auto"
       });
 
-      $("<div></div>").appendTo(nw_resize_button).html('&#8598').css({
+      $("<div></div>").appendTo(nw_resize_button).html('&#8689').css({
         "display": "block",
         "text-align": "center",
         "width": "16px",
         "position": "absolute",
-        "top": "-2px",
-        "left": "0",
+        // "top": "-2px",
+        // "left": "0",
+        "font-weight": "bold",
         "font-size": "16px",
         "line-height": "16px",
         "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
       });
 
-      move_button = $('<div></div>').appendTo(box_element).css({
+      move_button = $('<div class="fa fa-plus-circle"></div>').appendTo(box_element).css({
         "position": "absolute",
-        "bottom": "-8px",
-        "left": "-8px",
+        "top": "-10px",
+        "left": entry.width*0.5 - 8 + "px",
         "width": "16px",
-        "height": "0",
-        "padding": "16px 0 0 0",
+        "height": "16px",
+        // "padding": "16px 0 0 0",
         "overflow": "hidden",
-        "color": "#fff",
-        "background-color": "#030",
-        "border": "2px solid #fff",
-        "-moz-border-radius": "18px",
-        "-webkit-border-radius": "18px",
-        "border-radius": "18px",
-        "cursor": "move",
+        "color": "#000",
+        // "background-color": "#030",
+        // "border": "2px solid #fff",
+        // "-moz-border-radius": "18px",
+        // "-webkit-border-radius": "18px",
+        // "border-radius": "18px",
+        "cursor": "pointer",
         "-moz-user-select": "none",
-        "-webkit-user-select": "none",
+        // "-webkit-user-select": "none",
         "user-select": "none",
         "text-align": "center",
         "pointer-events":"auto"
@@ -618,6 +597,16 @@
       this.annotator_element.find(".annotated_bounding_box").detach();
       this.entries.splice(0);
       return this.onchange(this.entries);
+    }
+
+    update_labels(labels) {
+      var label_input = this.selector.get_input_element();
+      label_input.empty();
+      for (var i = 0; i < labels.length; i++) {
+        var label = labels[i];
+        label_input.append('<option value="' + label + '">' + label + '</option>');
+      }
+      label_input.attr("size", labels.length);
     }
 
   };
