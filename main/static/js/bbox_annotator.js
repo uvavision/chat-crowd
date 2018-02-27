@@ -173,7 +173,10 @@
       if (!label) {
         label = this.label_input.attr('label');
       }
-      data.label = $.trim(label.toLowerCase());
+      // if the user didn't select one option, label is null
+      if (label) {
+        data.label = $.trim(label.toLowerCase());
+      }
       if (options.input_method !== 'fixed') {
         this.label_input.val('');
       }
@@ -206,7 +209,7 @@
         height: rect.height + 'px'
       });
       return this.label_box.css({
-        left: (rect.left - this.border_width) + 'px',
+        left: (rect.left - this.border_width) + rect.width - this.label_box.width() + 'px',
         top: (rect.top + rect.height + this.border_width) + 'px'
       });
     }
@@ -317,9 +320,10 @@
               if (annotator.onchange) {
                 annotator.onchange(annotator.entries);
               }
-            } else {
-              alert("invalid object: " + data.label);
             }
+            // else {
+            //   alert("invalid object: " + data.label);
+            // }
             annotator.status = 'free';
         }
         return true;
@@ -355,13 +359,13 @@
       box_element = $('<div class="annotated_bounding_box"></div>');
       // box_element.appendTo(this.image_frame).css({
       box_element.css({
-        "border": this.border_width + "px solid rgb(255,30,30)",
+        "border": this.border_width + "px solid rgb( 255, 87, 51)",
         "position": "absolute",
         "top": (entry.top - this.border_width) + "px",
         "left": (entry.left - this.border_width) + "px",
         "width": entry.width + "px",
         "height": entry.height + "px",
-        "color": "rgb(255,30,30)",
+        "color": "rgb( 255, 87, 51)",
         "font-size": "small",
         "pointer-events":"none"
       });
@@ -542,19 +546,19 @@
         }
       });
       se_resize_button.mousemove(function (e) {
-        if (annotator.status !== 'hold') {
+        if (annotator.status !== 'hold' && annotator.status !== 'focused' && annotator.status !== 'input') {
           annotator.hit_menuitem = false;
           annotator.status = 'free';
         }
       });
       nw_resize_button.mousemove(function (e) {
-        if (annotator.status !== 'hold') {
+        if (annotator.status !== 'hold' && annotator.status !== 'focused' && annotator.status !== 'input') {
           annotator.hit_menuitem = false;
           annotator.status = 'free';
         }
       });
       move_button.mousemove(function (e) {
-        if (annotator.status !== 'hold') {
+        if (annotator.status !== 'hold' && annotator.status !== 'focused' && annotator.status !== 'input') {
           annotator.hit_menuitem = false;
           annotator.status = 'free';
         }
