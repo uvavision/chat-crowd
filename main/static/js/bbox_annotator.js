@@ -457,7 +457,7 @@
         // "-moz-border-radius": "18px",
         // "-webkit-border-radius": "18px",
         // "border-radius": "18px",
-        "cursor": "pointer",
+        "cursor": "move",
         "-moz-user-select": "none",
         // "-webkit-user-select": "none",
         "user-select": "none",
