@@ -140,8 +140,8 @@
   {%  else %}
     <div class="center-align bg-header blue lighten-5 align-center">
   {% endif %}
-      Welcome
-      <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
+      Welcome! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
+{#      <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.#}
       <div>
         Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
       </div>
@@ -239,12 +239,7 @@
                   }
                 });
                 var latest_canvas_data;
-                var canvas_submitted = false;
                 $("#submit_canvas").click(function (e) {
-                  if (canvas_submitted) {
-                    alert("you can only submit canvas once");
-                    return;
-                  }
                   if (use_message_turn && get_message_turn() === "instruction") {
                     alert("please wait for the instruction....");
                   } else {
@@ -255,7 +250,9 @@
                       var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                       var text = JSON.stringify(annotator.entries);
                       socket.emit('text', {msg: "#CANVAS-".concat(text), t: t});
-                      canvas_submitted = true;
+                      this.disabled = true;
+                      document.getElementById("textInput").setAttribute("placeholder", "DONE");
+                      document.getElementById("textInput").disabled = true;
                     }
                   }
                 });
@@ -302,10 +299,12 @@
               });
 
             $("#finish_drawing").click(function (e) {
-              var now = new Date(Date.now());
-              var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-              socket.emit('text', {msg: "#END", t: t});
-              window.location.href = "{{ url_for('main.end') }}";
+                var now = new Date(Date.now());
+                var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                socket.emit('text', {msg: "#END", t: t});
+                document.getElementById("textInput").setAttribute("placeholder", "DONE");
+                document.getElementById("textInput").disabled = true;
+                this.disabled = true;
             });
             </script>
         {% endif %}
