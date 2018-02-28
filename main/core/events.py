@@ -48,9 +48,15 @@ def joined(message):
     history = get_chatdata(db_chat, session)
     if history:
         session[TURN] = history[-1][TURN]
-    for ele in history:
-        emit('status', {MSG: get_message(ele[ROLE], ele[MSG]),
-                        ROLE: ele[ROLE]}, room=session[TASK_ID])
+    canvas_indices = [i for i in range(len(history)) if history[i][MSG].startswith(canvas_token)]
+    for i, ele in enumerate(history):
+        # hide canvas if it's not the last one
+        if len(canvas_indices) > 0 and i in canvas_indices[:-1]:
+            emit('status', {MSG: get_message(ele[ROLE], "HIDDEN" + ele[MSG]),
+                            ROLE: ele[ROLE]}, room=session[TASK_ID])
+        else:
+            emit('status', {MSG: get_message(ele[ROLE], ele[MSG]),
+                            ROLE: ele[ROLE]}, room=session[TASK_ID])
 
     db_coco_anno = get_coco_anno_db(session[DEBUG])
     anno = get_coco_anno_data(db_coco_anno, session)

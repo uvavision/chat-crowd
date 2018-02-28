@@ -193,6 +193,12 @@ var ConversationPanel = (function() {
               ]
             }
           ];
+        } else if (msg_data.startsWith('HIDDEN#CANVAS-')) {
+          leafNodes = [
+            {
+              'tagName': 'p',
+              'text': html[0].firstChild.outerHTML + "<i class=\"material-icons\" style=\"font-size:24px\">image</i>"
+            }]
         } else {
           var leafNodes = [{
             // <p>{messageText}</p>
