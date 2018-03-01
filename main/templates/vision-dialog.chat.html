@@ -174,7 +174,7 @@
                       </div>
                       <div class="input-field">
                           <button class="btn red lighten-1" id="finish_drawing" href="#" value="">
-                              finished drawing & submit task
+                              The drawing is complete
                           </button>
                       </div>
                   {% elif role == "agent" %}
@@ -299,12 +299,14 @@
               });
 
             $("#finish_drawing").click(function (e) {
+              if(confirm('You sure the drawing has completed the layout, and there is no need for futher instructions?')) {
                 var now = new Date(Date.now());
                 var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                 socket.emit('text', {msg: "#END", t: t});
                 document.getElementById("textInput").setAttribute("placeholder", "DONE");
                 document.getElementById("textInput").disabled = true;
                 this.disabled = true;
+              }
             });
             </script>
         {% endif %}
