@@ -30,7 +30,7 @@
 
         <form method="POST">
           {{ form.hidden_tag() }}
-          <label for="workerid">What is your ID for your registered account (e.g., CrowdFlower)?</label>
+          <label for="workerid">What is your Contributor ID?</label>
           <div class='red-text'>{% for error in form.workerid.errors %}{{ error }}{% endfor %}</div>
           {{ form.workerid() }}
 
@@ -75,7 +75,7 @@
             </label>
           </div>
           <div>
-          {{ form.submit(class_="btn btn-primary") }}
+              <h5>Press {{ form.submit(class_="btn btn-primary") }} to enter the main chat page</h5>
           </div>
         </form>
       </div>
