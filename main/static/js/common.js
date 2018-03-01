@@ -97,7 +97,8 @@ var Common = (function() {
   }
 
     function drawCanvasData(ctx, canvas_data, scale) {
-        ctx.strokeStyle = 'rgba(255, 0, 0, 0.2)';
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.lineWidth = 3;
         canvas_data.forEach(function (box_anno) {
             bbox = [box_anno['left'], box_anno['top'], box_anno['width'], box_anno['height']];
             ctx.rect(bbox[0] * scale, bbox[1] * scale, (bbox[2]) * scale, (bbox[3]) * scale);
