@@ -354,6 +354,8 @@
 
     // Add a new entry.
     add_entry(entry) {
+      entry.width = Math.max(20, entry.width);
+      entry.height = Math.max(30, entry.height);
       var annotator, box_element, close_button, se_resize_button, nw_resize_button, move_button, text_box;
       this.entries.push(entry);
       box_element = $('<div class="annotated_bounding_box"></div>');
@@ -363,8 +365,8 @@
         "position": "absolute",
         "top": (entry.top - this.border_width) + "px",
         "left": (entry.left - this.border_width) + "px",
-        "width": entry.width + "px",
-        "height": entry.height + "px",
+        "width": Math.max(20, entry.width) + "px",
+        "height": Math.max(30, entry.height) + "px",
         "color": "rgb( 255, 87, 51)",
         "font-size": "small",
         "pointer-events":"none"
@@ -374,7 +376,7 @@
       close_button = $('<div class="fa fa-times-circle"></div>').appendTo(box_element).css({
         "position": "absolute",
         "top": "-10px",
-        "right": "-8px",
+        "right": "-12px",
         "width": "16px",
         "height": "16px",
         "overflow": "hidden",
@@ -446,7 +448,7 @@
       move_button = $('<div class="fa fa-plus-circle" name="move_button"></div>').appendTo(box_element).css({
         "position": "absolute",
         "top": "-10px",
-        "left": entry.width*0.5 - 10 + "px",
+        "left": entry.width*0.5 - 12 + "px",
         "width": "16px",
         "height": "16px",
         // "padding": "16px 0 0 0",
@@ -481,11 +483,11 @@
       //   return close_button.hide();
       // }));
 
-      [close_button, move_button, nw_resize_button, se_resize_button].forEach(function (t) {
+      [move_button, nw_resize_button, se_resize_button].forEach(function (t) {
         t.hover((function (e) {
           t.fadeTo(1, 1);
         }), (function (e) {
-          t.fadeTo(1, 0);
+          t.fadeTo(1, 0.06);
         }));
       });
 
@@ -543,7 +545,7 @@
         annotator.entries.splice(index, 1);
         return annotator.onchange(annotator.entries);
       });
-      [close_button, move_button, nw_resize_button, se_resize_button].forEach(function (t) { t.fadeTo(1,0); });
+      [move_button, nw_resize_button, se_resize_button].forEach(function (t) { t.fadeTo(800,0.06); });
       // return close_button.hide();
     }
 
