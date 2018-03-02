@@ -354,8 +354,10 @@
 
     // Add a new entry.
     add_entry(entry) {
-      entry.width = Math.max(20, entry.width);
-      entry.height = Math.max(30, entry.height);
+      if (entry.width * entry.height < 600) {
+      	entry.width = Math.max(20, entry.width);
+      	entry.height = Math.max(30, entry.height);
+      }
       var annotator, box_element, close_button, se_resize_button, nw_resize_button, move_button, text_box;
       this.entries.push(entry);
       box_element = $('<div class="annotated_bounding_box"></div>');
@@ -365,8 +367,8 @@
         "position": "absolute",
         "top": (entry.top - this.border_width) + "px",
         "left": (entry.left - this.border_width) + "px",
-        "width": Math.max(20, entry.width) + "px",
-        "height": Math.max(30, entry.height) + "px",
+        "width": entry.width + "px",
+        "height": entry.height + "px",
         "color": "rgb( 255, 87, 51)",
         "font-size": "small",
         "pointer-events":"none"
