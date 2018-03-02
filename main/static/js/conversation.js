@@ -239,9 +239,10 @@ var ConversationPanel = (function() {
     // Scroll to the latest message sent by the user
     var scrollElAgent = scrollingChat.querySelector(settings.selectors.fromAgent
             + settings.selectors.latest);
-    var scrollElUser = scrollingChat.querySelector(settings.selectors.fromUser
-            + settings.selectors.latest);
-    scrollingChat.scrollTop = Math.max(scrollElUser.offsetTop, scrollElAgent.offsetTop);
+    //var scrollElUser = scrollingChat.querySelector(settings.selectors.fromUser
+            //+ settings.selectors.latest);
+    //scrollingChat.scrollTop = Math.max(scrollElUser.offsetTop, scrollElAgent.offsetTop);
+    scrollingChat.scrollTop = 100000;
   }
 
   // Handles the submission of input
