@@ -64,7 +64,8 @@
                 if (!contributed) {
                   if (data.role == "user")
                     contributed = true;
-                  if (data.role == "agent" && data.msg.includes("#CANVAS-"))
+                  //if (data.role == "agent" && data.msg.includes("#CANVAS-"))
+                  if (data.role == "agent")
                     contributed = true;
                 }
                 Api.sendRequest(data.msg, data.role, data.mode);
