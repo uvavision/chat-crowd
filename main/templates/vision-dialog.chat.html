@@ -154,12 +154,14 @@
     <div><p></p></div>
         {% if role == "agent" %}
                   <div class="center-align">
-                      <p>Drag and draw in the canvas:</p>
+	              </br>
+	              </br>
+                      <div>Drag your mouse and draw in the canvas below</div>
+	              </br>
+                      <div id="bbox_annotator"></div>
 		      <div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>
 		      <div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>
 		      <div class="fa "> &#8689 &#8690: Resize </div>
-	              <p></p>
-                      <div id="bbox_annotator"></div>
                   </div>
       {% endif %}
       {% if role == "user" %}
