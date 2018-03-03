@@ -11,6 +11,7 @@ import time
 import json
 import os
 from multiprocessing import Queue
+import requests
 
 canvas_token = '#CANVAS-'
 def get_message(role, text):
@@ -116,3 +117,12 @@ def left(message):
     leave_room(task_id)
     insert_chatdata(db_chat, session, {MSG: '#END'})
     emit('status', {MSG: role + ' has left the conversation.'}, room=task_id)
+
+@socketio.on('end_task', namespace='/chat')
+def complete(message):
+    task_id = session.get(TASK_ID)
+    role = session.get(ROLE)
+    r = requests.post("http://deep.cs.virginia.edu:5003/finished", data={'task_id': task_id, 'role': role, "msg": message[MSG]})
+    # print(r.status_code, r.reason)
+
+
