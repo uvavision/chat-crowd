@@ -118,6 +118,16 @@
         }
         function end_task() {
           if (contributed) {
+            if ("{{role}}" === "agent") {
+              socket.emit('end_task', {msg: "layout_not_completed"});
+            }
+            if ("{{role}}" === "user") {
+              if ($("#finish_drawing").is(':disabled')) {
+                socket.emit('end_task', {msg: "layout_completed"});
+              } else {
+                socket.emit('end_task', {msg: "layout_not_completed"});
+              }
+            }
             window.location.href = "{{ url_for('main.end') }}";
           } else {
             if ("{{role}}" === "agent")
