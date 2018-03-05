@@ -14,11 +14,11 @@
         <h5>Welcome!</h5>
         <div>
         {% if role == 'user' %}
-          <h2> Click <a href="{{url_for('static', filename='instruction_user.html')}}" target="_blank">here</a> for instructions.</h2>
+          <h2> Click <a href="{{url_for('static', filename='instructor-instruction/instructorinstruction.html')}}" target="_blank">here</a> for instructions.</h2>
         {% elif role == 'agent' and mode == 'mts' %}
             <h2> Click <a href="{{url_for('static', filename='instruction_mts.html')}}" target="_blank">here</a> for instructions.</h2>
         {% elif role == 'agent' %}
-          <h2> Click <a href="{{url_for('static', filename='instruction_agent.html')}}" target="_blank">here</a> for instructions.</h2>
+          <h2> Click <a href="{{url_for('static', filename='painter-instruction/painterinstruction.html')}}" target="_blank">here</a> for instructions.</h2>
         {% endif %}
       </div>
         <blockquote>
@@ -35,9 +35,9 @@
           <div class='red-text'>{% for error in form.workerid.errors %}{{ error }}{% endfor %}</div>
           {{ form.workerid() }}
 
-{#          <label for="username" >What name would you like to use for the chat?</label>#}
-{#          <div class='red-text'>{% for error in form.username.errors %}{{ error }}{% endfor %}</div>#}
-{#          {{ form.username() }}#}
+          <label for="username" >What is your CrowdFlower Username?</label>
+          <div class='red-text'>{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
+          {{ form.username() }}
 
           {% if is_debug %}
           <label for="task_id" >What is your Task ID (debug)?</label>

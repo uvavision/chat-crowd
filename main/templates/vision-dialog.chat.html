@@ -122,7 +122,7 @@
               socket.emit('end_task', {msg: "layout_not_completed"});
             }
             if ("{{role}}" === "user") {
-              if ($("#finish_drawing").is(':disabled')) {
+              if ($("#textInput").is(':disabled')) {
                 socket.emit('end_task', {msg: "layout_completed"});
               } else {
                 socket.emit('end_task', {msg: "layout_not_completed"});
@@ -151,8 +151,8 @@
   {%  else %}
     <div class="center-align bg-header blue lighten-5 align-center">
   {% endif %}
-      Welcome! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
-{#      <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.#}
+      <!--Welcome! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.-->
+      Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
       <div>
         Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
       </div>
@@ -312,6 +312,11 @@
                   } else {
                       alert("unable to load image based on taskid");
                   }
+                });
+                // finish_drawing button is enabled only when there are some drawings
+                document.getElementById("finish_drawing").disabled = true;
+                socket.on('latest_canvas', function (data) {
+                  document.getElementById("finish_drawing").disabled = false;
                 });
               });
 

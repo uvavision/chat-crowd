@@ -73,7 +73,7 @@ def get_chatdata(db_chat, session):
     task_id = session.get(TASK_ID)
     history = []
     for r in db_chat.find({TASK_ID: task_id, MSG: {"$exists": 1}}).sort("timestamp", 1):
-        history.append({ROLE: r[ROLE], MSG: r[MSG], TURN: r[TURN]})
+        history.append({ROLE: r[ROLE], MSG: r[MSG], TURN: r[TURN], USERNAME: r[USERNAME]})
     return history
 
 

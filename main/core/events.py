@@ -14,12 +14,12 @@ from multiprocessing import Queue
 import requests
 
 canvas_token = '#CANVAS-'
-def get_message(role, text):
+def get_message(role, text, username):
     role_name = {AGENT: 'painter', USER: 'instructor'}[role]
     if role == AGENT:
-        return '<div><b>{0}: </b>{1}</div>'.format(role_name, text)
+        return '<div><b>{0}({2}): </b>{1}</div>'.format(role_name, text, username)
     else:
-        return "<b>{0}: </b>{1}".format(role_name, text)
+        return "<b>{0}({2}): </b>{1}".format(role_name, text, username)
 
 
 @socketio.on('disconnect', namespace='/chat')
@@ -53,10 +53,10 @@ def joined(message):
     for i, ele in enumerate(history):
         # hide canvas if it's not the last one
         if len(canvas_indices) > 0 and i in canvas_indices[:-1]:
-            emit('status', {MSG: get_message(ele[ROLE], "HIDDEN" + ele[MSG]),
+            emit('status', {MSG: get_message(ele[ROLE], "HIDDEN" + ele[MSG], ele[USERNAME]),
                             ROLE: ele[ROLE]}, room=session[TASK_ID])
         else:
-            emit('status', {MSG: get_message(ele[ROLE], ele[MSG]),
+            emit('status', {MSG: get_message(ele[ROLE], ele[MSG], ele[USERNAME]),
                             ROLE: ele[ROLE]}, room=session[TASK_ID])
 
     db_coco_anno = get_coco_anno_db(session[DEBUG])
@@ -100,7 +100,7 @@ def text(message):
     if msg:
         session[TURN] = session.get(TURN) + 1
         insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human'})
-        emit('message', {MSG: get_message(role, msg), ROLE: role, MODE: mode},
+        emit('message', {MSG: get_message(role, msg, session.get(USERNAME)), ROLE: role, MODE: mode},
              room=session.get(TASK_ID))
         if role == AGENT:
             if msg.startswith(canvas_token):
