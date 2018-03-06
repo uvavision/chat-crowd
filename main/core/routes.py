@@ -98,11 +98,58 @@ def chat():
                            mode=mode, room=room, role_name=role_name,
                            role=role, username=username)
 
-
-# @main.route('/test', methods=['GET', 'POST'])
-# def test():
-#     '''design the test'''
-#     return render_template('index.html')
+'''
+@main.route('/test', methods=['GET', 'POST'])
+def test():
+    task_id = session.get(TASK_ID)
+    room = task_id
+    role = session.get(ROLE)
+    username = session.get(USERNAME)
+    is_pass = session.get(PASS)
+    if request.method == 'POST':
+        if role == AGENT:
+            form_test = TestFormAgent()
+            answer_data = [form_test.r1.data, form_test.r2.data, form_test.r3.data] # answers submitted
+            # compare answer_data with GOLD_ANSWERS
+            # if pass threshold:
+                # is_pass = True
+        if role == USER:
+            form_test = TestFormUser()
+            answer_data = [form_test.r1.data, form_test.r2.data, form_test.r3.data] # answers submitted
+            # compare answer_data with GOLD_ANSWERS
+            # if pass threshold:
+                # is_pass = True
+        if is_pass:
+            session[PASS] = is_pass
+            is_debug = session[DEBUG]
+            db_crowd = get_crowd_db(is_debug)
+            session[TURN] = 0
+            _id = None
+            for r in db_crowd.find({TASK_ID: task_id}):
+                _id = r['_id']
+                break
+            if not _id:
+                _id = insert_crowd(db_crowd, session)
+            else:
+                update_crowd(db_crowd, _id, session)
+            return redirect(url_for('.chat'))
+        else:
+            return redirect(url_for('.end'))
+    if role == USER:
+        form_test = TestFormUser()
+        return render_template(TEST_HTML, mode='test', domain=DOMAIN,
+                               form_test=form_test, role=role, room=room)
+    if role == AGENT:
+        form_test = TestFormAgent()
+        if 'rcount' in session and 'lst_q_data' in session:
+            return render_template(TEST_HTML, form_test=form_test,
+                                   username=username, room=room,
+                                   role=role)
+        return render_template(TEST_HTML, form_test=form_test,
+                               mode='test', username=username, room=room,
+                               role=role, lst_q_data=lst_q_data, domain=DOMAIN)
+    return render_template('index.html')
+'''
 
 
 @main.route('/end', methods=['GET', 'POST'])
