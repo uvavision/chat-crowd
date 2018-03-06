@@ -103,6 +103,7 @@ def text(message):
         emit('message', {MSG: get_message(role, msg, session.get(USERNAME)), ROLE: role, MODE: mode},
              room=session.get(TASK_ID))
         if role == AGENT:
+            # if there are other painters in the same room, update their canvases too?
             if msg.startswith(canvas_token):
                 emit('latest_canvas', {MSG: msg[len(canvas_token):], ROLE: role}, room=session[TASK_ID])
 
