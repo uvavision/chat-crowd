@@ -3,6 +3,14 @@
         <base href="/">
         <title>Thank you!</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+        <script>
+          // disable back button
+          history.pushState(null, null, document.URL);
+          window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+          });
+          // window.onbeforeunload = function() { return "Your work will be lost."; };
+        </script>
     </head>
     <body>
       <div class="container">
