@@ -1,0 +1,60 @@
+<html>
+<head>
+    <title>Chat Login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <link href="{{url_for('static', filename='css/materialize.css')}}" type="text/css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="//cdn.transifex.com/live.js"></script>
+</head>
+<body>
+<div class="container">
+    <h4>Welcome {{ workerid }} ({{ username }} )! </h4>
+    <h5>Please answer the following test questsion. </h5>
+    <h5>Note that to do the task you need to pass at least 90% of the test questions.</h5>
+    <!--<blockquote>-->
+        <!--Please answer the following test questions.<br>-->
+        <!--When you pass the test, you will be allowed to go to the task.<br>-->
+        <!--{#Please fill the form below and click "start" to move on to the next step.<br>#}-->
+        <!--{# If this is your first time doing this task, there will be a simple quiz. <br>#}-->
+        <!--{# Once you pass the quiz, you will enter the conversation. <br>#}-->
+    <!--</blockquote>-->
+
+
+    <form method="POST">
+        <blockquote>
+        {{ form_test.hidden_tag() }}
+        {{ form_test.r1.label }}
+            <img src={{form_test.r1data[0]}}> </img>
+            <ul>
+            {% for subfield in form_test.r1 %}
+                <li>{{ subfield }} {{ subfield.label }}</li>
+                <li><img src={{form_test.r1data[loop.index]}}</img></li>
+            {% endfor %}
+                </ul>
+            </blockquote>
+
+        <blockquote>
+        {{ form_test.r2.label }}
+        {{ form_test.r2 }}
+
+        </blockquote>
+
+        <!--{% for field in form_test %}-->
+                <!--{{ field.label }}-->
+        <!--{% endfor %}-->
+        <h5>{{ form_test.submit(class_="btn btn-primary") }}</h5>
+    </form>
+
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>if (!window.jQuery) {
+  document.write('<script src="bin/jquery-2.1.1.min.js"><\/script>');
+}
+</script>
+<script src={{url_for('static', filename='js/materialize.js' )}}></script>
+
+</html>
