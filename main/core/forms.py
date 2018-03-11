@@ -5,7 +5,6 @@ from wtforms.fields import (StringField, SubmitField, RadioField, SelectField,
 from wtforms.validators import Required
 from wtforms import widgets
 from .const import MODE_WOZ_CHAT, MODE_WOZ_QA
-from .. import LST_META
 
 
 class MultiCheckboxField(SelectMultipleField):

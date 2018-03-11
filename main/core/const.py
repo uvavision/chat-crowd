@@ -1,8 +1,8 @@
 AGENT = "agent"
 USER = "user"
 
-MODE_WOZ_CHAT = 'chat'
-MODE_WOZ_QA = 'qa'
+MODE_WOZ_CHAT = '2D shapes'
+MODE_WOZ_QA = 'real images'
 
 DEBUG = "is_debug"
 TASK_ID = "task_id"

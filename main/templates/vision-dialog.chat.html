@@ -152,7 +152,7 @@
     <div class="center-align bg-header blue lighten-5 align-center">
   {% endif %}
       <!--Welcome! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.-->
-      Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
+      Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b>.
       <div>
         Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
       </div>
@@ -168,7 +168,11 @@
 	              </br>
                       <div>Drag your mouse and draw in the canvas below</div>
 	              </br>
+                {% if mode == '2D shapes' %}
                       <div id="bbox_annotator"></div>
+                {%  else %}
+                  <div>ADD the tool for coco images</div>
+                {% endif %}
 		      <div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>
 		      <!--<div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>-->
 		      <div class="fa "> &#8689 &#8690: Resize </div>
@@ -214,8 +218,8 @@
       {% endif %}
 
       <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="{{ url_for('static', filename='js/bbox_annotator.js') }}"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+      <script src="{{ url_for('static', filename='js/bbox_annotator.js') }}"></script>
 
       <script src="{{url_for('static', filename='js/common.js')}}"></script>
       <script src="{{url_for('static', filename='js/api.js')}}"></script>

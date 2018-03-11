@@ -26,7 +26,7 @@ http://localhost:8080/login?role=agent&task_id=test123&workerid=test123&username
 
 
 config = None
-with open(path.join(APP_DOMAIN, 'app-activate.json'), 'r') as f:
+with open(path.join(APP_DOMAIN, 'app-2Dshape.json'), 'r') as f:
     config = json.load(f)
 uri_local = 'mongodb://localhost'
 uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +
@@ -42,22 +42,13 @@ coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
 coll_coco_anno = cli[mockdb][config["domain-db"]["coll_coco_anno"]]
 coll_coco_anno_test = cli[mockdb][config["domain-db"]["coll_coco_anno_test"]]
 
-MTS_API_URL = config["mts-api"]["mts-endpoint"]
-MTS_API_CID = config["mts-api"]["mts-api-cid"]
-MTS_API_CONTEXT = config["mts-api"]["mts-api-context"]
-MTS_API_MESSAGE = config["mts-api"]["mts-api-message"]
-MTS_API_KB = config["mts-api"]["mts-api-kb"]
 
 APP_URL = config["app-url"]
 DOMAIN = config["domain-name"]
-LST_META = config["metadata"]["LST_META"]
-SORTING_KEY = config["metadata"]["SORTING_KEY"]
-SORTING_ORDER = config["metadata"]["SORTING_ORDER"]
-TEXT4DEBUG = config["metadata"]["TEXT4DEBUG"]
+
 socketio = SocketIO()
 
-CHAT_HTML = DOMAIN + '.chat.html'
-VIZ_DATA_JSON = APP_STATIC + '/data/data-kbv.json'
+CHAT_HTML = 'vision-dialog.chat.html'
 
 
 def get_crowd_db(is_debug=True):
@@ -70,6 +61,7 @@ def get_chat_db(is_debug=True):
     if is_debug:
         return coll_chat_test
     return coll_chat
+
 
 def get_coco_anno_db(is_debug=True):
     if is_debug:
@@ -84,8 +76,6 @@ def create_app(debug=False):
     app.config['SECRET_KEY'] = 'RAWEFAwW#$Q$'
 
     from .core import main as main_blueprint
-    # from .viz.kbv import gen_visual_data
-    # gen_visual_data()
     app.register_blueprint(main_blueprint)
     socketio.init_app(app)
     return app

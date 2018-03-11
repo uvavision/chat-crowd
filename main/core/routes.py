@@ -9,7 +9,6 @@ from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, MTS, DS, TURN, PRE_DEFINED_TASK, MSG,
                     USER, AGENT, MESSAGE, MODE_WOZ_CHAT)
-from .. import SORTING_KEY, SORTING_ORDER, TEXT4DEBUG
 
 
 def _init_login_by_form(form):
