@@ -170,7 +170,7 @@
 	              </br>
                       <div id="bbox_annotator"></div>
 		      <div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>
-		      <div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>
+		      <!--<div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>-->
 		      <div class="fa "> &#8689 &#8690: Resize </div>
                   </div>
       {% endif %}
@@ -251,7 +251,6 @@
                 var annotator = new BBoxAnnotator({
                   url: canvas.toDataURL("image/png"),
                   input_method: "select",
-                  labels: ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck", "boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "sofa", "pottedplant", "bed", "diningtable", "toilet", "tvmonitor", "laptop", "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush"],
                   onchange: function (annotation) {
                   }
                 });
@@ -285,10 +284,6 @@
                   latest_canvas_data = annotator.entries.slice(0);
                 });
 
-                socket.on('coco_image_labels', function (data) {
-                  annotator.update_labels(JSON.parse(data['labels']));
-                });
-
               });
 
             </script>
@@ -311,7 +306,7 @@
                           var scale = canvas.width / img.width;
                           canvas.height = img.height * scale;
                           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                          Common.drawCanvasData(ctx, JSON.parse(data['boxes']), scale);
+//                          Common.drawCanvasData(ctx, JSON.parse(data['boxes']), scale);
                       };
                   } else {
                       alert("unable to load image based on taskid");

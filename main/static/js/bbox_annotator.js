@@ -24,8 +24,9 @@
       this.border_width = options.border_width || 4;
       this.selector = $('<div class="bbox_selector"></div>');
       this.selector.css({
-        "border": this.border_width + "px dotted rgb(255,30,30)",
-        "position": "absolute"
+        // "border": this.border_width + "px solid rgb(255,30,30)",
+        "position": "absolute",
+        "background-color": "rgba(100,100,100, 0.5)"
       });
       this.image_frame.append(this.selector);
       this.selector.css({
@@ -33,12 +34,17 @@
       });
       this.selector.hide();
       this.create_label_box(options);
+      this.shape = '';
+    }
+
+    set_shape(shape) {
+      this.shape = shape;
     }
 
     // Initializes a label input box.
     create_label_box(options) {
       var i, label, len, ref;
-      options.labels || (options.labels = ["object"]);
+      options.labels || (options.labels = ["red", "green", "blue"]);
       this.label_box = $('<div class="label_box"></div>');
       this.label_box.css({
         "position": "absolute"
@@ -49,9 +55,9 @@
           if (typeof options.labels === "string") {
             options.labels = [options.labels];
           }
-          this.label_input = $('<select class="label_input" name="label"></select>');
+          this.label_input = $('<select class="label_input" name="label" size="3"></select>');
           this.label_box.append(this.label_input);
-          this.label_input.append($('<option value>choose an item</option>'));
+          // this.label_input.append($('<option value>choose an item</option>'));
           ref = options.labels;
           for (i = 0, len = ref.length; i < len; i++) {
             label = ref[i];
@@ -115,10 +121,12 @@
       };
     }
 
-    start_with_existing(entry, update_pointer, move) {
+    start_with_existing(entry, update_pointer, move, pageX, pageY) {
       this.start_from_scratch = false;
       this.update_pointer = update_pointer;
       this.move = move;
+      this.mouse_start = this.crop(pageX, pageY);
+      this.shape = entry.shape;
     //  TODO use existing label
       this.offset = {x: entry.left, y: entry.top};
       this.pointer = {x: entry.left + entry.width, y: entry.top + entry.height};
@@ -126,7 +134,7 @@
       this.label_input.attr("label", entry.label);
       this.refresh();
       this.selector.show();
-      $('body').css('cursor', 'crosshair');
+      // $('body').css('cursor', 'crosshair');
       return document.onselectstart = function() {
         return false;
       };
@@ -136,13 +144,14 @@
     update_rectangle(pageX, pageY) {
       // console.log("this.update_pointer: " + this.update_pointer);
       if (this.move) {
-        var width = this.pointer.x - this.offset.x;
-        var height = this.pointer.y - this.offset.y;
-        this.offset = this.crop(pageX, pageY);
-        this.offset.x -= width*0.5;
-        this.pointer = this.crop(pageX, pageY);
-        this.pointer.x += width*0.5;
-        this.pointer.y += height;
+        var mouse = this.crop(pageX, pageY);
+        var offsetx = mouse.x - this.mouse_start.x;
+        var offsety = mouse.y - this.mouse_start.y;
+        this.mouse_start = mouse;
+        this.offset.x += offsetx;
+        this.offset.y += offsety;
+        this.pointer.x += offsetx;
+        this.pointer.y += offsety;
       } else {
         if (this.update_pointer) {
           this.pointer = this.crop(pageX, pageY);
@@ -169,6 +178,7 @@
       this.label_box.hide();
       this.selector.hide();
       data = this.rectangle();
+      data.shape = this.shape;
       var label  = this.label_input.val();
       if (!label) {
         label = this.label_input.attr('label');
@@ -190,24 +200,76 @@
       y1 = Math.min(this.offset.y, this.pointer.y);
       x2 = Math.max(this.offset.x, this.pointer.x);
       y2 = Math.max(this.offset.y, this.pointer.y);
+      if (!this.update_pointer) {
+        var size = Math.max(x2 - x1 + 1, y2 - y1 + 1);
+        return rect = {
+        left: x2 - size,
+        top: y2 - size,
+        width: size,
+        height: size
+      };
+      } else {
       return rect = {
         left: x1,
         top: y1,
-        width: x2 - x1 + 1,
-        height: y2 - y1 + 1
+        width: Math.max(x2 - x1 + 1, y2 - y1 + 1),
+        height: Math.max(y2 - y1 + 1, x2 - x1 + 1)
       };
+      }
+
+
+      // return rect = {
+      //   left: x1,
+      //   top: y1,
+      //   width: Math.max(x2 - x1 + 1, y2 - y1 + 1),
+      //   height: Math.max(y2 - y1 + 1, x2 - x1 + 1)
+      // };
     }
 
     // Update css of the box.
     refresh() {
+
       var rect;
       rect = this.rectangle();
-      this.selector.css({
-        left: (rect.left - this.border_width) + 'px',
-        top: (rect.top - this.border_width) + 'px',
-        width: rect.width + 'px',
-        height: rect.height + 'px'
-      });
+      if (this.shape === "rectangle") {
+        this.selector.css({
+          "border-radius": "",
+          left: (rect.left - this.border_width) + 'px',
+          top: (rect.top - this.border_width) + 'px',
+          width: rect.width + 'px',
+          height: rect.height + 'px',
+          "border-left": '0px',
+          "border-right": '0px',
+          "border-bottom": '0px',
+          "background-color": "rgba(100,100,100, 0.5)"
+        });
+      } else if (this.shape === "circle") {
+        this.selector.css({
+          "border-radius": "50%",
+          left: (rect.left - this.border_width) + 'px',
+          top: (rect.top - this.border_width) + 'px',
+          width: rect.width + 'px',
+          height: rect.height + 'px',
+          "border-left": '0px',
+          "border-right": '0px',
+          "border-bottom": '0px',
+          "background-color": "rgba(100,100,100, 0.5)"
+        });
+      } else if (this.shape === "triangle") {
+        this.selector.css({
+          "border-radius": "",
+          left: (rect.left - this.border_width) + 'px',
+          top: (rect.top - this.border_width) + 'px',
+          "border-left": (rect.width / 2) + 'px solid transparent',
+          "border-right": (rect.width / 2) + 'px solid transparent',
+          "border-bottom": (rect.height) + "px solid rgba(100,100,100, 0.5)",
+          "background-color": "",
+          width: '0px',
+          height: '0px'
+        });
+      } else {
+        alert("unkown shape");
+      }
       return this.label_box.css({
         left: (rect.left - this.border_width) + rect.width - this.label_box.width() + 'px',
         top: (rect.top + rect.height + this.border_width) + 'px'
@@ -228,10 +290,30 @@
       this.status = 'free';
       var annotator, image_element;
       annotator = this;
-      this.annotator_element = $(options.id || "#bbox_annotator");
+      this.top_element = $("#bbox_annotator");
+      var shapes = $('<div></div>');
+      this.rectangle = $('<button id="input_rectangle" value="rectangle"> rectangle &#9632;</button>');
+      this.circle = $('<button id="input_circle" value="circle"> circle &#9679;</button>');
+      this.triangle = $('<button id="input_triangle" value="triangle"> triangle &#9650;</button>');
+      this.input_shape = '';
+
+      // [rectangle, circle, triangle].forEach(function (t) {
+      //   this.annotator_element.append(t);
+      // });
+      shapes.append(this.rectangle);
+      shapes.append(this.circle);
+      shapes.append(this.triangle);
+
+      this.top_element.append(shapes);
+
+      this.annotator_element = $('<div id="bbox_annotator_inner" style="display:inline-block"></div>');
+      this.top_element.append(this.annotator_element);
+      // this.element.append(this.annotator_element);
       this.border_width = options.border_width || 4;
-      this.show_label = options.show_label || (options.input_method !== "fixed");
+      // this.show_label = options.show_label || (options.input_method !== "fixed");
+      this.show_label = false;
       this.image_frame = $('<div class="image_frame"></div>');
+
       this.annotator_element.append(this.image_frame);
       image_element = new Image();
       image_element.src = options.url;
@@ -241,7 +323,7 @@
         annotator.annotator_element.css({
           "width": (options.width + annotator.border_width * 2) + 'px',
           "height": (options.height + annotator.border_width * 2) + 'px',
-          "cursor": "crosshair"
+          // "cursor": "crosshair"
         });
         annotator.image_frame.css({
           "background-image": "url('" + image_element.src + "')",
@@ -265,8 +347,25 @@
       this.hit_menuitem = false;
       annotator = this;
       annotator.status = 'free';
+      [annotator.rectangle, annotator.circle, annotator.triangle].forEach(function (t) {
+        t.click(function () {
+          if (annotator.input_shape !== $( this ).val()) {
+            annotator.input_shape = $(this).val();
+            selector.set_shape(annotator.input_shape);
+            annotator.annotator_element.css('cursor', 'crosshair');
+
+            ['rectangle', 'circle', 'triangle'].forEach(function (t2) {
+              if (t2 === annotator.input_shape) {
+                $('#input_' + t2).css('font-weight', '900');
+              } else {
+                $('#input_' + t2).css('font-weight', '');
+              }
+            });
+          }
+        });
+      });
       this.annotator_element.mousedown(function(e) {
-        if (!annotator.hit_menuitem) {
+        if (!annotator.hit_menuitem && annotator.input_shape) {
           switch (annotator.status) {
             case 'free':
             case 'input':
@@ -286,6 +385,9 @@
         switch (annotator.status) {
           case 'hold':
             selector.update_rectangle(e.pageX, e.pageY);
+            if (selector.move) {
+              annotator.annotator_element.css('cursor', 'move');
+            }
         }
         return true;
       });
@@ -315,11 +417,16 @@
           case 'input':
             data = selector.finish(options);
             if (data.label) {
+              console.log("selected " + data.label);
             // if (options.labels.includes(data.label)) {
               annotator.add_entry(data);
               if (annotator.onchange) {
                 annotator.onchange(annotator.entries);
               }
+              annotator.annotator_element.css('cursor', 'default');
+              $('#input_' + annotator.input_shape).css('font-weight', '');
+              annotator.input_shape = '';
+
             }
             // else {
             //   alert("invalid object: " + data.label);
@@ -355,30 +462,92 @@
     // Add a new entry.
     add_entry(entry) {
       if (entry.width * entry.height < 600) {
-      	entry.width = Math.max(20, entry.width);
+      	entry.width = Math.max(30, entry.width);
       	entry.height = Math.max(30, entry.height);
       }
-      var annotator, box_element, close_button, se_resize_button, nw_resize_button, move_button, text_box;
+      var annotator, box_element, close_button, se_resize_button, nw_resize_button, text_box;
       this.entries.push(entry);
       box_element = $('<div class="annotated_bounding_box"></div>');
       // box_element.appendTo(this.image_frame).css({
-      box_element.css({
-        "border": this.border_width + "px solid rgb( 255, 87, 51)",
-        "position": "absolute",
-        "top": (entry.top - this.border_width) + "px",
-        "left": (entry.left - this.border_width) + "px",
-        "width": entry.width + "px",
-        "height": entry.height + "px",
-        "color": "rgb( 255, 87, 51)",
-        "font-size": "small",
-        "pointer-events":"none"
+      if (entry.shape == "rectangle") {
+        box_element.css({
+          "background-color": entry.label,
+          "opacity": 0.8,
+          // "border": this.border_width + "px solid " + entry.label,
+          "position": "absolute",
+          "top": (entry.top - this.border_width) + "px",
+          "left": (entry.left - this.border_width) + "px",
+          "width": entry.width + "px",
+          "height": entry.height + "px",
+          // "color": entry.label,
+          "font-size": "small",
+          "pointer-events": "auto"
+        });
+      } else if (entry.shape == "circle") {
+          box_element.css({
+          "background-color": entry.label,
+          "opacity": 0.8,
+          "border-radius": "50%",
+          "border": this.border_width + "px solid " + entry.label,
+          "position": "absolute",
+          "top": (entry.top - this.border_width) + "px",
+          "left": (entry.left - this.border_width) + "px",
+          "width": entry.width + "px",
+          "height": entry.height + "px",
+          // "color": entry.label,
+          "font-size": "small",
+          "pointer-events": "auto"
+        });
+      } else if (entry.shape === 'triangle') {
+         box_element.css({
+          "background-color": "",
+          "opacity": 0.8,
+          "position": "absolute",
+          "left": (entry.left - this.border_width) + 'px',
+          "top": (entry.top - this.border_width) + "px",
+          "border-left": entry.width/2 + "px solid transparent",
+          "border-right": entry.width/2 + 'px solid transparent',
+          "border-bottom": (entry.height) + "px solid " + entry.label,
+          "width": "0px",
+          "height": "0px",
+          // "color": entry.label,
+          "font-size": "small",
+          "pointer-events": "auto"
+        });
+      } else {
+        alert("known shape");
+      }
+      box_element.hover((function(e) {
+        if (!annotator.input_shape) {
+          $(this).css("cursor", "move");
+        }
+      }), (function(e) {
+        $(this).css("cursor", "default");
+      }));
+
+      box_element.mousedown(function (e) {
+        if (!annotator.input_shape && annotator.status !== "hold" && !annotator.hit_menuitem) {
+          annotator.hit_menuitem = true;
+          var clicked_box = $(this);
+          var index = clicked_box.prevAll(".annotated_bounding_box").length;
+          clicked_box.detach();
+          entry = annotator.entries.splice(index, 1)[0];
+          annotator.selector.start_with_existing(entry, false, true, e.pageX, e.pageY);
+          annotator.input_shape = entry.shape;
+          annotator.status = 'hold';
+        }
       });
+
       // this.image_frame.prepend(box_element);
       box_element.appendTo(this.image_frame);
+      var button_left = entry.width - 7;
+      if (this.input_shape == 'triangle') {
+        button_left = entry.width * 0.5 - 7;
+      }
       close_button = $('<div class="fa fa-times-circle"></div>').appendTo(box_element).css({
         "position": "absolute",
         "top": "-10px",
-        "right": "-12px",
+        "left": button_left + "px",
         "width": "16px",
         "height": "16px",
         "overflow": "hidden",
@@ -391,8 +560,8 @@
       });
       se_resize_button = $('<div name="se_resize_button"></div>').appendTo(box_element).css({
         "position": "absolute",
-        "bottom": "-8px",
-        "right": "-5px",
+        "top": entry.height + "px",
+        "left": button_left + "px",
         "width": "16px",
         "height": "16px",
         "overflow": "hidden",
@@ -417,10 +586,13 @@
         "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
       });
 
+      if (this.input_shape !== 'triangle') {
+        button_left = 7;
+      }
       nw_resize_button = $('<div name="nw_resize_button"></div>').appendTo(box_element).css({
         "position": "absolute",
         "top": "-3px",
-        "left": "-4px",
+        "left": -button_left + "px",
         "width": "16px",
         "height": "16px",
         "overflow": "hidden",
@@ -447,28 +619,6 @@
         "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
       });
 
-      move_button = $('<div class="fa fa-plus-circle" name="move_button"></div>').appendTo(box_element).css({
-        "position": "absolute",
-        "top": "-10px",
-        "left": entry.width*0.5 - 12 + "px",
-        "width": "16px",
-        "height": "16px",
-        // "padding": "16px 0 0 0",
-        "overflow": "hidden",
-        "color": "#000",
-        // "background-color": "#030",
-        // "border": "2px solid #fff",
-        // "-moz-border-radius": "18px",
-        // "-webkit-border-radius": "18px",
-        // "border-radius": "18px",
-        "cursor": "move",
-        "-moz-user-select": "none",
-        // "-webkit-user-select": "none",
-        "user-select": "none",
-        "text-align": "center",
-        "pointer-events":"auto"
-      });
-
       text_box = $('<div></div>').appendTo(box_element).css({
         "position": "absolute",
         "top": "2px",
@@ -480,12 +630,12 @@
       }
       annotator = this;
       // box_element.hover((function(e) {
-      //   return close_button.show();
+      //   console.log("mouse hover in");
       // }), (function(e) {
-      //   return close_button.hide();
+      //   console.log("mouse hover out");
       // }));
 
-      [move_button, nw_resize_button, se_resize_button].forEach(function (t) {
+      [close_button, nw_resize_button, se_resize_button].forEach(function (t) {
         t.hover((function (e) {
           t.fadeTo(1, 1);
         }), (function (e) {
@@ -493,7 +643,7 @@
         }));
       });
 
-      [move_button, nw_resize_button, se_resize_button].forEach(function (t) {
+      [nw_resize_button, se_resize_button].forEach(function (t) {
         t.hover((function(e) {
           if (annotator.status !== 'hold') {
             return annotator.hit_menuitem = true;
@@ -522,12 +672,14 @@
             index = clicked_box.prevAll(".annotated_bounding_box").length;
             clicked_box.detach();
             entry = annotator.entries.splice(index, 1)[0];
-            if (t.attr("name") === "se_resize_button")
-              annotator.selector.start_with_existing(entry, true, false);
-            if (t.attr("name") === "nw_resize_button")
-              annotator.selector.start_with_existing(entry, false, false);
-            if (t.attr("name") === "move_button")
-              annotator.selector.start_with_existing(entry, false, true);
+            if (t.attr("name") === "se_resize_button") {
+              annotator.selector.start_with_existing(entry, true, false, e.pageX, e.pageY);
+              annotator.input_shape = entry.shape;
+            }
+            if (t.attr("name") === "nw_resize_button") {
+              annotator.selector.start_with_existing(entry, false, false, e.pageX, e.pageY);
+              annotator.input_shape = entry.shape;
+            }
             annotator.status = 'hold';
           }
         });
@@ -547,7 +699,7 @@
         annotator.entries.splice(index, 1);
         return annotator.onchange(annotator.entries);
       });
-      [move_button, nw_resize_button, se_resize_button].forEach(function (t) { t.fadeTo(800,0.06); });
+      [close_button, nw_resize_button, se_resize_button].forEach(function (t) { t.fadeTo(800,0.06); });
       // return close_button.hide();
     }
 
