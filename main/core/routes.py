@@ -8,7 +8,7 @@ from .forms import (LoginForm, FeedbackForm, TestFormAgent, TestFormUser)
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG,
-                    USER, AGENT, MESSAGE, MODE_WOZ_CHAT, TASKS, SEP)
+                    USER, AGENT, MESSAGE, MODE_2D, TASKS, SEP)
 
 
 def _init_login_by_form(form):
@@ -17,7 +17,10 @@ def _init_login_by_form(form):
     session[USERNAME] = form.username.data
     # session[USERNAME] = "username_default"
     session[TASK_ID] = form.task_id.data
-    session[TASKS] = form.tasks.data
+    if not form.tasks.data:
+        session[TASKS] = [form.task_id.data]
+    else:
+        session[TASKS] = form.tasks.data
     session[ROLE] = form.role.data
     session[ROOM] = form.task_id.data
     session[MODE] = form.mode.data
@@ -28,7 +31,7 @@ def _init_login_by_form(form):
 def index():
     form = LoginForm()
     is_debug = True
-    session[MODE] = MODE_WOZ_CHAT
+    session[MODE] = MODE_2D
     if form.validate_on_submit():
         _init_login_by_form(form)
         session[DEBUG] = is_debug

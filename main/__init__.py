@@ -26,7 +26,7 @@ http://localhost:8080/login?role=agent&task_id=test123&workerid=test123&username
 
 
 config = None
-with open(path.join(APP_DOMAIN, 'app-2Dshape.json'), 'r') as f:
+with open(path.join(APP_DOMAIN, 'app-{}.json'.format(os.environ['domain']))) as f:
     config = json.load(f)
 uri_local = 'mongodb://localhost'
 uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +

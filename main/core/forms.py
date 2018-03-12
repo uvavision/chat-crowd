@@ -4,7 +4,6 @@ from wtforms.fields import (StringField, SubmitField, RadioField, SelectField,
                             TextAreaField)
 from wtforms.validators import Required
 from wtforms import widgets
-from .const import MODE_WOZ_CHAT, MODE_WOZ_QA
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -19,8 +18,8 @@ class LoginForm(FlaskForm):
     tasks = StringField('tasks', id="tasks", validators=None, default="57870")
     role = RadioField('role', choices=[('user', 'instructor'), ('agent', 'painter')],
                       validators=[Required()])
-    mode = RadioField('mode', choices=[(MODE_WOZ_CHAT, MODE_WOZ_CHAT),
-                      (MODE_WOZ_QA, MODE_WOZ_QA)], validators=[Required()])
+    mode = RadioField('mode', choices=[('2Dshape', "2D shapes"),
+                      ("COCO", "Real Images")], validators=[Required()])
     submit = SubmitField('Start', id='login')
 
 
