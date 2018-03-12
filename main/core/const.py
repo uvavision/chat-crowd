@@ -1,5 +1,5 @@
-AGENT = "agent"
-USER = "user"
+AGENT = "agent" # painter
+USER = "user"  # instructor
 
 MODE_COCO = 'COCO'
 MODE_2D = '2Dshape'

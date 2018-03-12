@@ -7,11 +7,12 @@ import datetime
 from collections import Counter, defaultdict
 import copy
 import operator
+import json
 
 from .const import (USERNAME, WORKER_ID, USER, AGENT, ROLE, TASK_ID, MSG,
-                    FEEDBACK, TURN, MODE, TS, TEST)
+                    FEEDBACK, TURN, MODE, TS, TEST, MODE_2D, MODE_COCO)
 from .utils import randomword
-from .. import APP_URL, coll_data, get_crowd_db, DOMAIN
+from .. import APP_URL, TEST_DATA_FILE, coll_data, get_crowd_db, DOMAIN
 
 
 fmt = '%Y-%m-%d %H:%M:%S.%f'
@@ -20,6 +21,11 @@ fmt = '%Y-%m-%d %H:%M:%S.%f'
 def get_ts_str():
     # tzinfo = None
     return str(datetime.datetime.now())
+
+
+def load_test_data(test_data_file=TEST_DATA_FILE):
+    with open(test_data_file) as file_:
+        return json.load(file_)
 
 
 def get_role_other(role_other, task_id, is_debug):
