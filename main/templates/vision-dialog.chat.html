@@ -113,9 +113,12 @@
             });
 
         });
-        function left_room() {
-            socket.emit('text', {msg:"#END"});
-        }
+
+        function next_task() {
+            // socket.emit('end_task', {msg:"#END"});
+            window.location.href = "{{ url_for('main.chat') }}";
+        };
+
         function end_task() {
           if (contributed) {
             if ("{{role}}" === "agent") {
@@ -153,9 +156,13 @@
   {% endif %}
       <!--Welcome! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.-->
       Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b>.
-      <div>
-        Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
-      </div>
+      {% if tasks == [] %}
+        <div>
+          Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
+        </div>
+      {% else %}
+        Click <button class="btn red lighten-1" id="end_task" href="#" onclick="next_task();" value="">Next Task</button> when the task is completed.
+      {% endif %}
     </div>
     <div id="contentParent" class="responsive-columns-wrapper">
     <div><p></p></div>

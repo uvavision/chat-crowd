@@ -7,8 +7,8 @@ from .. import get_chat_db, get_crowd_db
 from .forms import (LoginForm, FeedbackForm, TestFormAgent, TestFormUser)
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
-                    ROOM, PASS, MODE, MTS, DS, TURN, PRE_DEFINED_TASK, MSG,
-                    USER, AGENT, MESSAGE, MODE_WOZ_CHAT)
+                    ROOM, PASS, MODE, TURN, MSG,
+                    USER, AGENT, MESSAGE, MODE_WOZ_CHAT, TASKS, SEP)
 
 
 def _init_login_by_form(form):
@@ -17,6 +17,7 @@ def _init_login_by_form(form):
     session[USERNAME] = form.username.data
     # session[USERNAME] = "username_default"
     session[TASK_ID] = form.task_id.data
+    session[TASKS] = form.tasks.data
     session[ROLE] = form.role.data
     session[ROOM] = form.task_id.data
     session[MODE] = form.mode.data
@@ -31,12 +32,13 @@ def index():
     if form.validate_on_submit():
         _init_login_by_form(form)
         session[DEBUG] = is_debug
-        session[PASS] = False # if test mode available, set FALSE as default
+        session[PASS] = False  # if test mode available, set FALSE as default
         db_crowd = get_crowd_db(is_debug)
         workerid = session[WORKER_ID]
         role = session[ROLE]
         # if workerid and role:
         #     session[PASS] = is_pass_test(db_crowd, workerid, role)
+        session[PASS] = True
         if session[PASS]:
             return redirect(url_for('.chat'))
         else:
@@ -48,7 +50,14 @@ def index():
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    task_id = request.args.get(TASK_ID)
+    session[TASKS] = []
+    if TASKS in request.args:
+        tasks = request.args.get(TASKS).split(SEP)
+        session[TASKS] = tasks
+        task_id = tasks[0]
+    else:
+        task_id = request.args.get(TASK_ID)
+        tasks = [task_id]
     room = task_id
     role = request.args.get(ROLE)
     is_debug = request.args.get('debug')
@@ -57,16 +66,18 @@ def login():
     session[TASK_ID] = task_id
     form.role.data = role
     form.task_id.data = task_id
+    form.tasks.data = tasks
     form.mode.data = mode
     if form.validate_on_submit():
         _init_login_by_form(form)
         workerid = session[WORKER_ID]
-        session[PASS] = False # if test mode available, set FALSE as default
+        session[PASS] = False  # if test mode available, set FALSE as default
         session[DEBUG] = bool(int(is_debug)) if is_debug else False
         session[MODE] = mode if mode else MODE_WOZ_HUMAN
         if workerid and role:
             db_crowd = get_crowd_db(is_debug)
             session[PASS] = is_pass_test(db_crowd, workerid, session[ROLE])
+        session[PASS] = True
         if session[PASS]:
             return redirect(url_for('.chat'))
         else:
@@ -77,10 +88,9 @@ def login():
 
 @main.route('/chat')
 def chat():
-    """Chat session. The user's username and task_id must be stored in
-    the session."""
     username = session.get(USERNAME, '')
-    task_id = session.get(TASK_ID, '')
+    task_id = session[TASKS].pop()
+    session[TASK_ID] = task_id
     role = session.get(ROLE, '')
     is_pass = session.get(PASS)
     mode = session.get(MODE)
@@ -93,7 +103,7 @@ def chat():
         return redirect(url_for('.index'))
     db_chat = get_chat_db(session[DEBUG])
     role_name = {AGENT: 'painter', USER: 'instructor'}[role]
-    return render_template(CHAT_HTML, domain=DOMAIN,
+    return render_template(CHAT_HTML, domain=DOMAIN, tasks=session[TASKS],
                            mode=mode, room=room, role_name=role_name,
                            role=role, username=username)
 
@@ -143,8 +153,8 @@ def test():
     if role == USER:
         form_test = TestFormUser()
         return render_template('test.html', mode='test', domain=DOMAIN,
-                               form_test=form_test, role=role, room=room, workerid = session[WORKER_ID],
-                               username = session.get(USERNAME))
+                               form_test=form_test, role=role, room=room, workerid=session[WORKER_ID],
+                               username=session.get(USERNAME))
     if role == AGENT:
         form_test = TestFormAgent()
         # if 'rcount' in session and 'lst_q_data' in session:
@@ -172,7 +182,6 @@ def end():
         code = str(int(task_id[::-1]) + 12345)
     if request.method == 'POST':
         # form = FeedbackForm()
-        print(form.feedback.data)
         feedback = form.feedback.data
         db_crowd = get_crowd_db(is_debug)
         session['feedback'] = feedback

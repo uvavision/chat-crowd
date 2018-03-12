@@ -16,6 +16,7 @@ class LoginForm(FlaskForm):
     workerid = StringField('worderid', id='workerid', validators=[Required()], render_kw={"placeholder": "Enter your contributor ID..."})
     username = StringField('username', id="username", validators=[Required()], render_kw={"placeholder": "Enter your CrowdFlower UserName..."})
     task_id = StringField('task_id', id="task_id", validators=[Required()], default="57870")
+    tasks = StringField('tasks', id="tasks", validators=None, default="57870")
     role = RadioField('role', choices=[('user', 'instructor'), ('agent', 'painter')],
                       validators=[Required()])
     mode = RadioField('mode', choices=[(MODE_WOZ_CHAT, MODE_WOZ_CHAT),
