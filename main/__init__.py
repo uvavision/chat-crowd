@@ -39,8 +39,8 @@ coll_chat = cli[mockdb][config["domain-db"]["coll_chat_data"]]
 coll_chat_test = cli[mockdb][config["domain-db"]["coll_chat_data_test"]]
 coll_crowd = cli[mockdb][config["domain-db"]["coll_cf_data"]]
 coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
-coll_coco_anno = cli[mockdb][config["domain-db"]["coll_coco_anno"]]
-coll_coco_anno_test = cli[mockdb][config["domain-db"]["coll_coco_anno_test"]]
+coll_anno = cli[mockdb][config["domain-db"]["coll_coco_anno"]]
+coll_anno_test = cli[mockdb][config["domain-db"]["coll_coco_anno_test"]]
 
 
 APP_URL = config["app-url"]
@@ -64,10 +64,10 @@ def get_chat_db(is_debug=True):
     return coll_chat
 
 
-def get_coco_anno_db(is_debug=True):
+def get_anno_db(is_debug=True):
     if is_debug:
-        return coll_coco_anno_test
-    return coll_coco_anno
+        return coll_anno_test
+    return coll_anno
 
 
 def create_app(debug=False):

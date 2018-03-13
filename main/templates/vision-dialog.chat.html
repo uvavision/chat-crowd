@@ -180,9 +180,9 @@
                 {%  else %}
                   <div>ADD the tool for coco images</div>
                 {% endif %}
-		      <div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>
+		      <!--<div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>-->
 		      <!--<div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>-->
-		      <div class="fa "> &#8689 &#8690: Resize </div>
+		      <!--<div class="fa "> &#8689 &#8690: Resize </div>-->
                   </div>
       {% endif %}
       {% if role == "user" %}
@@ -252,7 +252,7 @@
                 var canvas = document.createElement('canvas');
                 canvas.setAttribute("id", "scratch");
                 canvas.setAttribute("width", "600");
-                canvas.setAttribute("height", "500");
+                canvas.setAttribute("height", "600");
                 canvas.setAttribute("style", "border:3px solid #d3d3d3;");
                 var ctx = canvas.getContext("2d");
                 ctx.lineWidth = 4;
@@ -302,9 +302,12 @@
             <script>
               $(document).ready(function () {
                 socket.on('coco_image_anno', function (data) {
+                  if (!data['boxes']) {
+                    alert("cannot find annotation entry based on provided task id")
+                  }
                   var canvas = document.getElementById("coco_image_anno");
                   canvas.setAttribute("data", data['boxes']);
-                  var labels = []
+                  var labels = [];
                   JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label']); });
                   document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
                   var ctx = canvas.getContext('2d');
@@ -323,6 +326,33 @@
                       alert("unable to load image based on taskid");
                   }
                 });
+
+                socket.on('2d_shape_anno', function (data) {
+                  console.log('2d_shape_anno');
+                  if (!data['boxes']) {
+                    alert("cannot find annotation entry based on provided task id")
+                  }
+                  var canvas = document.getElementById("coco_image_anno");
+                  canvas.setAttribute("data", data['boxes']);
+                  var labels = [];
+                  JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label']); });
+                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
+                  var scale = 1.0;
+                  var canvas_width = 600;
+                  var canvas_height = 600;
+                  canvas.setAttribute("width", (canvas_width * scale).toString());
+                  canvas.setAttribute("height", (canvas_height * scale).toString());
+                  canvas.setAttribute("style", "border:3px solid #d3d3d3;");
+                  var ctx = canvas.getContext("2d");
+//                  ctx.lineWidth = 4;
+//                  ctx.setLineDash([5, 3]);
+//                  ctx.strokeStyle = "gray";
+//                  ctx.strokeRect(0, 0, canvas.width, canvas.height);
+//                  ctx.setLineDash([]);
+                  Common.drawCanvasData(ctx, JSON.parse(data['boxes']), scale);
+
+                });
+
                 // finish_drawing button is enabled only when there are some drawings
 //                document.getElementById("finish_drawing").disabled = true;
                 socket.on('latest_canvas', function (data) {

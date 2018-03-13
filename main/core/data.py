@@ -8,6 +8,7 @@ from collections import Counter, defaultdict
 import copy
 import operator
 import json
+import os
 
 from .const import (USERNAME, WORKER_ID, USER, AGENT, ROLE, TASK_ID, MSG,
                     FEEDBACK, TURN, MODE, TS, TEST, MODE_2D, MODE_COCO)
@@ -77,19 +78,22 @@ def get_chatdata(db_chat, session):
     return history
 
 
-def get_coco_anno_data(db_coco_anno, session):
+def get_anno_data(db_anno, session):
     task_id = session.get(TASK_ID)
     try:
         task_id = int(task_id)
     except ValueError as e:
         return None
     annos = []
-    r = db_coco_anno.find({'cocoid': task_id})
+    r = db_anno.find({'cocoid': task_id})
     if r.count() == 0:
         return None
     assert r.count() == 1
     r0 = r[0]
-    return {"url": r0['url'], "boxes": r0["boxes"], "captions": r0["captions"]}
+    if os.environ['domain'] == '2Dshape':
+        return {"boxes": r0["boxes"]}
+    else: # COCO
+        return {"url": r0['url'], "boxes": r0["boxes"], "captions": r0["captions"]}
 
 
 def get_predefined_task(db_chat, session):

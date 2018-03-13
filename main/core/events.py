@@ -3,10 +3,10 @@ from flask_socketio import emit, join_room, leave_room
 from eventlet import sleep
 import datetime
 from .. import socketio
-from .. import get_crowd_db, get_chat_db, get_coco_anno_db
+from .. import get_crowd_db, get_chat_db, get_anno_db
 from .data import MSG, TURN
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, CONTEXT_ID)
-from .data import (insert_crowd, insert_chatdata, get_chatdata, get_coco_anno_data)
+from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data)
 import time
 import json
 import os
@@ -58,16 +58,21 @@ def joined(message):
         else:
             emit('status', {MSG: get_message(ele[ROLE], ele[MSG], ele[USERNAME]),
                             ROLE: ele[ROLE]}, room=session[TASK_ID])
-
-    db_coco_anno = get_coco_anno_db(session[DEBUG])
-    anno = get_coco_anno_data(db_coco_anno, session)
+    db_anno = get_anno_db(session[DEBUG])
+    anno = get_anno_data(db_anno, session)
     if anno:
         boxes = anno['boxes'].replace("'", '"')
         boxes_data = json.loads(boxes)
         labels = list(set([anno['label'] for anno in boxes_data]))
-        emit('coco_image_anno', {"url": anno['url'], "boxes": boxes}, room=session[TASK_ID])
+        if os.environ['domain'] == '2Dshape':
+            emit('2d_shape_anno', {"boxes": boxes}, room=session[TASK_ID])
+        else: # COCO
+            emit('coco_image_anno', {"url": anno['url'], "boxes": boxes}, room=session[TASK_ID])
     else:
-        emit('coco_image_anno', {}, room=session[TASK_ID])
+        if os.environ['domain'] == '2Dshape':
+            emit('2d_shape_anno', {}, room=session[TASK_ID])
+        else:
+            emit('coco_image_anno', {}, room=session[TASK_ID])
 
     for ele in reversed(history):
         if ele['role'] == AGENT and ele['msg'].startswith(canvas_token):

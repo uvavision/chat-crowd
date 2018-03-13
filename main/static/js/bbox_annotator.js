@@ -212,8 +212,8 @@
       return rect = {
         left: x1,
         top: y1,
-        width: Math.max(x2 - x1 + 1, y2 - y1 + 1),
-        height: Math.max(y2 - y1 + 1, x2 - x1 + 1)
+        width: Math.max(x2 - x1, y2 - y1),
+        height: Math.max(y2 - y1, x2 - x1)
       };
       }
 
