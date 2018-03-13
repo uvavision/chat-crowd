@@ -5,7 +5,7 @@ from . import main
 from .. import coll_data, APP_TEMPLATE, DOMAIN, CHAT_HTML
 from .. import get_chat_db, get_crowd_db
 from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser,
-                    TestFormCOCOAgent, TestFormCOCOUser) 
+                    TestFormCOCOAgent, TestFormCOCOUser)
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG,
@@ -32,22 +32,24 @@ def _init_login_by_form(form):
 def index():
     form = LoginForm()
     is_debug = True
-    session[MODE] = MODE_2D
+    mode = session.get(MODE, MODE_2D)
+    role = session.get(ROLE, AGENT)
     if form.validate_on_submit():
         _init_login_by_form(form)
         session[DEBUG] = is_debug
         session[PASS] = False  # if test mode available, set FALSE as default
         db_crowd = get_crowd_db(is_debug)
         workerid = session[WORKER_ID]
-        role = session[ROLE]
+        role = session.get(ROLE, AGENT)
+        mode = session.get(MODE, MODE_2D)
         if workerid and role:
             session[PASS] = is_pass_test(db_crowd, workerid, role)
         if session[PASS]:
             return redirect(url_for('.chat'))
         else:
             return redirect(url_for('.test'))
-    return render_template('index.html', form=form, mode=session[MODE],
-                           is_debug=is_debug)
+    return render_template('index.html', form=form, mode=mode,
+                           role=role, is_debug=is_debug)
 
 
 @main.route('/login', methods=['GET', 'POST'])

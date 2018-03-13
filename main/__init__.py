@@ -52,6 +52,7 @@ CHAT_HTML = 'vision-dialog.chat.html'
 TEST_HTML = 'test.html'
 TEST_DATA_FILE = os.path.join(APP_DATA, 'quiz_data.json')
 
+
 def get_crowd_db(is_debug=True):
     if is_debug:
         return coll_crowd_test
