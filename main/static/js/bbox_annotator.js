@@ -106,22 +106,23 @@
       };
     }
 
-    // When a new selection is made.
-    start(pageX, pageY) {
-      this.start_from_scratch = true;
-      this.update_pointer = true;
-      this.move = false;
-      this.pointer = this.crop(pageX, pageY);
-      this.offset = this.pointer;
-      this.refresh();
-      this.selector.show();
-      $('body').css('cursor', 'crosshair');
-      return document.onselectstart = function() {
-        return false;
-      };
-    }
+    // // When a new selection is made.
+    // start(pageX, pageY) {
+    //   this.start_from_scratch = true;
+    //   this.update_pointer = true;
+    //   this.move = false;
+    //   this.pointer = this.crop(pageX, pageY);
+    //   this.offset = this.pointer;
+    //   this.refresh();
+    //   this.selector.show();
+    //   $('body').css('cursor', 'crosshair');
+    //   return document.onselectstart = function() {
+    //     return false;
+    //   };
+    // }
 
     start_with_existing(entry, update_pointer, move, pageX, pageY) {
+      console.log('start from existing');
       this.start_from_scratch = false;
       this.update_pointer = update_pointer;
       this.move = move;
@@ -132,7 +133,7 @@
       this.pointer = {x: entry.left + entry.width, y: entry.top + entry.height};
       this.label_input.val(entry.label);
       this.label_input.attr("label", entry.label);
-      this.refresh();
+      // this.refresh();
       this.selector.show();
       // $('body').css('cursor', 'crosshair');
       return document.onselectstart = function() {
@@ -201,7 +202,8 @@
       x2 = Math.max(this.offset.x, this.pointer.x);
       y2 = Math.max(this.offset.y, this.pointer.y);
       if (!this.update_pointer) {
-        var size = Math.max(x2 - x1 + 1, y2 - y1 + 1);
+        // var size = Math.max(x2 - x1 + 1, y2 - y1 + 1);
+        var size = Math.max(x2 - x1, y2 - y1);
         return rect = {
         left: x2 - size,
         top: y2 - size,
@@ -228,14 +230,14 @@
 
     // Update css of the box.
     refresh() {
-
+      console.log("in refresh");
       var rect;
       rect = this.rectangle();
       if (this.shape === "rectangle") {
         this.selector.css({
           "border-radius": "",
-          left: (rect.left - this.border_width) + 'px',
-          top: (rect.top - this.border_width) + 'px',
+          left: (rect.left) + 'px',
+          top: (rect.top) + 'px',
           width: rect.width + 'px',
           height: rect.height + 'px',
           "border-left": '0px',
@@ -246,8 +248,8 @@
       } else if (this.shape === "circle") {
         this.selector.css({
           "border-radius": "50%",
-          left: (rect.left - this.border_width) + 'px',
-          top: (rect.top - this.border_width) + 'px',
+          left: (rect.left) + 'px',
+          top: (rect.top) + 'px',
           width: rect.width + 'px',
           height: rect.height + 'px',
           "border-left": '0px',
@@ -258,8 +260,8 @@
       } else if (this.shape === "triangle") {
         this.selector.css({
           "border-radius": "",
-          left: (rect.left - this.border_width) + 'px',
-          top: (rect.top - this.border_width) + 'px',
+          left: (rect.left) + 'px',
+          top: (rect.top) + 'px',
           "border-left": (rect.width / 2) + 'px solid transparent',
           "border-right": (rect.width / 2) + 'px solid transparent',
           "border-bottom": (rect.height) + "px solid rgba(100,100,100, 0.5)",
@@ -292,7 +294,7 @@
       annotator = this;
       this.top_element = $("#bbox_annotator");
       var shapes = $('<div></div>');
-      this.rectangle = $('<button id="input_rectangle" value="rectangle"> rectangle &#9632;</button>');
+      this.rectangle = $('<button id="input_rectangle" value="rectangle"> square &#9632;</button>');
       this.circle = $('<button id="input_circle" value="circle"> circle &#9679;</button>');
       this.triangle = $('<button id="input_triangle" value="triangle"> triangle &#9650;</button>');
       this.input_shape = '';
@@ -327,12 +329,67 @@
         });
         annotator.image_frame.css({
           "background-image": "url('" + image_element.src + "')",
-          "width": options.width + "px",
-          "height": options.height + "px",
+          "width": "600px",
+          "height": "500px",
           "position": "relative"
         });
+
+        // add 5x6 grid
+        this.grid_blocks = [];
+        var grid_size = 100;
+        for (var row = 0; row < 5; ++row) {
+          for (var col = 0; col < 6; ++col) {
+            var grid_block = $('<div class="grid_block"></div>');
+            grid_block.attr("x", col*grid_size);
+            grid_block.attr("y", row*grid_size);
+            grid_block.attr("width", grid_size);
+            grid_block.attr("height", grid_size);
+            this.grid_blocks.push(grid_block);
+            grid_block.appendTo(annotator.image_frame).css({
+                "opacity": 0.5,
+                "border": "1px dotted gray",
+                "position": "absolute",
+                "top": row * grid_size + "px",
+                "left": col * grid_size + "px",
+                "width": grid_size + "px",
+                "height": grid_size + "px",
+                "pointer-events": "auto"
+              });
+          }
+        }
         annotator.selector = new BBoxSelector(annotator.image_frame, options);
-        return annotator.initialize_events(annotator.selector, options);
+        annotator.initialize_events(annotator.selector, options, this.grid_blocks);
+        this.grid_blocks.forEach(function (t) {
+          t.hover((function (e) {
+            if (annotator.input_shape && annotator.status !== 'hold') {
+              $(this).css("background-color", "gray");
+            }
+          }), (function (e) {
+            $(this).css("background-color", "");
+          }));
+        });
+
+        this.grid_blocks.forEach(function (t) {
+          t.click(function (e) {
+            if (annotator.input_shape && !annotator.hit_menuitem) {
+              annotator.selector.offset = {x: parseInt(t.attr('x')) + 10, y: parseInt(t.attr('y')) + 10};
+              annotator.selector.pointer = {
+                x: parseInt(t.attr('x')) + parseInt(t.attr('width')) - 10,
+                y: parseInt(t.attr('y')) + parseInt(t.attr('height') - 10)
+              };
+              annotator.selector.refresh();
+              annotator.selector.selector.show();
+              annotator.status = 'input';
+              var pointer = annotator.selector.crop(e.pageX, e.pageY);
+              annotator.selector.label_box.css({
+                left: pointer.x + 'px',
+                top: pointer.y + 'px'
+              });
+              annotator.selector.label_box.show();
+              annotator.selector.label_input.focus();
+            }
+          });
+        });
       };
       image_element.onerror = function() {
         return annotator.annotator_element.text("Invalid image URL: " + options.url);
@@ -342,7 +399,7 @@
     }
 
     // Initialize events.
-    initialize_events(selector, options) {
+    initialize_events(selector, options, grid_blocks) {
       var annotator;
       this.hit_menuitem = false;
       annotator = this;
@@ -352,7 +409,7 @@
           if (annotator.input_shape !== $( this ).val()) {
             annotator.input_shape = $(this).val();
             selector.set_shape(annotator.input_shape);
-            annotator.annotator_element.css('cursor', 'crosshair');
+            annotator.annotator_element.css('cursor', 'pointer');
 
             ['rectangle', 'circle', 'triangle'].forEach(function (t2) {
               if (t2 === annotator.input_shape) {
@@ -364,23 +421,23 @@
           }
         });
       });
-      this.annotator_element.mousedown(function(e) {
-        if (!annotator.hit_menuitem && annotator.input_shape) {
-          switch (annotator.status) {
-            case 'free':
-            case 'input':
-              if (annotator.status === 'input') {
-                selector.get_input_element().blur();
-              }
-              if (e.which === 1) { // left button
-                selector.start(e.pageX, e.pageY);
-                annotator.status = 'hold';
-              }
-          }
-        }
-        annotator.hit_menuitem = false;
-        return true;
-      });
+      // this.annotator_element.mousedown(function(e) {
+      //   if (!annotator.hit_menuitem && annotator.input_shape) {
+      //     switch (annotator.status) {
+      //       case 'free':
+      //       case 'input':
+      //         if (annotator.status === 'input') {
+      //           selector.get_input_element().blur();
+      //         }
+      //         if (e.which === 1) { // left button
+      //           selector.start(e.pageX, e.pageY);
+      //           annotator.status = 'hold';
+      //         }
+      //     }
+      //   }
+      //   annotator.hit_menuitem = false;
+      //   return true;
+      // });
       $(window).mousemove(function(e) {
         switch (annotator.status) {
           case 'hold':
@@ -403,9 +460,22 @@
               }
             } else {
               annotator.status = 'input';
+              var p = selector.crop(e.pageX, e.pageY);
+              for (var i = 0; i < grid_blocks.length; i++) {
+                var t = grid_blocks[i];
+                var x0 = parseInt(t.attr('x'));
+                var y0 = parseInt(t.attr('y'));
+                var xx = parseInt(t.attr('x')) + parseInt(t.attr('width'));
+                var yy = parseInt(t.attr('y')) + parseInt(t.attr('height'));
+                if (p.x >= x0 && p.x <= xx && p.y >= y0 && p.y <= yy){
+                  selector.offset = {x: x0+10, y: y0+10};
+                  selector.pointer = {x: xx-10, y: yy-10};
+                  selector.refresh();
+                  break;
+                }
+              }
               selector.get_input_element().blur();
             }
-
         }
         annotator.hit_menuitem = false;
         //annotator.status = 'free';
@@ -417,7 +487,6 @@
           case 'input':
             data = selector.finish(options);
             if (data.label) {
-              console.log("selected " + data.label);
             // if (options.labels.includes(data.label)) {
               annotator.add_entry(data);
               if (annotator.onchange) {
@@ -465,7 +534,7 @@
       	entry.width = Math.max(30, entry.width);
       	entry.height = Math.max(30, entry.height);
       }
-      var annotator, box_element, close_button, se_resize_button, nw_resize_button, text_box;
+      var annotator, box_element, close_button, text_box;
       this.entries.push(entry);
       box_element = $('<div class="annotated_bounding_box"></div>');
       // box_element.appendTo(this.image_frame).css({
@@ -473,10 +542,9 @@
         box_element.css({
           "background-color": entry.label,
           "opacity": 0.8,
-          // "border": this.border_width + "px solid " + entry.label,
           "position": "absolute",
-          "top": (entry.top - this.border_width) + "px",
-          "left": (entry.left - this.border_width) + "px",
+          "top": (entry.top) + "px",
+          "left": (entry.left) + "px",
           "width": entry.width + "px",
           "height": entry.height + "px",
           // "color": entry.label,
@@ -488,10 +556,9 @@
           "background-color": entry.label,
           "opacity": 0.8,
           "border-radius": "50%",
-          "border": this.border_width + "px solid " + entry.label,
           "position": "absolute",
-          "top": (entry.top - this.border_width) + "px",
-          "left": (entry.left - this.border_width) + "px",
+          "top": (entry.top) + "px",
+          "left": (entry.left) + "px",
           "width": entry.width + "px",
           "height": entry.height + "px",
           // "color": entry.label,
@@ -503,8 +570,8 @@
           "background-color": "",
           "opacity": 0.8,
           "position": "absolute",
-          "left": (entry.left - this.border_width) + 'px',
-          "top": (entry.top - this.border_width) + "px",
+          "left": (entry.left) + 'px',
+          "top": (entry.top) + "px",
           "border-left": entry.width/2 + "px solid transparent",
           "border-right": entry.width/2 + 'px solid transparent',
           "border-bottom": (entry.height) + "px solid " + entry.label,
@@ -558,66 +625,10 @@
         "text-align": "center",
         "pointer-events":"auto"
       });
-      se_resize_button = $('<div name="se_resize_button"></div>').appendTo(box_element).css({
-        "position": "absolute",
-        "top": entry.height + "px",
-        "left": button_left + "px",
-        "width": "16px",
-        "height": "16px",
-        "overflow": "hidden",
-        "color": "#000",
-        "cursor": "se-resize",
-        "-moz-user-select": "none",
-        "-webkit-user-select": "none",
-        "user-select": "none",
-        "text-align": "center",
-        "pointer-events":"auto"
-      });
-      $("<div></div>").appendTo(se_resize_button).html('&#8690').css({
-        "display": "block",
-        "text-align": "center",
-        "width": "16px",
-        "position": "absolute",
-        // "top": "-2px",
-        // "left": "0",
-        "font-weight": "bold",
-        "font-size": "16px",
-        "line-height": "16px",
-        "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
-      });
 
       if (this.input_shape !== 'triangle') {
         button_left = 7;
       }
-      nw_resize_button = $('<div name="nw_resize_button"></div>').appendTo(box_element).css({
-        "position": "absolute",
-        "top": "-3px",
-        "left": -button_left + "px",
-        "width": "16px",
-        "height": "16px",
-        "overflow": "hidden",
-        "color": "#000",
-         // "background-color": "#ccc",
-        "cursor": "nw-resize",
-        "-moz-user-select": "none",
-        "-webkit-user-select": "none",
-        "user-select": "none",
-        "text-align": "center",
-        "pointer-events":"auto"
-      });
-
-      $("<div></div>").appendTo(nw_resize_button).html('&#8689').css({
-        "display": "block",
-        "text-align": "center",
-        "width": "16px",
-        "position": "absolute",
-        // "top": "-2px",
-        // "left": "0",
-        "font-weight": "bold",
-        "font-size": "16px",
-        "line-height": "16px",
-        "font-family": '"Helvetica Neue", Consolas, Verdana, Tahoma, Calibri, ' + 'Helvetica, Menlo, "Droid Sans", sans-serif'
-      });
 
       text_box = $('<div></div>').appendTo(box_element).css({
         "position": "absolute",
@@ -635,57 +646,13 @@
       //   console.log("mouse hover out");
       // }));
 
-      [close_button, nw_resize_button, se_resize_button].forEach(function (t) {
+      [close_button].forEach(function (t) {
         t.hover((function (e) {
           t.fadeTo(1, 1);
         }), (function (e) {
           t.fadeTo(1, 0.06);
         }));
       });
-
-      [nw_resize_button, se_resize_button].forEach(function (t) {
-        t.hover((function(e) {
-          if (annotator.status !== 'hold') {
-            return annotator.hit_menuitem = true;
-          }
-        }), (function(e) {
-          return annotator.hit_menuitem = false;
-        }));
-        t.mousemove(function (e) {
-          if (annotator.status !== 'hold' && annotator.status !== 'focused' && annotator.status !== 'input') {
-            annotator.hit_menuitem = false;
-            annotator.status = 'free';
-          }
-        });
-        t.mouseup(function (e) {
-          if (annotator.status !== 'hold') {
-            annotator.hit_menuitem = false;
-            annotator.status = 'free';
-          }
-        });
-        t.mousedown(function(e) {
-          // return annotator.hit_menuitem = true;
-          if (annotator.status !== "hold") {
-            annotator.hit_menuitem = true;
-            var clicked_box, index;
-            clicked_box = se_resize_button.parent(".annotated_bounding_box");
-            index = clicked_box.prevAll(".annotated_bounding_box").length;
-            clicked_box.detach();
-            entry = annotator.entries.splice(index, 1)[0];
-            if (t.attr("name") === "se_resize_button") {
-              annotator.selector.start_with_existing(entry, true, false, e.pageX, e.pageY);
-              annotator.input_shape = entry.shape;
-            }
-            if (t.attr("name") === "nw_resize_button") {
-              annotator.selector.start_with_existing(entry, false, false, e.pageX, e.pageY);
-              annotator.input_shape = entry.shape;
-            }
-            annotator.status = 'hold';
-          }
-        });
-
-      });
-
 
       close_button.mousedown(function(e) {
         return annotator.hit_menuitem = true;
@@ -699,7 +666,7 @@
         annotator.entries.splice(index, 1);
         return annotator.onchange(annotator.entries);
       });
-      [close_button, nw_resize_button, se_resize_button].forEach(function (t) { t.fadeTo(800,0.06); });
+      [close_button].forEach(function (t) { t.fadeTo(800,0.06); });
       // return close_button.hide();
     }
 
