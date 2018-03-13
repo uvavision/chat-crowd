@@ -168,9 +168,11 @@ var ConversationPanel = (function() {
         if (msg_data.startsWith('#CANVAS-')) {
           canvas_data = JSON.parse(msg_data.slice('#CANVAS-'.length));
           var canvas = document.createElement('canvas');
-          var scale = 0.8;
-          canvas.setAttribute("width", (600 * scale).toString());
-          canvas.setAttribute("height", (500 * scale).toString());
+          var scale = 0.5;
+          var canvas_width = 800;
+          var canvas_height = 800;
+          canvas.setAttribute("width", (canvas_width * scale).toString());
+          canvas.setAttribute("height", (canvas_height * scale).toString());
           canvas.setAttribute("style", "border:3px solid #d3d3d3;");
           var ctx = canvas.getContext("2d");
           ctx.lineWidth = 4;
@@ -188,8 +190,8 @@ var ConversationPanel = (function() {
               'tagName': 'img',
               'attributes': [{'name': 'src', 'value': canvas.toDataURL("image/png")},
                 {'name': 'data', 'value': JSON.stringify(canvas_data)},
-                {'name': 'height', 'value': "400"},
-                {'name': 'width', 'value': "480"},
+                {'name': 'height', 'value': canvas_height*scale},
+                {'name': 'width', 'value': canvas_width*scale}
               ]
             }
           ];
