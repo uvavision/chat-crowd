@@ -4,11 +4,12 @@ from flask import render_template, render_template_string
 from . import main
 from .. import coll_data, APP_TEMPLATE, DOMAIN, CHAT_HTML
 from .. import get_chat_db, get_crowd_db
-from .forms import (LoginForm, FeedbackForm, TestFormAgent, TestFormUser)
+from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser, TestFormAgent,
+                    TestFormCOCOAgent, TestFormCOCOUser)  # TestFormAgent, TestFormUser,
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG,
-                    USER, AGENT, MESSAGE, MODE_2D, TASKS, SEP)
+                    USER, AGENT, MESSAGE, MODE_2D, MODE_COCO, TASKS, SEP)
 
 
 def _init_login_by_form(form):
@@ -39,9 +40,8 @@ def index():
         db_crowd = get_crowd_db(is_debug)
         workerid = session[WORKER_ID]
         role = session[ROLE]
-        # if workerid and role:
-        #     session[PASS] = is_pass_test(db_crowd, workerid, role)
-        session[PASS] = True
+        if workerid and role:
+            session[PASS] = is_pass_test(db_crowd, workerid, role)
         if session[PASS]:
             return redirect(url_for('.chat'))
         else:
@@ -80,7 +80,6 @@ def login():
         if workerid and role:
             db_crowd = get_crowd_db(is_debug)
             session[PASS] = is_pass_test(db_crowd, workerid, session[ROLE])
-        session[PASS] = True
         if session[PASS]:
             return redirect(url_for('.chat'))
         else:
@@ -116,27 +115,27 @@ def test():
     task_id = session.get(TASK_ID)
     room = task_id
     role = session.get(ROLE)
+    mode = session.get(MODE)
     username = session.get(USERNAME)
     is_pass = session.get(PASS)
+    d_testform = {MODE_2D: {AGENT: TestForm2DAgent(), USER: TestForm2DUser()},
+                  MODE_COCO: {AGENT: TestFormCOCOAgent(), USER: TestFormCOCOUser()}}
+    form_test = d_testform[mode][role]
     if request.method == 'POST':
-        if role == AGENT:
-            form_test = TestFormAgent()
-            answer_data = [form_test.r1.data, form_test.r2.data] # answers submitted
-            # pass 90% of the test questions
-            if sum([answer_data[i] == form_test.answers[i] for i in range(len(answer_data))]) >= 0.9 * len(answer_data):
-                is_pass = True
-            # compare answer_data with GOLD_ANSWERS
-            # if pass threshold:
-                # is_pass = True
-        if role == USER:
-            form_test = TestFormUser()
-            answer_data = [form_test.r1.data, form_test.r2.data] # answers submitted
-            # pass 90% of the test questions
-            if sum([answer_data[i] == form_test.answers[i] for i in range(len(answer_data))]) >= 0.9 * len(answer_data):
-                is_pass = True
-            # compare answer_data with GOLD_ANSWERS
-            # if pass threshold:
-                # is_pass = True
+        answer_data = [form_test.r1.data, form_test.r2.data]
+        print('@@ answer_data', answer_data, form_test.answers)
+        if answer_data == form_test.answers:
+            is_pass = True
+        # if role == AGENT:
+        #     form_test = TestFormAgent()
+        #     answer_data = [form_test.r1.data, form_test.r2.data] # answers submitted
+        #     if sum([answer_data[i] == form_test.answers[i] for i in range(len(answer_data))]) >= 0.9 * len(answer_data):
+        #         is_pass = True
+        # if role == USER:
+        #     form_test = TestForm2DUser()
+        #     answer_data = [form_test.r1.data, form_test.r2.data] # answers submitted
+        #     if sum([answer_data[i] == form_test.answers[i] for i in range(len(answer_data))]) >= 0.9 * len(answer_data):
+        #         is_pass = True
         if is_pass:
             session[PASS] = is_pass
             is_debug = session[DEBUG]
@@ -153,21 +152,9 @@ def test():
             return redirect(url_for('.chat'))
         else:
             return redirect(url_for('.end'))
-    if role == USER:
-        form_test = TestFormUser()
-        return render_template('test.html', mode='test', domain=DOMAIN,
-                               form_test=form_test, role=role, room=room, workerid=session[WORKER_ID],
-                               username=session.get(USERNAME))
-    if role == AGENT:
-        form_test = TestFormAgent()
-        # if 'rcount' in session and 'lst_q_data' in session:
-        #     return render_template(TEST_HTML, form_test=form_test,
-        #                            username=username, room=room,
-        #                            role=role)
-        return render_template('test.html', form_test=form_test,
-                               mode='test', username=username, room=room,
-                               role=role, domain=DOMAIN, workerid = session[WORKER_ID])
-    return render_template('index.html')
+    return render_template('test.html', mode='test', domain=DOMAIN,
+                           form_test=form_test, role=role, room=room,
+                           username=username)
 
 
 @main.route('/end', methods=['GET', 'POST'])

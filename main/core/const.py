@@ -21,6 +21,10 @@ TURN = 'turn'
 FEEDBACK = 'feedback'
 
 SEP = ';'
+Q = 'Q'
+C = 'C'
+A = 'A'
+DATA = 'DATA'
 
 
 # NAME = 'Name'

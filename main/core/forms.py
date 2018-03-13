@@ -4,6 +4,10 @@ from wtforms.fields import (StringField, SubmitField, RadioField, SelectField,
                             TextAreaField)
 from wtforms.validators import Required
 from wtforms import widgets
+from .data import load_test_data
+from .const import MODE_2D, MODE_COCO, AGENT, USER, Q, C, A, DATA
+
+data_test = load_test_data()
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -21,6 +25,62 @@ class LoginForm(FlaskForm):
     mode = RadioField('mode', choices=[('2Dshape', "2D shapes"),
                       ("COCO", "Real Images")], validators=[Required()])
     submit = SubmitField('Start', id='login')
+
+
+class TestForm2DAgent(FlaskForm):
+    '''add test for user'''
+    data = data_test[MODE_2D][AGENT]
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
+    r1data = {
+            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
+            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
+            }
+
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    answers = [data[0][A], data[1][A]]
+    submit = SubmitField('Submit', id='test_submit')
+
+
+class TestForm2DUser(FlaskForm):
+    '''add test for user'''
+    data = data_test[MODE_2D][USER]
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
+    r1data = {
+            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
+            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
+            }
+
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    answers = [data[0][A], data[1][A]]
+    submit = SubmitField('Submit', id='test_submit')
+
+
+class TestFormCOCOAgent(FlaskForm):
+    '''add test for user'''
+    data = data_test[MODE_2D][AGENT]
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
+    r1data = {
+            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
+            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
+            }
+
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    answers = [data[0][A], data[1][A]]
+    submit = SubmitField('Submit', id='test_submit')
+
+
+class TestFormCOCOUser(FlaskForm):
+    '''add test for user'''
+    data = data_test[MODE_2D][USER]
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
+    r1data = {
+            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
+            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
+            }
+
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    answers = [data[0][A], data[1][A]]
+    submit = SubmitField('Submit', id='test_submit')
 
 
 class TestFormUser(FlaskForm):
