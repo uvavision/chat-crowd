@@ -4,8 +4,8 @@ from flask import render_template, render_template_string
 from . import main
 from .. import coll_data, APP_TEMPLATE, DOMAIN, CHAT_HTML
 from .. import get_chat_db, get_crowd_db
-from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser, TestFormAgent,
-                    TestFormCOCOAgent, TestFormCOCOUser)  # TestFormAgent, TestFormUser,
+from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser,
+                    TestFormCOCOAgent, TestFormCOCOUser) 
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG,
@@ -91,7 +91,9 @@ def login():
 @main.route('/chat')
 def chat():
     username = session.get(USERNAME, '')
-    task_id = session[TASKS].pop()
+    task_id = session.get(TASK_ID, '')
+    if len(session[TASKS]) > 0:
+        task_id = session[TASKS].pop()
     session[TASK_ID] = task_id
     role = session.get(ROLE, '')
     is_pass = session.get(PASS)

@@ -30,13 +30,9 @@ class LoginForm(FlaskForm):
 class TestForm2DAgent(FlaskForm):
     '''add test for user'''
     data = data_test[MODE_2D][AGENT]
-    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
-    r1data = {
-            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
-            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
-            }
-
-    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[0][Q], validators=[Required()])
+    r1data = data[0][DATA]
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], description=data[1][Q], validators=[Required()])
     answers = [data[0][A], data[1][A]]
     submit = SubmitField('Submit', id='test_submit')
 
@@ -44,13 +40,9 @@ class TestForm2DAgent(FlaskForm):
 class TestForm2DUser(FlaskForm):
     '''add test for user'''
     data = data_test[MODE_2D][USER]
-    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
-    r1data = {
-            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
-            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
-            }
-
-    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[0][Q], validators=[Required()])
+    r1data = data[0][DATA]
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], description=data[1][Q], validators=[Required()])
     answers = [data[0][A], data[1][A]]
     submit = SubmitField('Submit', id='test_submit')
 
@@ -58,13 +50,9 @@ class TestForm2DUser(FlaskForm):
 class TestFormCOCOAgent(FlaskForm):
     '''add test for user'''
     data = data_test[MODE_2D][AGENT]
-    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
-    r1data = {
-            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
-            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
-            }
-
-    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[0][Q], validators=[Required()])
+    r1data = data[0][DATA]
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], description=data[1][Q], validators=[Required()])
     answers = [data[0][A], data[1][A]]
     submit = SubmitField('Submit', id='test_submit')
 
@@ -72,64 +60,10 @@ class TestFormCOCOAgent(FlaskForm):
 class TestFormCOCOUser(FlaskForm):
     '''add test for user'''
     data = data_test[MODE_2D][USER]
-    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], validators=[Required()])
-    r1data = {
-            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
-            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
-            }
-
-    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], validators=[Required()])
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[1][Q], validators=[Required()])
+    r1data = data[0][DATA]
+    r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], description=data[1][Q], validators=[Required()])
     answers = [data[0][A], data[1][A]]
-    submit = SubmitField('Submit', id='test_submit')
-
-
-class TestFormUser(FlaskForm):
-    '''add test for user'''
-    r1 = RadioField('Given a chat history (canvas and instructions), choose the most helpful instructions.',
-                    choices=[('s1', 'the cat'),
-                             ('s2', 'Instruction for improving the existing layout, such as “XXX”.'),
-                             ('s3', 'End the task since the layout is completed.'),
-                             ('s4', 'Answer the question of the painter, such as “XXX”.'),
-                             ('s5', 'None of above.')],
-                      validators=[Required()])
-    r1data = {
-            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
-            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
-            }
-
-    r2 = RadioField('question 2 desc',
-                    choices=[('s1', ' Instruction for new drawing, such as “XXX”.'),
-                             ('s2', 'Instruction for improving the existing layout, such as “XXX”.'),
-                             ('s3', 'End the task since the layout is completed.'),
-                             ('s4', 'Answer the question of the painter, such as “XXX”.'),
-                             ('s5', 'None of above.')],
-                      validators=[Required()])
-    answers = ['s1', 's2']
-    submit = SubmitField('Submit', id='test_submit')
-
-
-class TestFormAgent(FlaskForm):
-    '''add test for agent'''
-    r1 = RadioField('Given a chat history (canvas and instructions), choose the most helpful instructions.',
-                    choices=[('s1', 'the cat'),
-                             ('s2', 'Instruction for improving the existing layout, such as “XXX”.'),
-                             ('s3', 'End the task since the layout is completed.'),
-                             ('s4', 'Answer the question of the painter, such as “XXX”.'),
-                             ('s5', 'None of above.')],
-                      validators=[Required()])
-    r1data = {
-            0: "http://www.catster.com/wp-content/uploads/2017/08/A-fluffy-cat-looking-funny-surprised-or-concerned.jpg",
-            1: 'https://www.gravatar.com/avatar/1c60217a4b8ca36f157b9a6eb3511e7d?s=32&d=identicon&r=PG', 2:'b', 3:'c', 4:'d', 5:'e'
-            }
-
-    r2 = RadioField('question 2 desc',
-                    choices=[('s1', ' Instruction for new drawing, such as “XXX”.'),
-                             ('s2', 'Instruction for improving the existing layout, such as “XXX”.'),
-                             ('s3', 'End the task since the layout is completed.'),
-                             ('s4', 'Answer the question of the painter, such as “XXX”.'),
-                             ('s5', 'None of above.')],
-                      validators=[Required()])
-    answers = ['s1', 's2']
     submit = SubmitField('Submit', id='test_submit')
 
 

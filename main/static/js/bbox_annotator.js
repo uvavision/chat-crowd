@@ -122,7 +122,6 @@
     // }
 
     start_with_existing(entry, update_pointer, move, pageX, pageY) {
-      console.log('start from existing');
       this.start_from_scratch = false;
       this.update_pointer = update_pointer;
       this.move = move;
@@ -133,7 +132,7 @@
       this.pointer = {x: entry.left + entry.width, y: entry.top + entry.height};
       this.label_input.val(entry.label);
       this.label_input.attr("label", entry.label);
-      // this.refresh();
+      this.refresh();
       this.selector.show();
       // $('body').css('cursor', 'crosshair');
       return document.onselectstart = function() {
@@ -143,7 +142,6 @@
 
     // When a selection updates.
     update_rectangle(pageX, pageY) {
-      // console.log("this.update_pointer: " + this.update_pointer);
       if (this.move) {
         var mouse = this.crop(pageX, pageY);
         var offsetx = mouse.x - this.mouse_start.x;
@@ -230,7 +228,6 @@
 
     // Update css of the box.
     refresh() {
-      console.log("in refresh");
       var rect;
       rect = this.rectangle();
       if (this.shape === "rectangle") {
@@ -377,6 +374,7 @@
                 x: parseInt(t.attr('x')) + parseInt(t.attr('width')) - 10,
                 y: parseInt(t.attr('y')) + parseInt(t.attr('height') - 10)
               };
+              // this will also update position of label_box
               annotator.selector.refresh();
               annotator.selector.selector.show();
               annotator.status = 'input';
@@ -470,6 +468,7 @@
                 if (p.x >= x0 && p.x <= xx && p.y >= y0 && p.y <= yy){
                   selector.offset = {x: x0+10, y: y0+10};
                   selector.pointer = {x: xx-10, y: yy-10};
+                  // this will also update position of label_box
                   selector.refresh();
                   break;
                 }

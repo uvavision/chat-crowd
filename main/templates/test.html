@@ -4,64 +4,38 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <link href="{{url_for('static', filename='css/materialize.css')}}" type="text/css" rel="stylesheet">
+    <!-- <link href="{{url_for('static', filename='css/materialize.css')}}" type="text/css" rel="stylesheet"> -->
     <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="//cdn.transifex.com/live.js"></script>
 </head>
 <body>
 <div class="container">
-    <h5>Welcome {{ username }}! Please answer the following questsions. </h5>
-    <!--<blockquote>-->
-        <!--Please answer the following test questions.<br>-->
-        <!--When you pass the test, you will be allowed to go to the task.<br>-->
-        <!--{#Please fill the form below and click "start" to move on to the next step.<br>#}-->
-        <!--{# If this is your first time doing this task, there will be a simple quiz. <br>#}-->
-        <!--{# Once you pass the quiz, you will enter the conversation. <br>#}-->
-    <!--</blockquote>-->
+    <h5 class="teal-text">Welcome <b>{{ username }}</b>! Please answer the two questsions below. </h5>
 
     <form method="POST">
+      {{ form_test.hidden_tag() }}
+      <div class="row">
+        <div class="col s9"><div class="card"><div class="card-image"><img src={{form_test.r1data[0]}}></img></div></div></div>
+      </div>
       <ol class="collection">
         <li>
-          {{ form_test.hidden_tag() }}
-          {{ form_test.r1.label }}
-              <img class="col s6" src={{form_test.r1data[0]}}> </img>
-              <ul>
+          <b class="teal-text">{{ form_test.r1.description }}</b>
+          {{ form_test.r1 }}
+
+          <!-- <ul>
                 {% for subfield in form_test.r1 %}
                     <li>{{ subfield }} {{ subfield.label }}</li>
                     <li><img class="col s6" src={{form_test.r1data[loop.index]}}</img></li>
                 {% endfor %}
-              </ul>
+              </ul> -->
           </li>
         <li>
-          {{ form_test.r2.label }}
+          <b class="teal-text">{{ form_test.r2.description }}</b>
           {{ form_test.r2 }}
         </li>
       </ol>
-      <!--
-        <blockquote>
-        {{ form_test.hidden_tag() }}
-        {{ form_test.r1.label }}
-            <img class="col s6" src={{form_test.r1data[0]}}> </img>
-            <ul>
-            {% for subfield in form_test.r1 %}
-                <li>{{ subfield }} {{ subfield.label }}</li>
-                <li><img class="col s6" src={{form_test.r1data[loop.index]}}</img></li>
-            {% endfor %}
-                </ul>
-            </blockquote>
-
-        <blockquote>
-        {{ form_test.r2.label }}
-        {{ form_test.r2 }}
-
-        </blockquote>
-      -->
-
-        <!--{% for field in form_test %}-->
-                <!--{{ field.label }}-->
-        <!--{% endfor %}-->
-        <h5>{{ form_test.submit(class_="btn btn-primary") }}</h5>
+      <div>{{ form_test.submit(class_="btn btn-primary") }}</div>
     </form>
 
 </div>
