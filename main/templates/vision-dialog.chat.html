@@ -335,8 +335,9 @@
                   var canvas = document.getElementById("coco_image_anno");
                   canvas.setAttribute("data", data['boxes']);
                   var labels = [];
-                  JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label']); });
+                  JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label'] + ' ' + t['shape']); });
                   document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
+                  document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
                   var scale = 1.0;
                   var canvas_width = 600;
                   var canvas_height = 600;
@@ -355,31 +356,57 @@
 
                 // finish_drawing button is enabled only when there are some drawings
 //                document.getElementById("finish_drawing").disabled = true;
+                function get_objname(anno) {
+                  return anno['label']+ ' ' + anno['shape'];
+                }
+                function shape_layout_match(gt_layout, current_layout) {
+                  for (var i = 0; i < current_layout.length; ++i) {
+                    var matched = false;
+                    for (var j = 0; j < gt_layout.length; ++j) {
+                      var a = current_layout[i];
+                      var b = gt_layout[j];
+                      if (a['left'] === b['left'] && a['top'] === b['top']
+                          && a['width'] === b['width'] && a['height'] === b['height']
+                          && a['shape'] === b['shape'] && a['label'] === b['label']) {
+                        matched = true;
+                      }
+                    }
+                    if (!matched)
+                      return false;
+                  }
+                  return true;
+                }
                 socket.on('latest_canvas', function (data) {
+                  console.log("latest canvas");
                   var canvas = document.getElementById("coco_image_anno");
-                  var canvas_data = JSON.parse(canvas.getAttribute('data'));
-                  var gt_labels = {};
-                  var labels = {};
-                  canvas_data.forEach(function (t) {
-                    var label = t['label'];
-                    labels[label] = 0;
-                    if (label in gt_labels) {
-                      gt_labels[label] += 1;
+                  var gt_layout = JSON.parse(canvas.getAttribute('data'));
+                  var gt_objs = {};
+                  var present_objs = {};
+                  gt_layout.forEach(function (t) {
+                    var objname = get_objname(t);
+                    present_objs[objname] = 0;
+                    if (objname in gt_objs) {
+                      gt_objs[objname] += 1;
                     } else {
-                      gt_labels[label] = 1;
+                      gt_objs[objname] = 1;
                     }
                   });
 
-                  JSON.parse(data['msg']).forEach(function (t) { labels[t['label']] += 1;});
+                  var current_layout = JSON.parse(data['msg']);
+                  current_layout.forEach(function (t) { present_objs[get_objname(t)] += 1;});
                   var missing = [];
-                  for (var key in labels) {
-                      if (labels.hasOwnProperty(key)) {
-                          if (gt_labels[key] !== labels[key]) {
+                  for (var key in present_objs) {
+                      if (present_objs.hasOwnProperty(key)) {
+                          if (gt_objs[key] !== present_objs[key]) {
                             missing.push(key);
                           }
                       }
                   }
                   document.getElementById("finish_drawing").setAttribute("missing", missing.toString());
+                  if (shape_layout_match(gt_layout, current_layout))
+                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "true");
+                  else
+                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
                 });
               });
 
@@ -388,13 +415,17 @@
               if (missing.length > 0) {
                 alert("missing objects: " + missing);
               } else {
-                  if(confirm('You sure the drawing has completed the layout, and there is no need for futher instructions?')) {
-                    var now = new Date(Date.now());
-                    var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-                    socket.emit('text', {msg: "#END", t: t});
-                    document.getElementById("textInput").setAttribute("placeholder", "DONE");
-                    document.getElementById("textInput").disabled = true;
-                    this.disabled = true;
+                  if (($("#finish_drawing")).attr("layoutmatch") === "false") {
+                    alert("Layouts of shapes are not the same");
+                  } else {
+                    if (confirm('You sure the drawing has completed the layout, and there is no need for futher instructions?')) {
+                      var now = new Date(Date.now());
+                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                      socket.emit('text', {msg: "#END", t: t});
+                      document.getElementById("textInput").setAttribute("placeholder", "DONE");
+                      document.getElementById("textInput").disabled = true;
+                      this.disabled = true;
+                    }
                   }
               }
             });
