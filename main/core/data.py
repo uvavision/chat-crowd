@@ -24,7 +24,16 @@ def get_ts_str():
     return str(datetime.datetime.now())
 
 
-def load_test_data(test_data_file=TEST_DATA_FILE):
+def get_bot_response(role=None):
+    response = "Please proceed to next task or submit the job."
+    # if role == AGENT:  # painter
+    #     response = ""
+    # if role == USER:  # instructor
+    #     response = ""
+    return response
+
+
+def load_quiz_data(test_data_file=TEST_DATA_FILE):
     with open(test_data_file) as file_:
         return json.load(file_)
 

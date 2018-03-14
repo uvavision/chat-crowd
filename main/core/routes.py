@@ -55,7 +55,6 @@ def index():
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    session[TASKS] = []
     if TASKS in request.args:
         tasks = request.args.get(TASKS).split(SEP)
         session[TASKS] = tasks
@@ -63,6 +62,7 @@ def login():
     else:
         task_id = request.args.get(TASK_ID)
         tasks = [task_id]
+        session[TASKS] = [task_id]
     room = task_id
     role = request.args.get(ROLE)
     is_debug = request.args.get('debug')

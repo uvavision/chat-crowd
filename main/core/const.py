@@ -1,4 +1,4 @@
-AGENT = "agent" # painter
+AGENT = "agent"  # painter
 USER = "user"  # instructor
 
 MODE_COCO = 'COCO'
