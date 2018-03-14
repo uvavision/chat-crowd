@@ -115,30 +115,39 @@
         });
 
         function next_task() {
+          if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
+            socket.emit('end_task', {msg: "layout_completed"});
+            window.location.href = "{{ url_for('main.end') }}";
+          } else {
+              if (contributed) {
+                socket.emit('end_task', {msg: "layout_not_completed"});
+                window.location.href = "{{ url_for('main.chat') }}";
+              } else {
+                if ("{{role}}" === "agent")
+                  alert("please contribute at least one drawing");
+                if ("{{role}}" === "user")
+                  alert("please contribute at least one instruction");
+              }
+          }
             // socket.emit('end_task', {msg:"#END"});
-            window.location.href = "{{ url_for('main.chat') }}";
+//            window.location.href = "{{ url_for('main.chat') }}";
         };
 
         function end_task() {
-          if (contributed) {
-            if ("{{role}}" === "agent") {
-              socket.emit('end_task', {msg: "layout_not_completed"});
-            }
-            if ("{{role}}" === "user") {
-              if ($("#textInput").is(':disabled')) {
-                socket.emit('end_task', {msg: "layout_completed"});
-              } else {
-                socket.emit('end_task', {msg: "layout_not_completed"});
-              }
-            }
+          if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
+            socket.emit('end_task', {msg: "layout_completed"});
             window.location.href = "{{ url_for('main.end') }}";
           } else {
-            if ("{{role}}" === "agent")
-              alert("please contribute at least one canvas");
-            if ("{{role}}" === "user")
-              alert("please contribute at least one instruction");
+              if (contributed) {
+                socket.emit('end_task', {msg: "layout_not_completed"});
+                window.location.href = "{{ url_for('main.end') }}";
+              } else {
+                if ("{{role}}" === "agent")
+                  alert("please contribute at least one drawing");
+                if ("{{role}}" === "user")
+                  alert("please contribute at least one instruction");
+              }
           }
-
             <!--socket.emit('left', {}, function() {-->
                 <!--socket.disconnect();-->
                 <!--window.location.href = "{{ url_for('main.end') }}";-->
@@ -200,11 +209,11 @@
                           <i class="material-icons prefix">textsms</i>
                           <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
                       </div>
-                      <div class="input-field">
-                          <button class="btn red lighten-1" id="finish_drawing" href="#" value="">
-                              The drawing is complete
-                          </button>
-                      </div>
+                      <!--<div class="input-field">-->
+                          <!--<button class="btn red lighten-1" id="finish_drawing" href="#" value="">-->
+                              <!--The drawing is complete-->
+                          <!--</button>-->
+                      <!--</div>-->
                   {% elif role == "agent" %}
                       <div class="input-field inputOutline">
                           <i class="material-icons prefix">textsms</i>
@@ -245,7 +254,25 @@
       <script src="{{url_for('static', filename='js/cp.js')}}" type="text/javascript"></script>
 
 {#      <script>document.getElementById("user_utterance").disabled = true;</script>#}
-
+        <script>
+            function shape_layout_match(gt_layout, current_layout) {
+              for (var i = 0; i < gt_layout.length; ++i) {
+                var matched = false;
+                for (var j = 0; j < current_layout.length; ++j) {
+                  var a = current_layout[i];
+                  var b = gt_layout[j];
+                  if (a['left'] === b['left'] && a['top'] === b['top']
+                      && a['width'] === b['width'] && a['height'] === b['height']
+                      && a['shape'] === b['shape'] && a['label'] === b['label']) {
+                    matched = true;
+                  }
+                }
+                if (!matched)
+                  return false;
+              }
+              return true;
+            }
+        </script>
         {% if role == "agent" %}
             <script>
               $(document).ready(function () {
@@ -293,6 +320,18 @@
                     annotator.add_entry(entry);
                   });
                   latest_canvas_data = annotator.entries.slice(0);
+                  var textInput = document.getElementById("textInput");
+                  var gt_layout = JSON.parse(textInput.getAttribute('data'));
+                  if (shape_layout_match(gt_layout, canvas_data)) {
+                      document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
+                      document.getElementById("textInput").disabled = true;
+                      $("#submit_canvas").hide();
+                  }
+                });
+
+                socket.on('2d_shape_anno', function (data) {
+                  var canvas = document.getElementById("textInput");
+                  canvas.setAttribute("data", data['boxes']);
                 });
 
               });
@@ -309,7 +348,7 @@
                   canvas.setAttribute("data", data['boxes']);
                   var labels = [];
                   JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label']); });
-                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
+//                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
                   var ctx = canvas.getContext('2d');
                   var img = new Image();
                   if ('url' in data && 'boxes' in data) {
@@ -336,8 +375,8 @@
                   canvas.setAttribute("data", data['boxes']);
                   var labels = [];
                   JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label'] + ' ' + t['shape']); });
-                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
-                  document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
+//                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
+//                  document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
                   var scale = 1.0;
                   var canvas_width = 500;
                   var canvas_height = 500;
@@ -359,23 +398,7 @@
                 function get_objname(anno) {
                   return anno['label']+ ' ' + anno['shape'];
                 }
-                function shape_layout_match(gt_layout, current_layout) {
-                  for (var i = 0; i < current_layout.length; ++i) {
-                    var matched = false;
-                    for (var j = 0; j < gt_layout.length; ++j) {
-                      var a = current_layout[i];
-                      var b = gt_layout[j];
-                      if (a['left'] === b['left'] && a['top'] === b['top']
-                          && a['width'] === b['width'] && a['height'] === b['height']
-                          && a['shape'] === b['shape'] && a['label'] === b['label']) {
-                        matched = true;
-                      }
-                    }
-                    if (!matched)
-                      return false;
-                  }
-                  return true;
-                }
+
                 socket.on('latest_canvas', function (data) {
                   console.log("latest canvas");
                   var canvas = document.getElementById("coco_image_anno");
@@ -402,33 +425,42 @@
                           }
                       }
                   }
-                  document.getElementById("finish_drawing").setAttribute("missing", missing.toString());
-                  if (shape_layout_match(gt_layout, current_layout))
-                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "true");
-                  else
-                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
+                  if (shape_layout_match(gt_layout, current_layout)) {
+//                      var now = new Date(Date.now());
+//                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+//                      socket.emit('text', {msg: "#END", t: t});
+                      document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
+                      document.getElementById("textInput").disabled = true;
+                  }
+
+
+//                  document.getElementById("finish_drawing").setAttribute("missing", missing.toString());
+//                  if (shape_layout_match(gt_layout, current_layout))
+//                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "true");
+//                  else
+//                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
                 });
               });
 
-            $("#finish_drawing").click(function (e) {
-              var missing = ($("#finish_drawing")).attr("missing");
-              if (missing.length > 0) {
-                alert("missing objects: " + missing);
-              } else {
-                  if (($("#finish_drawing")).attr("layoutmatch") === "false") {
-                    alert("Layouts of shapes are not the same");
-                  } else {
-                    if (confirm('You sure the drawing has completed the layout, and there is no need for futher instructions?')) {
-                      var now = new Date(Date.now());
-                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-                      socket.emit('text', {msg: "#END", t: t});
-                      document.getElementById("textInput").setAttribute("placeholder", "DONE");
-                      document.getElementById("textInput").disabled = true;
-                      this.disabled = true;
-                    }
-                  }
-              }
-            });
+//            $("#finish_drawing").click(function (e) {
+//              var missing = ($("#finish_drawing")).attr("missing");
+//              if (missing.length > 0) {
+//                alert("missing objects: " + missing);
+//              } else {
+//                  if (($("#finish_drawing")).attr("layoutmatch") === "false") {
+//                    alert("Layouts of shapes are not the same");
+//                  } else {
+//                    if (confirm('You sure the drawing has completed the layout, and there is no need for futher instructions?')) {
+//                      var now = new Date(Date.now());
+//                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+//                      socket.emit('text', {msg: "#END", t: t});
+//                      document.getElementById("textInput").setAttribute("placeholder", "DONE");
+//                      document.getElementById("textInput").disabled = true;
+//                      this.disabled = true;
+//                    }
+//                  }
+//              }
+//            });
             </script>
         {% endif %}
 

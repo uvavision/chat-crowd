@@ -122,5 +122,6 @@ def left(message):
 def complete(message):
     task_id = session.get(TASK_ID)
     role = session.get(ROLE)
+    print(message)
     r = requests.post("http://deep.cs.virginia.edu:5003/finished", data={'task_id': task_id, 'role': role, "msg": message[MSG]})
     # print(r.status_code, r.reason)
