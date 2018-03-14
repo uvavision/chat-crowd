@@ -8,7 +8,7 @@ from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser,
                     TestFormCOCOAgent, TestFormCOCOUser)
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
-                    ROOM, PASS, MODE, TURN, MSG,
+                    ROOM, PASS, MODE, TURN, MSG, TOTAL,
                     USER, AGENT, MESSAGE, MODE_2D, MODE_COCO, TASKS, SEP)
 
 
@@ -22,6 +22,7 @@ def _init_login_by_form(form):
         session[TASKS] = [form.task_id.data]
     else:
         session[TASKS] = form.tasks.data
+    session[TOTAL] = len(session[TASKS])
     session[ROLE] = form.role.data
     session[ROOM] = form.task_id.data
     session[MODE] = form.mode.data
@@ -63,6 +64,7 @@ def login():
         task_id = request.args.get(TASK_ID)
         tasks = [task_id]
         session[TASKS] = [task_id]
+    session[TOTAL] = len(tasks)
     room = task_id
     role = request.args.get(ROLE)
     is_debug = request.args.get('debug')
@@ -109,9 +111,12 @@ def chat():
         return redirect(url_for('.index'))
     db_chat = get_chat_db(session[DEBUG])
     role_name = {AGENT: 'painter', USER: 'instructor'}[role]
+    total = session[TOTAL]
+    left = session[TOTAL] - len(session[TASKS])
+    progress = 'task {} out of {}'.format(left, total)
     return render_template(CHAT_HTML, domain=DOMAIN, tasks=session[TASKS],
                            mode=mode, room=room, role_name=role_name,
-                           role=role, username=username)
+                           role=role, username=username, progress=progress)
 
 
 @main.route('/test', methods=['GET', 'POST'])

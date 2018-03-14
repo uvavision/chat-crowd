@@ -26,6 +26,7 @@ C = 'C'
 A = 'A'
 DATA = 'DATA'
 
+TOTAL = 'total'
 
 # NAME = 'Name'
 
