@@ -21,12 +21,18 @@ APP_DOMAIN = os.path.join(APP_ROOT, 'domains')
 # N_PER_AGENT = 3
 
 '''
-http://localhost:8080/login?role=agent&task_id=test123&workerid=test123&username=Jason&mode=mts&debug=1
+single task:
+http://localhost:8080/login?role=agent&task_id=test123&workerid=test123&username=Jason&mode=COCO&debug=1
+
+multiple tasks:
+http://localhost:8080/login?role=agent&tasks=test1;test2;test3&workerid=test123&username=Jason&mode=2Dshape&debug=1
 '''
 
+add_bot_response = False
 
 config = None
-with open(path.join(APP_DOMAIN, 'app-{}.json'.format(os.environ['domain']))) as f:
+config_file = path.join(APP_DOMAIN, 'app-{}.json'.format(os.environ['domain']))
+with open(config_file) as f:
     config = json.load(f)
 uri_local = 'mongodb://localhost'
 uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +

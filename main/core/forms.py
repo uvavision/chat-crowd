@@ -4,10 +4,10 @@ from wtforms.fields import (StringField, SubmitField, RadioField, SelectField,
                             TextAreaField)
 from wtforms.validators import Required
 from wtforms import widgets
-from .data import load_test_data
+from .data import load_quiz_data
 from .const import MODE_2D, MODE_COCO, AGENT, USER, Q, C, A, DATA
 
-data_test = load_test_data()
+data_test = load_quiz_data()
 
 
 class MultiCheckboxField(SelectMultipleField):
