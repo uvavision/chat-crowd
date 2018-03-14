@@ -251,8 +251,8 @@
               $(document).ready(function () {
                 var canvas = document.createElement('canvas');
                 canvas.setAttribute("id", "scratch");
-                canvas.setAttribute("width", "600");
-                canvas.setAttribute("height", "600");
+                canvas.setAttribute("width", "500");
+                canvas.setAttribute("height", "500");
                 canvas.setAttribute("style", "border:3px solid #d3d3d3;");
                 var ctx = canvas.getContext("2d");
                 ctx.lineWidth = 4;
@@ -339,8 +339,8 @@
                   document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
                   document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
                   var scale = 1.0;
-                  var canvas_width = 600;
-                  var canvas_height = 600;
+                  var canvas_width = 500;
+                  var canvas_height = 500;
                   canvas.setAttribute("width", (canvas_width * scale).toString());
                   canvas.setAttribute("height", (canvas_height * scale).toString());
                   canvas.setAttribute("style", "border:3px solid #d3d3d3;");

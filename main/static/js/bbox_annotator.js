@@ -326,16 +326,16 @@
         });
         annotator.image_frame.css({
           "background-image": "url('" + image_element.src + "')",
-          "width": "600px",
-          "height": "600px",
+          "width": "500px",
+          "height": "500px",
           "position": "relative"
         });
 
         // add 5x6 grid
         this.grid_blocks = [];
         var grid_size = 100;
-        for (var row = 0; row < 6; ++row) {
-          for (var col = 0; col < 6; ++col) {
+        for (var row = 0; row < 5; ++row) {
+          for (var col = 0; col < 5; ++col) {
             var grid_block = $('<div class="grid_block"></div>');
             grid_block.attr("x", col*grid_size);
             grid_block.attr("y", row*grid_size);

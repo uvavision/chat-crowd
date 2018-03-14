@@ -10,11 +10,11 @@ import random
 def sample_layout():
     grid_size = 100
     num_shapes = random.choice(range(4, 10))
-    positions = random.sample(range(36), num_shapes)
+    positions = random.sample(range(25), num_shapes)
     layout = []
     for p in positions:
-        row = p // 6
-        col = p % 6
+        row = p // 5
+        col = p % 5
         top = col * grid_size + 10
         left = row * grid_size + 10
         width = grid_size - 20
