@@ -54,7 +54,7 @@ DOMAIN = config["domain-name"]
 
 socketio = SocketIO()
 
-CHAT_HTML = 'vision-dialog.chat.html'
+CHAT_HTML = 'vision-dialog.chat.{}.html'.format(os.environ['domain'])
 TEST_HTML = 'test.html'
 TEST_DATA_FILE = os.path.join(APP_DATA, 'quiz_data.json')
 

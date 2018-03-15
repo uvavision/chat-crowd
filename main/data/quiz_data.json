@@ -111,7 +111,7 @@
     "COCO": {
         "agent": [
             {
-                "Q": "Given a chat history (canvas and instructions), select all the operation needed for the drawing tasks?",
+                "Q": "Given a chat history (canvas and instructions), select all the operations needed for the drawing tasks?",
                 "C": [
                     [
                         1,
