@@ -1,0 +1,221 @@
+{
+    "2Dshape": {
+        "agent": [
+            {
+                "Q": "Given the chat history (canvas and instructions) above, select all the operation needed for the drawing tasks?",
+                "C": [
+                    [
+                        1,
+                        "Add a new object"
+                    ],
+                    [
+                        2,
+                        "Move an object"
+                    ],
+                    [
+                        3,
+                        "Delete an object"
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "1",
+                    "2"
+                ],
+                "DATA": [
+                    "https://s3.amazonaws.com/crowdflower-make-cloud/images%2F1520950233906-Screen+Shot+2018-03-13+at+10.06.40+AM.png"
+                ]
+            },
+            {
+                "Q": "Given the canvas on the left of UI above, choose all that are applicable based on the instruction \"draw a yellow circle next to the squares.\"",
+                "C": [
+                    [
+                        1,
+                        "Draw a yellow circle on the canvas."
+                    ],
+                    [
+                        2,
+                        "Ask instructor \"What are the location of yellow circle relative to the squares? Left, right, up or down?\""
+                    ],
+                    [
+                        3,
+                        "Ask instructor \"What do you mean?\""
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "2"
+                ]
+            }
+        ],
+        "user": [
+            {
+                "Q": "Given a chat history (canvas and instructions), choose all the helpful instructions.",
+                "C": [
+                    [
+                        1,
+                        "\"Good job so far. Thanks!\""
+                    ],
+                    [
+                        2,
+                        "\"You need to move all the squares not just the middle one. And then draw a red rectangle below the middle square.\""
+                    ],
+                    [
+                        3,
+                        "\"There are five shapes in total in the painting, three squares, one circle and one triangle.\""
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "2"
+                ],
+                "DATA": [
+                    "https://s3.amazonaws.com/crowdflower-make-cloud/images%2F1520960806371-Screen+Shot+2018-03-13+at+1.01.32+PM.png"
+                ]
+            },
+            {
+                "Q": "Which instructions would result in the same painting as the instruction \"Move the squares up because you need to draw a red triangle below the middle square. \", ",
+                "C": [
+                    [
+                        1,
+                        "\"Draw a triangle below the green row.\""
+                    ],
+                    [
+                        2,
+                        "\"There is a red triangle right below the middle square in the row. But you need to move the squares first.\""
+                    ],
+                    [
+                        3,
+                        "\"Paint one red triangle and place it underneath the squares.\""
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "2"
+                ]
+            }
+        ]
+    },
+    "COCO": {
+        "agent": [
+            {
+                "Q": "Given a chat history (canvas and instructions), select all the operation needed for the drawing tasks?",
+                "C": [
+                    [
+                        1,
+                        "Add a new object"
+                    ],
+                    [
+                        2,
+                        "Move an object"
+                    ],
+                    [
+                        3,
+                        "Delete an object"
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "1",
+                    "2"
+                ],
+                "DATA": [
+                    "XXX link to images"
+                ]
+            },
+            {
+                "Q": "Choose all that are applicable to canvas given the instruction \"draw a yellow circle next to the circle\"",
+                "C": [
+                    [
+                        1,
+                        "Draw on the canvas like"
+                    ],
+                    [
+                        2,
+                        "Ask instructor \"What are the location of yellow circle? Left, right, up or down?\""
+                    ],
+                    [
+                        3,
+                        "Ask instructor \"What do you mean?\""
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "2"
+                ]
+            }
+        ],
+        "user": [
+            {
+                "Q": "Given a chat history (canvas and instructions), choose the most helpful instructions.",
+                "C": [
+                    [
+                        1,
+                        "Instruction for new drawing, such as \u201cXXX\u201d.  "
+                    ],
+                    [
+                        2,
+                        "Instruction for improving the existing layout, such as \u201cXXX\u201d."
+                    ],
+                    [
+                        3,
+                        "Answer the question of the painter, such as \u201cXXX\u201d."
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "1",
+                    "2"
+                ],
+                "DATA": [
+                    "XXX link to the images"
+                ]
+            },
+            {
+                "Q": "If you try to rewrite the instruction \"draw a dog and a person\" to make it clear for the drawing task, which version would you choose?",
+                "C": [
+                    [
+                        1,
+                        "Draw on the canvas like"
+                    ],
+                    [
+                        2,
+                        "Ask instructor \"What are the location of yellow circle? Left, right, up or down?\""
+                    ],
+                    [
+                        3,
+                        "Ask instructor \"What do you mean?\""
+                    ],
+                    [
+                        4,
+                        "None of above."
+                    ]
+                ],
+                "A": [
+                    "2"
+                ]
+            }
+        ]
+    }
+}

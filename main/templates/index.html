@@ -11,23 +11,22 @@
     </head>
     <body>
       <div class="container">
-        <h5>Welcome!</h5>
-        <div>
-        {% if role == 'user' %}
-          <h2> Click <a href="{{url_for('static', filename='instructor-instruction/instructorinstruction.html')}}" target="_blank">here</a> for instructions.</h2>
-        {% elif role == 'agent' and mode == 'mts' %}
-            <h2> Click <a href="{{url_for('static', filename='instruction_mts.html')}}" target="_blank">here</a> for instructions.</h2>
+        <h5>
+            Welcome! Click <a href="{{url_for('static', filename='cf_')}}{{mode}}_{{role}}.html" target="_blank">here</a> to view the instructions again.
+        <!-- {% if role == 'user' %}
+           Click <a href="{{url_for('static', filename='instructor-instruction/cf_{{role}}_{{mode}}.html')}}" target="_blank">here</a> to view the instructions again.
         {% elif role == 'agent' %}
-          <h2> Click <a href="{{url_for('static', filename='painter-instruction/painterinstruction.html')}}" target="_blank">here</a> for instructions.</h2>
-        {% endif %}
-      </div>
-        <blockquote>
+           Click <a href="{{url_for('static', filename='painter-instruction/painterinstruction.html')}}" target="_blank">here</a> for instructions.
+        {% endif %} -->
+        </h5>
+
+        <!-- <blockquote>
           Please fill the form below.<br>
           {#Please fill the form below and click "start" to move on to the next step.<br>#}
 {#          If this is your first time doing this task, there will be a simple quiz. <br>#}
 {#          Once you pass the quiz, you will enter the conversation. <br>#}
           Have fun contributing!
-        </blockquote>
+        </blockquote> -->
 
         <form method="POST">
           {{ form.hidden_tag() }}
@@ -35,46 +34,47 @@
           <div class='red-text'>{% for error in form.workerid.errors %}{{ error }}{% endfor %}</div>
           {{ form.workerid() }}
 
-          <label for="username" >What is your CrowdFlower Username?</label>
+          <label for="username" >What USERNAME do you want to use for the task?</label>
           <div class='red-text'>{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
           {{ form.username() }}
 
           {% if is_debug %}
-          <label for="task_id" >What is your Task ID (debug)?</label>
-            {{ form.task_id() }}
-          <div class='red-text'>{% for error in form.task_id.errors %}{{ error }}{% endfor %}</div>
+            <label for="task_id" >What is your Task ID (debug)?</label>
+              {{ form.task_id() }}
+            <div class='red-text'>{% for error in form.task_id.errors %}{{ error }}{% endfor %}</div>
             <!-- {{ form.task_id(disabled=True) }} -->
+            <div>
+              <label for="mode">
+                ROLE:
+                {% for subfield in form.role %}
+                  <tr>
+                    {% if is_debug %}
+                      <td>{{subfield()}}</td>
+                      {% else %}
+                      <td>{{subfield(disabled=True)}}</td>
+                      {% endif %}
+                      <td>{{subfield.label()}}</td>
+                  </tr>
+                {% endfor %}
+              </label>
+            </div>
+            <div>
+              <label for="mode">
+                MODE:
+                {% for subfield in form.mode %}
+                  <tr>
+                    {% if is_debug %}
+                      <td>{{subfield()}}</td>
+                      {% else %}
+                      <td>{{subfield(disabled=True)}}</td>
+                      {% endif %}
+                      <td>{{subfield.label()}}</td>
+                  </tr>
+                {% endfor %}
+              </label>
+            </div>
           {% endif %}
-          <div>
-            <label for="mode">
-              ROLE:
-              {% for subfield in form.role %}
-                <tr>
-                  {% if is_debug %}
-                    <td>{{subfield()}}</td>
-                    {% else %}
-                    <td>{{subfield(disabled=True)}}</td>
-                    {% endif %}
-                    <td>{{subfield.label()}}</td>
-                </tr>
-              {% endfor %}
-            </label>
-          </div>
-          <div>
-            <label for="mode">
-              MODE:
-              {% for subfield in form.mode %}
-                <tr>
-                  {% if is_debug %}
-                    <td>{{subfield()}}</td>
-                    {% else %}
-                    <td>{{subfield(disabled=True)}}</td>
-                    {% endif %}
-                    <td>{{subfield.label()}}</td>
-                </tr>
-              {% endfor %}
-            </label>
-          </div>
+
           <div>
               <h5>Press {{ form.submit(class_="btn btn-primary") }} to enter the main chat page</h5>
           </div>

@@ -16,14 +16,26 @@
       "plan": "Standard",
       "name": "Compose for MongoDB-6k",
       "tags": [
-        "chatbot DB",
+        "big_data",
         "data_management",
         "ibm_created"
       ]
     }
   ],
-  "name": "woz-crowd",
+  "domain-name": "vision-dialog-COCO",
+  "domain-db": {
+    "db-name": "layout-COCO",
+    "coll_domain_data": "data",
+    "coll_chat_data": "chatdata",
+    "coll_chat_data_test": "testchatdata",
+    "coll_cf_data": "chatcf",
+    "coll_cf_data_test": "testchatcf",
+    "coll_coco_anno": "coco_anno",
+    "coll_coco_anno_test": "test_coco_anno"
+  },
+  "app-name": "vision-dialog-COCO",
   "description": "woz via crowd sourcing",
   "website": "http://woz.mybluemix.net",
-  "repository": "https://github.ibm.com/ImplicitDialog/chat-crowd"
+  "repository": "https://github.com/uvavision/chat-crowd",
+  "app-url": "deep.cs.virginia.edu/login?"
 }

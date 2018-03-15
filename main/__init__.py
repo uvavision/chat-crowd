@@ -21,12 +21,18 @@ APP_DOMAIN = os.path.join(APP_ROOT, 'domains')
 # N_PER_AGENT = 3
 
 '''
-http://localhost:8080/login?role=agent&task_id=test123&workerid=test123&username=Jason&mode=mts&debug=1
+single task:
+http://localhost:8080/login?role=agent&task_id=test123&workerid=test123&username=Jason&mode=COCO&debug=1
+
+multiple tasks:
+http://localhost:8080/login?role=agent&tasks=test1;test2;test3&workerid=test123&username=Jason&mode=2Dshape&debug=1
 '''
 
+add_bot_response = False
 
 config = None
-with open(path.join(APP_DOMAIN, 'app-activate.json'), 'r') as f:
+config_file = path.join(APP_DOMAIN, 'app-{}.json'.format(os.environ['domain']))
+with open(config_file) as f:
     config = json.load(f)
 uri_local = 'mongodb://localhost'
 uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +
@@ -39,25 +45,18 @@ coll_chat = cli[mockdb][config["domain-db"]["coll_chat_data"]]
 coll_chat_test = cli[mockdb][config["domain-db"]["coll_chat_data_test"]]
 coll_crowd = cli[mockdb][config["domain-db"]["coll_cf_data"]]
 coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
-coll_coco_anno = cli[mockdb][config["domain-db"]["coll_coco_anno"]]
-coll_coco_anno_test = cli[mockdb][config["domain-db"]["coll_coco_anno_test"]]
+coll_anno = cli[mockdb][config["domain-db"]["coll_coco_anno"]]
+coll_anno_test = cli[mockdb][config["domain-db"]["coll_coco_anno_test"]]
 
-MTS_API_URL = config["mts-api"]["mts-endpoint"]
-MTS_API_CID = config["mts-api"]["mts-api-cid"]
-MTS_API_CONTEXT = config["mts-api"]["mts-api-context"]
-MTS_API_MESSAGE = config["mts-api"]["mts-api-message"]
-MTS_API_KB = config["mts-api"]["mts-api-kb"]
 
 APP_URL = config["app-url"]
 DOMAIN = config["domain-name"]
-LST_META = config["metadata"]["LST_META"]
-SORTING_KEY = config["metadata"]["SORTING_KEY"]
-SORTING_ORDER = config["metadata"]["SORTING_ORDER"]
-TEXT4DEBUG = config["metadata"]["TEXT4DEBUG"]
+
 socketio = SocketIO()
 
-CHAT_HTML = DOMAIN + '.chat.html'
-VIZ_DATA_JSON = APP_STATIC + '/data/data-kbv.json'
+CHAT_HTML = 'vision-dialog.chat.html'
+TEST_HTML = 'test.html'
+TEST_DATA_FILE = os.path.join(APP_DATA, 'quiz_data.json')
 
 
 def get_crowd_db(is_debug=True):
@@ -71,10 +70,11 @@ def get_chat_db(is_debug=True):
         return coll_chat_test
     return coll_chat
 
-def get_coco_anno_db(is_debug=True):
+
+def get_anno_db(is_debug=True):
     if is_debug:
-        return coll_coco_anno_test
-    return coll_coco_anno
+        return coll_anno_test
+    return coll_anno
 
 
 def create_app(debug=False):
@@ -84,8 +84,6 @@ def create_app(debug=False):
     app.config['SECRET_KEY'] = 'RAWEFAwW#$Q$'
 
     from .core import main as main_blueprint
-    # from .viz.kbv import gen_visual_data
-    # gen_visual_data()
     app.register_blueprint(main_blueprint)
     socketio.init_app(app)
     return app

@@ -1,11 +1,12 @@
-AGENT = "agent"
-USER = "user"
+AGENT = "agent"  # painter
+USER = "user"  # instructor
 
-MODE_WOZ_CHAT = 'chat'
-MODE_WOZ_QA = 'qa'
+MODE_COCO = 'COCO'
+MODE_2D = '2Dshape'
 
 DEBUG = "is_debug"
 TASK_ID = "task_id"
+TASKS = "tasks"
 ROLE = "role"
 USERNAME = "username"
 WORKER_ID = "worker_id"
@@ -17,17 +18,15 @@ MSG = 'msg'
 TS = 'timestamp'
 TEST = 'is_pass'
 TURN = 'turn'
-TURN_G = 'turn_g'
 FEEDBACK = 'feedback'
-MTS = 'mts'
-DS = 'dialog_state'
-QUERY = 'query'
-DQ = 'db_query'
-PRE_DEFINED_TASK = 'pre_defined_task'
-# operations
-LTE = "<="
-GTE = ">="
 
+SEP = ';'
+Q = 'Q'
+C = 'C'
+A = 'A'
+DATA = 'DATA'
+
+TOTAL = 'total'
 
 # NAME = 'Name'
 

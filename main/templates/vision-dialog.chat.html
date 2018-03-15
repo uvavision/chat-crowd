@@ -298,7 +298,7 @@
                 socket.on('coco_image_anno', function (data) {
                   var canvas = document.getElementById("coco_image_anno");
                   canvas.setAttribute("data", data['boxes']);
-                  var labels = []
+                  var labels = [];
                   JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label']); });
                   document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
                   var ctx = canvas.getContext('2d');
@@ -311,7 +311,7 @@
                           var scale = canvas.width / img.width;
                           canvas.height = img.height * scale;
                           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                          Common.drawCanvasData(ctx, JSON.parse(data['boxes']), scale);
+                          Common.drawCanvasDataCOCO(ctx, JSON.parse(data['boxes']), scale);
                       };
                   } else {
                       alert("unable to load image based on taskid");

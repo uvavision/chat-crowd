@@ -1,9 +1,0 @@
-YOU: Hi, where are you from?	(Avoid random chitchat.)
-agent: I'm from Michigan. How can I help you?
-YOU: I am looking for rental apartment.
-agent: Please tell me your preferences on location.
-YOU: I like buildings with glass window	(Please try to respond to agent's question.)
-agent: What is your price range?
-YOU: less than $100	(Please make your request base on the commonsense)
-agent: There are no apartments in that price range but I can look for some other cheaper options.
-YOU: Never mind then, bye!	(Please adjust search criteria to explore other options.)

@@ -1,6 +1,6 @@
 import json
 from tqdm import tqdm
-from main import coll_coco_anno
+from main import coll_anno
 
 
 if __name__ == '__main__':
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     for key in tqdm(cocoid2cocourl):
         try:
             r = {"cocoid": key, "url": cocoid2cocourl[key], "boxes": str(cocoid2boxanno[key]), "captions": str(cocoid2caption[key])}
-            coll_coco_anno.insert(r)
+            coll_anno.insert(r)
         except KeyError as e:
             pass
 

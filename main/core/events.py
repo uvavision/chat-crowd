@@ -3,10 +3,11 @@ from flask_socketio import emit, join_room, leave_room
 from eventlet import sleep
 import datetime
 from .. import socketio
-from .. import get_crowd_db, get_chat_db, get_coco_anno_db
+from .. import get_crowd_db, get_chat_db, get_anno_db, add_bot_response
 from .data import MSG, TURN
-from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, CONTEXT_ID)
-from .data import (insert_crowd, insert_chatdata, get_chatdata, get_coco_anno_data)
+from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE)
+from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data,
+                   get_bot_response)
 import time
 import json
 import os
@@ -14,7 +15,7 @@ from multiprocessing import Queue
 import requests
 
 canvas_token = '#CANVAS-'
-def get_message(role, text, username):
+def get_message(role, text, username="ADMIN"):
     role_name = {AGENT: 'painter', USER: 'instructor'}[role]
     if role == AGENT:
         return '<div><b>{0}({2}): </b>{1}</div>'.format(role_name, text, username)
@@ -58,37 +59,29 @@ def joined(message):
         else:
             emit('status', {MSG: get_message(ele[ROLE], ele[MSG], ele[USERNAME]),
                             ROLE: ele[ROLE]}, room=session[TASK_ID])
-
-    db_coco_anno = get_coco_anno_db(session[DEBUG])
-    anno = get_coco_anno_data(db_coco_anno, session)
+    db_anno = get_anno_db(session[DEBUG])
+    anno = get_anno_data(db_anno, session)
     if anno:
         boxes = anno['boxes'].replace("'", '"')
         boxes_data = json.loads(boxes)
         labels = list(set([anno['label'] for anno in boxes_data]))
-        emit('coco_image_labels', {"labels": str(labels).replace("'", '"')}, room=session[TASK_ID])
-        emit('coco_image_anno', {"url": anno['url'], "boxes": boxes}, room=session[TASK_ID])
+        if os.environ['domain'] == '2Dshape':
+            emit('2d_shape_anno', {"boxes": boxes}, room=session[TASK_ID])
+        else: # COCO
+            emit('coco_image_labels', {"labels": str(labels).replace("'", '"')}, room=session[TASK_ID])
+            emit('coco_image_anno', {"url": anno['url'], "boxes": boxes}, room=session[TASK_ID])
     else:
-        emit('coco_image_labels', {"labels": ""}, room=session[TASK_ID])
-        emit('coco_image_anno', {}, room=session[TASK_ID])
+        if os.environ['domain'] == '2Dshape':
+            emit('2d_shape_anno', {}, room=session[TASK_ID])
+        else:
+            emit('coco_image_labels', {"labels": ""}, room=session[TASK_ID])
+            emit('coco_image_anno', {}, room=session[TASK_ID])
 
     for ele in reversed(history):
         if ele['role'] == AGENT and ele['msg'].startswith(canvas_token):
             canvas_data = ele['msg'][len(canvas_token):]
             emit('latest_canvas', {MSG: str(canvas_data), ROLE: ele[ROLE]}, room=session[TASK_ID])
             break
-
-    '''
-    is_other_logged, username_other = get_role_other(role_other, taskid,
-                                                     is_debug)
-    msg = '{} ({}) has joined!'.format(username, role)
-    emit('status', {MSG: msg, ROLE: role},
-         taskid=taskid, role=role, username=username, room=room)
-    if is_other_logged:
-        role_other = [ele for ele in ['agent', 'user'] if ele != role][0]
-        msg = '{} ({}) has joined!'.format(username_other, role_other)
-        emit('status', {MSG: msg, ROLE: role_other}, taskid=taskid,
-             role=role_other, username=username_other, room=room)
-    '''
 
 
 @socketio.on('text', namespace='/chat')
@@ -100,12 +93,19 @@ def text(message):
     if msg:
         session[TURN] = session.get(TURN) + 1
         insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human'})
-        emit('message', {MSG: get_message(role, msg, session.get(USERNAME)), ROLE: role, MODE: mode},
-             room=session.get(TASK_ID))
+        emit('message', {MSG: get_message(role, msg, session.get(USERNAME)),
+             ROLE: role, MODE: mode}, room=session.get(TASK_ID))
         if role == AGENT:
             # if there are other painters in the same room, update their canvases too?
             if msg.startswith(canvas_token):
                 emit('latest_canvas', {MSG: msg[len(canvas_token):], ROLE: role}, room=session[TASK_ID])
+        if add_bot_response:
+            other_role = {AGENT: USER, USER: AGENT}[role]
+            response = get_bot_response(other_role)
+            import time
+            time.sleep(2)
+            emit('message', {MSG: get_message(other_role, response),
+                 ROLE: other_role, MODE: mode}, room=session.get(TASK_ID))
 
 
 @socketio.on('left', namespace='/chat')
@@ -119,11 +119,11 @@ def left(message):
     insert_chatdata(db_chat, session, {MSG: '#END'})
     emit('status', {MSG: role + ' has left the conversation.'}, room=task_id)
 
+
 @socketio.on('end_task', namespace='/chat')
 def complete(message):
     task_id = session.get(TASK_ID)
     role = session.get(ROLE)
-    r = requests.post("http://deep.cs.virginia.edu:5003/finished", data={'task_id': task_id, 'role': role, "msg": message[MSG]})
+    print(message)
+    r = requests.post("http://deep.cs.virginia.edu:5004/finished", data={'task_id': task_id, 'role': role, "msg": message[MSG]})
     # print(r.status_code, r.reason)
-
-

@@ -4,48 +4,38 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <link href="{{url_for('static', filename='css/materialize.css')}}" type="text/css" rel="stylesheet">
+    <!-- <link href="{{url_for('static', filename='css/materialize.css')}}" type="text/css" rel="stylesheet"> -->
     <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="//cdn.transifex.com/live.js"></script>
 </head>
 <body>
 <div class="container">
-    <h4>Welcome {{ workerid }} ({{ username }} )! </h4>
-    <h5>Please answer the following test questsion. </h5>
-    <h5>Note that to do the task you need to pass at least 90% of the test questions.</h5>
-    <!--<blockquote>-->
-        <!--Please answer the following test questions.<br>-->
-        <!--When you pass the test, you will be allowed to go to the task.<br>-->
-        <!--{#Please fill the form below and click "start" to move on to the next step.<br>#}-->
-        <!--{# If this is your first time doing this task, there will be a simple quiz. <br>#}-->
-        <!--{# Once you pass the quiz, you will enter the conversation. <br>#}-->
-    <!--</blockquote>-->
-
+    <h5>Welcome <b>{{ username }}</b>! Please answer the two questsions based on the chat history in the image. </h5>
 
     <form method="POST">
-        <blockquote>
-        {{ form_test.hidden_tag() }}
-        {{ form_test.r1.label }}
-            <img src={{form_test.r1data[0]}}> </img>
-            <ul>
-            {% for subfield in form_test.r1 %}
-                <li>{{ subfield }} {{ subfield.label }}</li>
-                <li><img src={{form_test.r1data[loop.index]}}</img></li>
-            {% endfor %}
-                </ul>
-            </blockquote>
+      {{ form_test.hidden_tag() }}
+      <div class="row">
+        <div class="col s9"><div class="card"><div class="card-image"><img src={{form_test.r1data[0]}}></img></div></div></div>
+      </div>
+      <ol class="collection">
+        <li>
+          <b class="teal-text">{{ form_test.r1.description }}</b>
+          {{ form_test.r1 }}
 
-        <blockquote>
-        {{ form_test.r2.label }}
-        {{ form_test.r2 }}
-
-        </blockquote>
-
-        <!--{% for field in form_test %}-->
-                <!--{{ field.label }}-->
-        <!--{% endfor %}-->
-        <h5>{{ form_test.submit(class_="btn btn-primary") }}</h5>
+          <!-- <ul>
+                {% for subfield in form_test.r1 %}
+                    <li>{{ subfield }} {{ subfield.label }}</li>
+                    <li><img class="col s6" src={{form_test.r1data[loop.index]}}</img></li>
+                {% endfor %}
+              </ul> -->
+          </li>
+        <li>
+          <b class="teal-text">{{ form_test.r2.description }}</b>
+          {{ form_test.r2 }}
+        </li>
+      </ol>
+      <div>{{ form_test.submit(class_="btn btn-primary") }}</div>
     </form>
 
 </div>
