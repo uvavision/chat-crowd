@@ -114,13 +114,21 @@
 
         });
 
+        var task_end_signalled = false;
+
         function next_task() {
           if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
-            socket.emit('end_task', {msg: "layout_completed"});
-            window.location.href = "{{ url_for('main.end') }}";
+            if (!task_end_signalled) {
+              socket.emit('end_task', {msg: "layout_completed"});
+              task_end_signalled = true;
+            }
+            window.location.href = "{{ url_for('main.chat') }}";
           } else {
               if (contributed) {
-                socket.emit('end_task', {msg: "layout_not_completed"});
+                if (!task_end_signalled) {
+                  socket.emit('end_task', {msg: "layout_not_completed"});
+                  task_end_signalled = true;
+                }
                 window.location.href = "{{ url_for('main.chat') }}";
               } else {
                 if ("{{role}}" === "agent")
@@ -135,11 +143,17 @@
 
         function end_task() {
           if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
-            socket.emit('end_task', {msg: "layout_completed"});
+            if (!task_end_signalled) {
+              socket.emit('end_task', {msg: "layout_completed"});
+              task_end_signalled = true;
+            }
             window.location.href = "{{ url_for('main.end') }}";
           } else {
               if (contributed) {
-                socket.emit('end_task', {msg: "layout_not_completed"});
+                if (!task_end_signalled) {
+                  socket.emit('end_task', {msg: "layout_not_completed"});
+                  task_end_signalled = true;
+                }
                 window.location.href = "{{ url_for('main.end') }}";
               } else {
                 if ("{{role}}" === "agent")
