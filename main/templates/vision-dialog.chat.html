@@ -113,27 +113,54 @@
             });
 
         });
-        function left_room() {
-            socket.emit('text', {msg:"#END"});
-        }
-        function end_task() {
-          if (contributed) {
-            if ("{{role}}" === "agent") {
-              socket.emit('end_task', {msg: "layout_not_completed"});
+
+        var task_end_signalled = false;
+
+        function next_task() {
+          if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
+            if (!task_end_signalled) {
+              socket.emit('end_task', {msg: "layout_completed"});
+              task_end_signalled = true;
             }
-            if ("{{role}}" === "user") {
-              if ($("#textInput").is(':disabled')) {
-                socket.emit('end_task', {msg: "layout_completed"});
+            window.location.href = "{{ url_for('main.chat') }}";
+          } else {
+              if (contributed) {
+                if (!task_end_signalled) {
+                  socket.emit('end_task', {msg: "layout_not_completed"});
+                  task_end_signalled = true;
+                }
+                window.location.href = "{{ url_for('main.chat') }}";
               } else {
-                socket.emit('end_task', {msg: "layout_not_completed"});
+                if ("{{role}}" === "agent")
+                  alert("please contribute at least one drawing");
+                if ("{{role}}" === "user")
+                  alert("please contribute at least one instruction");
               }
+          }
+            // socket.emit('end_task', {msg:"#END"});
+//            window.location.href = "{{ url_for('main.chat') }}";
+        };
+
+        function end_task() {
+          if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
+            if (!task_end_signalled) {
+              socket.emit('end_task', {msg: "layout_completed"});
+              task_end_signalled = true;
             }
             window.location.href = "{{ url_for('main.end') }}";
           } else {
-            if ("{{role}}" === "agent")
-              alert("please contribute at least one canvas");
-            if ("{{role}}" === "user")
-              alert("please contribute at least one instruction");
+              if (contributed) {
+                if (!task_end_signalled) {
+                  socket.emit('end_task', {msg: "layout_not_completed"});
+                  task_end_signalled = true;
+                }
+                window.location.href = "{{ url_for('main.end') }}";
+              } else {
+                if ("{{role}}" === "agent")
+                  alert("please contribute at least one drawing");
+                if ("{{role}}" === "user")
+                  alert("please contribute at least one instruction");
+              }
           }
 
             <!--socket.emit('left', {}, function() {-->
@@ -152,10 +179,14 @@
     <div class="center-align bg-header blue lighten-5 align-center">
   {% endif %}
       <!--Welcome! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.-->
-      Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.
-      <div>
-        Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">submit</button> when the task is completed.
-      </div>
+      Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> on {{progress}}.
+      {% if tasks == [] %}
+        <div>
+          Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
+        </div>
+      {% else %}
+        Click <button class="btn red lighten-1" id="end_task" href="#" onclick="next_task();" value="">Next Task</button> when the task is completed.
+      {% endif %}
     </div>
     <div id="contentParent" class="responsive-columns-wrapper">
     <div><p></p></div>
