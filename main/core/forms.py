@@ -60,7 +60,7 @@ class TestFormCOCOAgent(FlaskForm):
 class TestFormCOCOUser(FlaskForm):
     '''add test for user'''
     data = data_test[MODE_COCO][USER]
-    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[1][Q], validators=[Required()])
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[0][Q], validators=[Required()])
     r1data = data[0][DATA]
     r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], description=data[1][Q], validators=[Required()])
     answers = [data[0][A], data[1][A]]
