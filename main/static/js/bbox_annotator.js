@@ -485,13 +485,13 @@
       //   return close_button.hide();
       // }));
 
-      [move_button, nw_resize_button, se_resize_button].forEach(function (t) {
-        t.hover((function (e) {
-          t.fadeTo(1, 1);
-        }), (function (e) {
-          t.fadeTo(1, 0.06);
-        }));
-      });
+      //[move_button, nw_resize_button, se_resize_button].forEach(function (t) {
+      //  t.hover((function (e) {
+      //    t.fadeTo(1, 1);
+      //  }), (function (e) {
+      //    t.fadeTo(1, 0.06);
+      //  }));
+      //});
 
       [move_button, nw_resize_button, se_resize_button].forEach(function (t) {
         t.hover((function(e) {
@@ -547,7 +547,7 @@
         annotator.entries.splice(index, 1);
         return annotator.onchange(annotator.entries);
       });
-      [move_button, nw_resize_button, se_resize_button].forEach(function (t) { t.fadeTo(800,0.06); });
+      //[move_button, nw_resize_button, se_resize_button].forEach(function (t) { t.fadeTo(800,0.06); });
       // return close_button.hide();
     }
 
