@@ -387,7 +387,7 @@
                     var now = new Date(Date.now());
                     var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                     socket.emit('text', {msg: "#END", t: t});
-                    document.getElementById("textInput").setAttribute("placeholder", "DONE");
+                    document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
                     document.getElementById("textInput").disabled = true;
                     this.disabled = true;
                   }
