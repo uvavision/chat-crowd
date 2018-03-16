@@ -111,11 +111,11 @@
     "COCO": {
         "agent": [
             {
-                "Q": "Given a chat history (canvas and instructions), select all the operation needed for the drawing tasks?",
+                "Q": "Given a chat history (canvas and instructions), select all the operations needed for the last two instructions?",
                 "C": [
                     [
                         1,
-                        "Add a new object"
+                        "Resize an object"
                     ],
                     [
                         2,
@@ -123,11 +123,11 @@
                     ],
                     [
                         3,
-                        "Delete an object"
+                        "Add an object"
                     ],
                     [
                         4,
-                        "None of above."
+                        "Delete an object"
                     ]
                 ],
                 "A": [
@@ -135,19 +135,19 @@
                     "2"
                 ],
                 "DATA": [
-                    "XXX link to images"
+                    "https://s3.amazonaws.com/crowdflower-make-cloud/images%2F1521160431737-Screen+Shot+2018-03-15+at+8.21.06+PM.png"
                 ]
             },
             {
-                "Q": "Choose all that are applicable to canvas given the instruction \"draw a yellow circle next to the circle\"",
+                "Q": "Choose all that are applicable given a new instruction \"draw a surfer\"",
                 "C": [
                     [
                         1,
-                        "Draw on the canvas like"
+                        "Draw a person and a surfboard."
                     ],
                     [
                         2,
-                        "Ask instructor \"What are the location of yellow circle? Left, right, up or down?\""
+                        "Ask instructor \"Where shall I draw the surfer?\""
                     ],
                     [
                         3,
@@ -165,19 +165,19 @@
         ],
         "user": [
             {
-                "Q": "Given a chat history (canvas and instructions), choose the most helpful instructions.",
+                "Q": "Given a chat history (canvas and instructions), choose all the instructions that are helpful.",
                 "C": [
                     [
                         1,
-                        "Instruction for new drawing, such as \u201cXXX\u201d.  "
+                        "\"You need to move the person and the dog down to the bottom.\""
                     ],
                     [
                         2,
-                        "Instruction for improving the existing layout, such as \u201cXXX\u201d."
+                        "\"The size of the person is bigger than the dog. Please adjust the size of the dog.\""
                     ],
                     [
                         3,
-                        "Answer the question of the painter, such as \u201cXXX\u201d."
+                        "\"You didn't understand the previous instruction?!\""
                     ],
                     [
                         4,
@@ -189,23 +189,23 @@
                     "2"
                 ],
                 "DATA": [
-                    "XXX link to the images"
+                    "https://s3.amazonaws.com/crowdflower-make-cloud/images%2F1521158374959-Screen+Shot+2018-03-15+at+7.58.37+PM.png"
                 ]
             },
             {
-                "Q": "If you try to rewrite the instruction \"draw a dog and a person\" to make it clear for the drawing task, which version would you choose?",
+                "Q": "Assuming the painter has improved the drawing of the runner and the dog, which one could be the next instruction?",
                 "C": [
                     [
                         1,
-                        "Draw on the canvas like"
+                        "\"Glad that you have successfully improved the drawing! Great job!\""
                     ],
                     [
                         2,
-                        "Ask instructor \"What are the location of yellow circle? Left, right, up or down?\""
+                        "\"Next, please draw a surfer at the background. Draw a surfboard under the surfer.\""
                     ],
                     [
                         3,
-                        "Ask instructor \"What do you mean?\""
+                        "\"The layout of the image is complete!\""
                     ],
                     [
                         4,
