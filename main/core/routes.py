@@ -3,14 +3,17 @@ from flask import session, redirect, url_for, request, jsonify
 from flask import render_template, render_template_string
 from . import main
 from .. import coll_data, APP_TEMPLATE, DOMAIN, CHAT_HTML
-from .. import get_chat_db, get_crowd_db
+from .. import get_chat_db, get_crowd_db, get_anno_db
+from .data import get_chatdata, get_anno_data
+from .events import get_message
 from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser,
                     TestFormCOCOAgent, TestFormCOCOUser)
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
-                    ROOM, PASS, MODE, TURN, MSG, TOTAL,
+                    ROOM, PASS, MODE, TURN, MSG, TOTAL, ROLE_NAME,
                     USER, AGENT, MESSAGE, MODE_2D, MODE_COCO, TASKS, SEP)
 
+from itertools import groupby
 
 def _init_login_by_form(form):
     session.clear()
@@ -110,7 +113,7 @@ def chat():
     if username == '' or task_id == '':
         return redirect(url_for('.index'))
     db_chat = get_chat_db(session[DEBUG])
-    role_name = {AGENT: 'painter', USER: 'instructor'}[role]
+    role_name = ROLE_NAME[role]
     total = session[TOTAL]
     left = session[TOTAL] - len(session[TASKS])
     progress = 'task {} out of {}'.format(left, total)
@@ -135,16 +138,6 @@ def test():
         print('@@ answer_data', answer_data, form_test.answers)
         if answer_data == form_test.answers:
             is_pass = True
-        # if role == AGENT:
-        #     form_test = TestFormAgent()
-        #     answer_data = [form_test.r1.data, form_test.r2.data] # answers submitted
-        #     if sum([answer_data[i] == form_test.answers[i] for i in range(len(answer_data))]) >= 0.9 * len(answer_data):
-        #         is_pass = True
-        # if role == USER:
-        #     form_test = TestForm2DUser()
-        #     answer_data = [form_test.r1.data, form_test.r2.data] # answers submitted
-        #     if sum([answer_data[i] == form_test.answers[i] for i in range(len(answer_data))]) >= 0.9 * len(answer_data):
-        #         is_pass = True
         if is_pass:
             session[PASS] = is_pass
             is_debug = session[DEBUG]
@@ -194,3 +187,29 @@ def end():
                            current_reward=current_reward,
                            estimated_reward=estimated_reward,
                            task_url_next=task_url_agent_next)
+
+@main.route('/history', methods=['GET'])
+def history():
+    task_id = request.args.get(TASK_ID)
+    print("requesting history of " + task_id)
+    session = {'is_debug': False, 'task_id': task_id}
+
+    db_anno = get_anno_db(session['is_debug'])
+    anno = get_anno_data(db_anno, session)
+    # print(anno)
+    anno = '#CANVAS-' + anno['boxes'].replace("'", '"')
+    # print(anno)
+
+    db_chat = get_chat_db(session['is_debug'])
+    history = get_chatdata(db_chat, session)
+    groups = []
+    uniquekeys = []
+    for k, g in groupby(history, lambda x: x['username']+x['role']):
+        groups.append(list(g))  # Store group iterator as a list
+        uniquekeys.append(k)
+    new_history = []
+    for group in groups:
+        msg = [g['msg'] for g in group]
+        new_history.append({'role': group[0]['role'], 'username': group[0]['username'], 'msg': '\n'.join(msg)})
+    anno = {'msg': anno}
+    return render_template('history.html', task_id=task_id, anno=anno, history=history, role_mapping={'user': 'Instructor', 'agent': 'Painter'})

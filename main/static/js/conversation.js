@@ -169,7 +169,12 @@ var ConversationPanel = (function() {
           canvas_data = JSON.parse(msg_data.slice('#CANVAS-'.length));
           var canvas = document.createElement('canvas');
           var scale = 0.5;
-          var canvas_width = 500;
+          var textInput = document.getElementById("textInput");
+          if (textInput.getAttribute("mode") === '2Dshape') {
+            var canvas_width = 500;
+          } else {
+            var canvas_width = 600;
+          }
           var canvas_height = 500;
           canvas.setAttribute("width", (canvas_width * scale).toString());
           canvas.setAttribute("height", (canvas_height * scale).toString());
@@ -180,7 +185,13 @@ var ConversationPanel = (function() {
           ctx.strokeStyle = "gray";
           ctx.strokeRect(0, 0, canvas.width, canvas.height);
           ctx.setLineDash([]);
-          Common.drawCanvasData(ctx, canvas_data, scale);
+          var textInput = document.getElementById("textInput");
+          if (textInput.getAttribute("mode") === '2Dshape') {
+              Common.drawCanvasData(ctx, canvas_data, scale);
+          } else {
+              Common.drawCanvasDataCOCO(ctx, canvas_data, scale);
+          }
+
           leafNodes = [
             {
               'tagName': 'p',

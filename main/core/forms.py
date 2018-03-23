@@ -18,12 +18,12 @@ class MultiCheckboxField(SelectMultipleField):
 class LoginForm(FlaskForm):
     workerid = StringField('worderid', id='workerid', validators=[Required()], render_kw={"placeholder": "Enter your contributor ID..."})
     username = StringField('username', id="username", validators=[Required()], render_kw={"placeholder": "Enter your CrowdFlower UserName..."})
-    task_id = StringField('task_id', id="task_id", validators=[Required()], default="57870")
-    tasks = StringField('tasks', id="tasks", validators=None, default="57870")
+    task_id = StringField('task_id', id="task_id", validators=[Required()], default="12445")
+    tasks = StringField('tasks', id="tasks", validators=None, default="12445")
     role = RadioField('role', choices=[('user', 'instructor'), ('agent', 'painter')],
                       validators=[Required()])
     mode = RadioField('mode', choices=[('2Dshape', "2D shapes"),
-                      ("COCO", "Photos")], validators=[Required()])
+                      ("COCO", "Real Images")], validators=[Required()])
     submit = SubmitField('Start', id='login')
 
 
@@ -60,7 +60,7 @@ class TestFormCOCOAgent(FlaskForm):
 class TestFormCOCOUser(FlaskForm):
     '''add test for user'''
     data = data_test[MODE_COCO][USER]
-    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[1][Q], validators=[Required()])
+    r1 = MultiCheckboxField(data[0][Q], choices=data[0][C], description=data[0][Q], validators=[Required()])
     r1data = data[0][DATA]
     r2 = MultiCheckboxField(data[1][Q], choices=data[1][C], description=data[1][Q], validators=[Required()])
     answers = [data[0][A], data[1][A]]

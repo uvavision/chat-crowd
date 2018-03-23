@@ -98,8 +98,6 @@ var Common = (function() {
   }
 
     function drawCanvasData(ctx, canvas_data, scale) {
-        console.log("in draw canvas data");
-        console.log(canvas_data);
         // ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
         // ctx.lineWidth = 3;
         ctx.globalAlpha = 0.8;
@@ -134,13 +132,13 @@ var Common = (function() {
     }
 
     function drawCanvasDataCOCO(ctx, canvas_data, scale) {
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-    ctx.lineWidth = 3;
-    canvas_data.forEach(function (box_anno) {
-        bbox = [box_anno['left'], box_anno['top'], box_anno['width'], box_anno['height']];
-        ctx.rect(bbox[0] * scale, bbox[1] * scale, (bbox[2]) * scale, (bbox[3]) * scale);
-        ctx.stroke();
-        drawTextBG(ctx, box_anno['label'], '15px arial', bbox[0] * scale, bbox[1] * scale);
-    });
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.lineWidth = 3;
+        canvas_data.forEach(function (box_anno) {
+            bbox = [box_anno['left'], box_anno['top'], box_anno['width'], box_anno['height']];
+            ctx.rect(bbox[0] * scale, bbox[1] * scale, (bbox[2]) * scale, (bbox[3]) * scale);
+            ctx.stroke();
+            drawTextBG(ctx, box_anno['label'], '15px arial', bbox[0] * scale, bbox[1] * scale);
+        });
 }
 }());

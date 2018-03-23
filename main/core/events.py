@@ -5,7 +5,7 @@ import datetime
 from .. import socketio
 from .. import get_crowd_db, get_chat_db, get_anno_db, add_bot_response
 from .data import MSG, TURN
-from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE)
+from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, ROLE_NAME)
 from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data,
                    get_bot_response)
 import time
@@ -16,7 +16,7 @@ import requests
 
 canvas_token = '#CANVAS-'
 def get_message(role, text, username="ADMIN"):
-    role_name = {AGENT: 'painter', USER: 'instructor'}[role]
+    role_name = ROLE_NAME[role]
     if role == AGENT:
         return '<div><b>{0}({2}): </b>{1}</div>'.format(role_name, text, username)
     else:
@@ -68,11 +68,13 @@ def joined(message):
         if os.environ['domain'] == '2Dshape':
             emit('2d_shape_anno', {"boxes": boxes}, room=session[TASK_ID])
         else: # COCO
+            emit('coco_image_labels', {"labels": str(labels).replace("'", '"')}, room=session[TASK_ID])
             emit('coco_image_anno', {"url": anno['url'], "boxes": boxes}, room=session[TASK_ID])
     else:
         if os.environ['domain'] == '2Dshape':
             emit('2d_shape_anno', {}, room=session[TASK_ID])
         else:
+            emit('coco_image_labels', {"labels": ""}, room=session[TASK_ID])
             emit('coco_image_anno', {}, room=session[TASK_ID])
 
     for ele in reversed(history):
@@ -122,6 +124,15 @@ def left(message):
 def complete(message):
     task_id = session.get(TASK_ID)
     role = session.get(ROLE)
-    print(message)
-    r = requests.post("http://deep.cs.virginia.edu:5003/finished", data={'task_id': task_id, 'role': role, "msg": message[MSG]})
+    # dispatch_addr = "http://deep.cs.virginia.edu:5003/finished".format()
+    # print(message)
+    db_chat = get_chat_db(session[DEBUG])
+    insert_chatdata(db_chat, session, {MSG: '#END_TASK'})
+    # TODO set dispatching address using configuration file
+    if os.environ['domain'] == '2Dshape':
+        r = requests.post("http://deep.cs.virginia.edu:5003/finished",
+                          data={'task_id': task_id, 'role': role, "msg": message[MSG]})
+    else:
+        r = requests.post("http://deep.cs.virginia.edu:5004/finished",
+                          data={'task_id': task_id, 'role': role, "msg": message[MSG]})
     # print(r.status_code, r.reason)

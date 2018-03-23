@@ -83,6 +83,10 @@
                       alert('please wait for the canvas...');
                     } else {
                       var text = $('#textInput').val();
+                      if (text.split(" ").length < 4) {
+                          alert("Your input is too brief. Please provide something informative. Thank you!")
+                          return;
+                      }
                       var now = new Date(Date.now());
                       var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                       $('#textInput').val("");
@@ -101,15 +105,6 @@
                     $('#textInput1').timedDisable(3);
                     socket.emit('text', {msg:text, t:t});
                 }
-            });
-            $('#search').click(function() {
-              $('#progressbar1').show();
-              $("#result").empty();
-              $("#rcount").empty();
-              <!--$("#rcount1").empty();-->
-              $("#more").empty();
-              $("#post-search").hide();
-              $("#pre-search").show();
             });
 
         });
@@ -177,11 +172,14 @@
   {%  else %}
     <div class="center-align bg-header blue lighten-5 align-center">
   {% endif %}
-      <!--Welcome! You will play the role of <b>{{role_name}}</b> in <b>{{mode}}</b> mode.-->
       Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> on {{progress}}.
       {% if tasks == [] %}
         <div>
-          Click <button class="btn red lighten-1" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
+          {% if role == "agent" %}
+            Click <button class="btn teal" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
+          {% else %}
+            Click <button class="btn blue darken-3" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
+          {% endif %}
         </div>
       {% else %}
         Click <button class="btn red lighten-1" id="end_task" href="#" onclick="next_task();" value="">Next Task</button> when the task is completed.
@@ -193,48 +191,48 @@
     <div><p></p></div>
     <div><p></p></div>
         {% if role == "agent" %}
-                  <div class="center-align">
-	              </br>
-	              </br>
-                      <div>Drag your mouse and draw in the canvas below</div>
-	              </br>
-                {% if mode == '2Dshape' %}
-                      <div id="bbox_annotator"></div>
-                {%  else %}
-                  <div>ADD the tool for coco images</div>
-                {% endif %}
-		      <!--<div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>-->
-		      <!--<div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>-->
-		      <!--<div class="fa "> &#8689 &#8690: Resize </div>-->
-                  </div>
+              <div class="center-align">
+              </br>
+                  <div class="teal-text"><b>Drag your mouse and draw in the canvas below</b></div>
+              </br>
+                  <div id="bbox_annotator"></div>
+            {% if mode == 'COCO' %}
+                  <div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>
+                  <div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>
+                  <div class="fa "> &#8689 &#8690: Resize </div>
+            {% endif %}
+              </div>
       {% endif %}
       {% if role == "user" %}
-              <div class="center-align"><p>Image Layout Reference</p>
+              <div class="center-align blue-text text-darken-2"><p><b>Image Layout Reference</b></p>
                   <canvas id="coco_image_anno"></canvas>
               </div>
       {% endif %}
       {% if mode !='test' %}
           <div id="chat-column-holder" class="responsive-column content-column">
-              <div class="center-align"><p>Interactive Drawing History</p></div>
+              <br>
+              <div class="center-align"><b>Interactive Drawing History</b></div>
               <div class="chat-column">
                 <div id="scrollingChat"></div>
                   {% if role == "user" %}
                       <div class="input-field inputOutline">
                           <i class="material-icons prefix">textsms</i>
-                          <input id="textInput" placeholder="Type instruction here... (Press Enter to submit)"></input>
+                          <input id="textInput" mode="{{ mode }}" placeholder="Type instruction here... (Press Enter to submit)"></input>
                       </div>
-                      <!--<div class="input-field">-->
-                          <!--<button class="btn red lighten-1" id="finish_drawing" href="#" value="">-->
-                              <!--The drawing is complete-->
-                          <!--</button>-->
-                      <!--</div>-->
+                  {% if mode == 'COCO' %}
+                      <div class="input-field">
+                          <button class="btn red lighten-1" id="finish_drawing" href="#" value="">
+                              The drawing is complete
+                          </button>
+                      </div>
+                  {% endif %}
                   {% elif role == "agent" %}
                       <div class="input-field inputOutline">
                           <i class="material-icons prefix">textsms</i>
-                          <input id="textInput" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
+                          <input id="textInput" mode="{{ mode }}" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
                       </div>
                       <div class="input-field">
-                          <button class="btn red lighten-1" id="submit_canvas" href="#" value="">
+                          <button class="btn teal lighten-1" id="submit_canvas" href="#" value="">
                               submit canvas
                           </button>
                       </div>
@@ -249,8 +247,11 @@
 
       <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
       <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-      <script src="{{ url_for('static', filename='js/bbox_annotator.js') }}"></script>
-
+        {% if mode == '2Dshape' %}
+        <script src="{{ url_for('static', filename='js/bbox_annotator_2Dshape.js') }}"></script>
+        {% else %}
+        <script src="{{ url_for('static', filename='js/bbox_annotator_coco.js') }}"></script>
+        {% endif %}
       <script src="{{url_for('static', filename='js/common.js')}}"></script>
       <script src="{{url_for('static', filename='js/api.js')}}"></script>
       <script src="{{url_for('static', filename='js/conversation.js')}}"></script>
@@ -292,7 +293,12 @@
               $(document).ready(function () {
                 var canvas = document.createElement('canvas');
                 canvas.setAttribute("id", "scratch");
-                canvas.setAttribute("width", "500");
+                var textInput = document.getElementById("textInput");
+                if (textInput.getAttribute("mode") === '2Dshape') {
+                    canvas.setAttribute("width", "500");
+                } else {
+                    canvas.setAttribute("width", "600");
+                }
                 canvas.setAttribute("height", "500");
                 canvas.setAttribute("style", "border:3px solid #d3d3d3;");
                 var ctx = canvas.getContext("2d");
@@ -325,6 +331,8 @@
                   }
                 });
 
+                // in case of multiple painters in the same room
+                // update painters canvas if other painters draw something
                 socket.on('latest_canvas', function (data) {
                   if (annotator.entries.length > 0) {
                     annotator.clear_all();
@@ -335,17 +343,24 @@
                   });
                   latest_canvas_data = annotator.entries.slice(0);
                   var textInput = document.getElementById("textInput");
-                  var gt_layout = JSON.parse(textInput.getAttribute('data'));
-                  if (shape_layout_match(gt_layout, canvas_data)) {
-                      document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
-                      document.getElementById("textInput").disabled = true;
-                      $("#submit_canvas").hide();
+                  if (textInput.getAttribute("mode") === '2Dshape') {
+                      var gt_layout = JSON.parse(textInput.getAttribute('data'));
+                      if (shape_layout_match(gt_layout, canvas_data)) {
+                          document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
+                          document.getElementById("textInput").disabled = true;
+                          $("#submit_canvas").hide();
+                      }
                   }
                 });
 
+                socket.on('coco_image_labels', function (data) {
+                  annotator.update_labels(JSON.parse(data['labels']));
+                });
+
                 socket.on('2d_shape_anno', function (data) {
-                  var canvas = document.getElementById("textInput");
-                  canvas.setAttribute("data", data['boxes']);
+                  //  the painter use the data attribute to retrieve groundtruth layout
+                  var textInput = document.getElementById("textInput");
+                  textInput.setAttribute("data", data['boxes']);
                 });
 
               });
@@ -354,6 +369,7 @@
         {% elif role == "user" %}
             <script>
               $(document).ready(function () {
+
                 socket.on('coco_image_anno', function (data) {
                   if (!data['boxes']) {
                     alert("cannot find annotation entry based on provided task id")
@@ -362,18 +378,18 @@
                   canvas.setAttribute("data", data['boxes']);
                   var labels = [];
                   JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label']); });
-//                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
+                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
                   var ctx = canvas.getContext('2d');
                   var img = new Image();
                   if ('url' in data && 'boxes' in data) {
                       img.src = data['url'];
                       img.onload = function () {
                           //canvas.width = img.width;
-                          canvas.width = 600;
+                          canvas.width = 500;
                           var scale = canvas.width / img.width;
                           canvas.height = img.height * scale;
                           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-//                          Common.drawCanvasData(ctx, JSON.parse(data['boxes']), scale);
+                          Common.drawCanvasDataCOCO(ctx, JSON.parse(data['boxes']), scale);
                       };
                   } else {
                       alert("unable to load image based on taskid");
@@ -381,7 +397,6 @@
                 });
 
                 socket.on('2d_shape_anno', function (data) {
-                  console.log('2d_shape_anno');
                   if (!data['boxes']) {
                     alert("cannot find annotation entry based on provided task id")
                   }
@@ -389,8 +404,6 @@
                   canvas.setAttribute("data", data['boxes']);
                   var labels = [];
                   JSON.parse(data['boxes']).forEach(function (t) { labels.push(t['label'] + ' ' + t['shape']); });
-//                  document.getElementById("finish_drawing").setAttribute("missing", labels.toString());
-//                  document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
                   var scale = 1.0;
                   var canvas_width = 500;
                   var canvas_height = 500;
@@ -398,84 +411,78 @@
                   canvas.setAttribute("height", (canvas_height * scale).toString());
                   canvas.setAttribute("style", "border:3px solid #d3d3d3;");
                   var ctx = canvas.getContext("2d");
-//                  ctx.lineWidth = 4;
-//                  ctx.setLineDash([5, 3]);
-//                  ctx.strokeStyle = "gray";
-//                  ctx.strokeRect(0, 0, canvas.width, canvas.height);
-//                  ctx.setLineDash([]);
                   Common.drawCanvasData(ctx, JSON.parse(data['boxes']), scale);
-
-                });
-
-                // finish_drawing button is enabled only when there are some drawings
-//                document.getElementById("finish_drawing").disabled = true;
-                function get_objname(anno) {
-                  return anno['label']+ ' ' + anno['shape'];
-                }
-
-                socket.on('latest_canvas', function (data) {
-                  console.log("latest canvas");
-                  var canvas = document.getElementById("coco_image_anno");
-                  var gt_layout = JSON.parse(canvas.getAttribute('data'));
-                  var gt_objs = {};
-                  var present_objs = {};
-                  gt_layout.forEach(function (t) {
-                    var objname = get_objname(t);
-                    present_objs[objname] = 0;
-                    if (objname in gt_objs) {
-                      gt_objs[objname] += 1;
-                    } else {
-                      gt_objs[objname] = 1;
-                    }
-                  });
-
-                  var current_layout = JSON.parse(data['msg']);
-                  current_layout.forEach(function (t) { present_objs[get_objname(t)] += 1;});
-                  var missing = [];
-                  for (var key in present_objs) {
-                      if (present_objs.hasOwnProperty(key)) {
-                          if (gt_objs[key] !== present_objs[key]) {
-                            missing.push(key);
-                          }
-                      }
-                  }
-                  if (shape_layout_match(gt_layout, current_layout)) {
-//                      var now = new Date(Date.now());
-//                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-//                      socket.emit('text', {msg: "#END", t: t});
-                      document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
-                      document.getElementById("textInput").disabled = true;
-                  }
-
-
-//                  document.getElementById("finish_drawing").setAttribute("missing", missing.toString());
-//                  if (shape_layout_match(gt_layout, current_layout))
-//                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "true");
-//                  else
-//                    document.getElementById("finish_drawing").setAttribute("layoutmatch", "false");
                 });
               });
-
-//            $("#finish_drawing").click(function (e) {
-//              var missing = ($("#finish_drawing")).attr("missing");
-//              if (missing.length > 0) {
-//                alert("missing objects: " + missing);
-//              } else {
-//                  if (($("#finish_drawing")).attr("layoutmatch") === "false") {
-//                    alert("Layouts of shapes are not the same");
-//                  } else {
-//                    if (confirm('You sure the drawing has completed the layout, and there is no need for futher instructions?')) {
-//                      var now = new Date(Date.now());
-//                      var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-//                      socket.emit('text', {msg: "#END", t: t});
-//                      document.getElementById("textInput").setAttribute("placeholder", "DONE");
-//                      document.getElementById("textInput").disabled = true;
-//                      this.disabled = true;
-//                    }
-//                  }
-//              }
-//            });
             </script>
+
+            {% if mode == '2Dshape' %}
+                <script>
+                     $(document).ready(function () {
+                         socket.on('latest_canvas', function (data) {
+                             var canvas = document.getElementById("coco_image_anno");
+                             var gt_layout = JSON.parse(canvas.getAttribute('data'));
+                             var current_layout = JSON.parse(data['msg']);
+                             if (shape_layout_match(gt_layout, current_layout)) {
+                                 document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
+                                 document.getElementById("textInput").disabled = true;
+                             }
+                         });
+                     });
+                </script>
+            {% else %}
+                <script>
+                     $(document).ready(function () {
+                         // finish_drawing button is enabled only when there are some drawings
+                         // document.getElementById("finish_drawing").disabled = true;
+                         socket.on('latest_canvas', function (data) {
+                             var canvas = document.getElementById("coco_image_anno");
+                             var canvas_data = JSON.parse(canvas.getAttribute('data'));
+                             var gt_labels = {};
+                             var labels = {};
+                             canvas_data.forEach(function (t) {
+                                 var label = t['label'];
+                                 labels[label] = 0;
+                                 if (label in gt_labels) {
+                                     gt_labels[label] += 1;
+                                 } else {
+                                     gt_labels[label] = 1;
+                                 }
+                             });
+
+                             JSON.parse(data['msg']).forEach(function (t) {
+                                 labels[t['label']] += 1;
+                             });
+                             var missing = [];
+                             for (var key in labels) {
+                                 if (labels.hasOwnProperty(key)) {
+                                     if (gt_labels[key] !== labels[key]) {
+                                         missing.push(key);
+                                     }
+                                 }
+                             }
+                             document.getElementById("finish_drawing").setAttribute("missing", missing.toString());
+                         });
+
+                         $("#finish_drawing").click(function (e) {
+                             var missing = ($("#finish_drawing")).attr("missing");
+                             if (missing.length > 0) {
+                                 alert("missing objects: " + missing);
+                             } else {
+                                 if (confirm('You sure the drawing has completed the layout, and there is no need for futher instructions?')) {
+                                     var now = new Date(Date.now());
+                                     var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+                                     socket.emit('text', {msg: "#END", t: t});
+                                     document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
+                                     document.getElementById("textInput").disabled = true;
+                                     this.disabled = true;
+                                 }
+                             }
+                         });
+
+                     });
+                </script>
+            {% endif %}
         {% endif %}
 
       <script>

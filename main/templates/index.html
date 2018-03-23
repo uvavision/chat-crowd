@@ -30,7 +30,7 @@
 
         <form method="POST">
           {{ form.hidden_tag() }}
-          <label for="workerid">What is your Contributor ID?</label>
+          <label for="workerid">What is your Contributor ID? (<b class="red-text">REQUIRED for sending you confirmation code and payment.</b>)</label>
           <div class='red-text'>{% for error in form.workerid.errors %}{{ error }}{% endfor %}</div>
           {{ form.workerid() }}
 
