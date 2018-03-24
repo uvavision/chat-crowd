@@ -6,6 +6,7 @@ from flask import jsonify
 import json
 import requests
 from queue import Queue
+from crowd_task_generator import get_confirmation_code
 
 instructor_config = {
     "id": 1247844,
@@ -61,10 +62,10 @@ class JobManager:
             cml = """<div class="html-element-wrapper">
             <a class="clicked validates-clicked" href="{{taskurl}}" target="_blank">Click Here to go to the task</a>
             </div>
-            <cml:text label="Confirmation Code" data-validates-regex="{{confirmation_code}}" 
-            validates="required ss-required regex" data-validates-regex-message="Please copy and paste the code here that can be found at the end of the Survey" 
-            default="Enter here..." 
-            instructions="Enter Survey code in this field after completing"></cml:text>
+            <cml:text label="Confirmation Code" data-validates-regex="{{confirmation_code}}"
+            validates="required ss-required regex" data-validates-regex-message="Please copy and paste the code here that can be found at the end of the Survey"
+            default="Enter here..."
+            instructions="Enter confirmation code in this field after completing"></cml:text>
             """
             data = {'job[cml]': instruction + '\n\n' + cml}
             r = requests.put(url, data=data)
@@ -99,7 +100,8 @@ class JobManager:
             for i in range(self.dispatch_size):
                 taskids.append(self.taskidQueue.get())
 
-            code = str(int(taskids[0][::-1]) + 12345)
+            # code = str(int(taskids[0][::-1]) + 12345)
+            code = get_confirmation_code(taskids[0])
             url = "https://api.crowdflower.com/v1/jobs/{}/units.json?key={}".format(self.job_id, self.api_key)
             taskurl = 'http://deep.cs.virginia.edu:8080/login?role={}&mode=2Dshape&tasks={}'.format(
                 self.role_mapping[self.role], ';'.join(taskids))
