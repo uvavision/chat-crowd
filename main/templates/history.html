@@ -1,0 +1,52 @@
+<html>
+<head>
+    <base href="/">
+    <title>history for {{ task_id }}</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script>
+      $(document).ready(function () {
+        console.log($('img'));
+        var imgs = $('img').toArray();
+        imgs.forEach(function (img) {
+          console.log($(img).attr('data').slice('#CANVAS-'.length));
+              var canvas_data = JSON.parse($(img).attr('data').slice('#CANVAS-'.length));
+              var canvas = document.createElement('canvas');
+              var scale = 0.8;
+              var canvas_width = 500;
+              var canvas_height = 500;
+              canvas.setAttribute("width", (canvas_width * scale).toString());
+              canvas.setAttribute("height", (canvas_height * scale).toString());
+              canvas.setAttribute("style", "border:3px solid #d3d3d3;");
+              var ctx = canvas.getContext("2d");
+              ctx.lineWidth = 4;
+              ctx.setLineDash([5, 3]);
+              ctx.strokeStyle = "gray";
+              ctx.strokeRect(0, 0, canvas.width, canvas.height);
+              ctx.setLineDash([]);
+              Common.drawCanvasData(ctx, canvas_data, scale);
+              $(img).attr('src', canvas.toDataURL("image/png"));
+            }
+        );
+      });
+    </script>
+</head>
+<body>
+<div class="container">
+    <h3>Interactive Drawing History of Task {{ task_id }}</h3>
+{#    <img src="" data={{ anno['msg'] }}>#}
+    <div class="section">
+        {% for hist in history %}
+            <h5>{{ role_mapping[hist['role']] }} ({{ hist['username'] }}):</h5>
+            {% if '#CANVAS-' in hist['msg'] %}
+                <img src="" data={{ hist['msg'] }}>
+            {% else %}
+                <p>{{ hist['msg'] }}:</p>
+            {% endif %}
+
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>
