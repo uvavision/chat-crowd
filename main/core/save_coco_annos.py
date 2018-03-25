@@ -1,5 +1,7 @@
 import json
 from tqdm import tqdm
+import os
+os.environ['domain'] = 'COCO'
 from main import coll_anno
 
 

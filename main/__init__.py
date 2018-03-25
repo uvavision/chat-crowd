@@ -20,14 +20,6 @@ APP_DOMAIN = os.path.join(APP_ROOT, 'domains')
 # MTS_API_URL = local_url
 # N_PER_AGENT = 3
 
-'''
-single task:
-http://localhost:8080/login?role=agent&task_id=test123&workerid=test123&username=Jason&mode=COCO&debug=1
-
-multiple tasks:
-http://localhost:8080/login?role=agent&tasks=test1;test2;test3&workerid=test123&username=Jason&mode=2Dshape&debug=1
-'''
-
 add_bot_response = False
 
 config = None
@@ -45,8 +37,7 @@ coll_chat = cli[mockdb][config["domain-db"]["coll_chat_data"]]
 coll_chat_test = cli[mockdb][config["domain-db"]["coll_chat_data_test"]]
 coll_crowd = cli[mockdb][config["domain-db"]["coll_cf_data"]]
 coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
-coll_anno = cli[mockdb][config["domain-db"]["coll_coco_anno"]]
-coll_anno_test = cli[mockdb][config["domain-db"]["coll_coco_anno_test"]]
+coll_anno = cli[mockdb][config["domain-db"]["coll_anno_data"]]
 
 
 APP_URL = config["app-url"]
@@ -73,8 +64,6 @@ def get_chat_db(is_debug=True):
 
 
 def get_anno_db(is_debug=True):
-    if is_debug:
-        return coll_anno_test
     return coll_anno
 
 
