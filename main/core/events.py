@@ -10,7 +10,7 @@ from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data,
 import json
 import os
 import requests
-from crowdflower.server_config import SERVER_HOST, DISPATCHER_2DSHAPE_PORT, DISPATCHER_COCO_PORT
+from crowdsourcing.server_config import SERVER_HOST, DISPATCHER_2DSHAPE_PORT, DISPATCHER_COCO_PORT
 
 
 

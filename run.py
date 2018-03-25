@@ -2,7 +2,7 @@
 import os
 import argparse
 
-from crowdflower.server_config import SERVER_PORT
+from crowdsourcing.server_config import SERVER_PORT
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--domain', default='2Dshape', type=str)
