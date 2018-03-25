@@ -36,6 +36,5 @@
   "app-name": "vision-dialog-2Dshape",
   "description": "woz via crowd sourcing",
   "website": "http://woz.mybluemix.net",
-  "repository": "https://github.com/uvavision/chat-crowd",
-  "app-url": "deep.cs.virginia.edu/login?"
+  "repository": "https://github.com/uvavision/chat-crowd"
 }

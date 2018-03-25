@@ -40,7 +40,6 @@ coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
 coll_anno = cli[mockdb][config["domain-db"]["coll_anno_data"]]
 
 
-APP_URL = config["app-url"]
 DOMAIN = config["domain-name"]
 
 socketio = SocketIO()

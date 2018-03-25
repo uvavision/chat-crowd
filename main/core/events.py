@@ -1,6 +1,5 @@
 from flask import session
 from flask_socketio import emit, join_room, leave_room
-from eventlet import sleep
 import datetime
 from .. import socketio
 from .. import get_crowd_db, get_chat_db, get_anno_db, add_bot_response
@@ -8,11 +7,12 @@ from .data import MSG, TURN
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, ROLE_NAME)
 from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data,
                    get_bot_response)
-import time
 import json
 import os
-from multiprocessing import Queue
 import requests
+from crowdflower.server_config import SERVER_HOST, DISPATCHER_2DSHAPE_PORT, DISPATCHER_COCO_PORT
+
+
 
 canvas_token = '#CANVAS-'
 def get_message(role, text, username="ADMIN"):
@@ -124,15 +124,12 @@ def left(message):
 def complete(message):
     task_id = session.get(TASK_ID)
     role = session.get(ROLE)
-    # dispatch_addr = "http://deep.cs.virginia.edu:5003/finished".format()
-    # print(message)
     db_chat = get_chat_db(session[DEBUG])
     insert_chatdata(db_chat, session, {MSG: '#END_TASK'})
-    # TODO set dispatching address using configuration file
     if os.environ['domain'] == '2Dshape':
-        r = requests.post("http://deep.cs.virginia.edu:5003/finished",
+        r = requests.post("{}:{}/finished".format(SERVER_HOST, DISPATCHER_2DSHAPE_PORT),
                           data={'task_id': task_id, 'role': role, "msg": message[MSG]})
     else:
-        r = requests.post("http://deep.cs.virginia.edu:5004/finished",
+        r = requests.post("{}:{}/finished".format(SERVER_HOST, DISPATCHER_COCO_PORT),
                           data={'task_id': task_id, 'role': role, "msg": message[MSG]})
     # print(r.status_code, r.reason)

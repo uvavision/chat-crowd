@@ -13,7 +13,7 @@ import os
 from .const import (USERNAME, WORKER_ID, USER, AGENT, ROLE, TASK_ID, MSG,
                     FEEDBACK, TURN, MODE, TS, TEST, MODE_2D, MODE_COCO)
 from .utils import randomword
-from .. import APP_URL, TEST_DATA_FILE, coll_data, get_crowd_db, DOMAIN
+from .. import TEST_DATA_FILE, coll_data, get_crowd_db, DOMAIN
 
 
 fmt = '%Y-%m-%d %H:%M:%S.%f'

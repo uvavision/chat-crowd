@@ -1,8 +1,8 @@
 import hashlib
 import urllib
+from server_config import SERVER_HOST, SERVER_PORT
 
-APP_URL = "http://deep.cs.virginia.edu:8080/login?"
-
+APP_URL = "{}:{}/login?".format(SERVER_HOST, SERVER_PORT)
 
 def get_confirmation_code(task_id, is_hash=True):
     if is_hash:

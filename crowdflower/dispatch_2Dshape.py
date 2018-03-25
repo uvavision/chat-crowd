@@ -3,11 +3,11 @@ import atexit
 from flask import Flask
 from flask import request
 from flask import jsonify
-import json
 import requests
 from queue import Queue
 from crowd_task_generator import get_confirmation_code
 import random
+from server_config import SERVER_HOST, SERVER_PORT, DISPATCHER_2DSHAPE_PORT
 
 instructor_config = {
     "id": 1248383,
@@ -104,7 +104,7 @@ class JobManager:
             # code = str(int(taskids[0][::-1]) + 12345)
             code = get_confirmation_code(taskids[0])
             url = "https://api.crowdflower.com/v1/jobs/{}/units.json?key={}".format(self.job_id, self.api_key)
-            taskurl = 'http://deep.cs.virginia.edu:8080/login?role={}&mode=2Dshape&tasks={}'.format(
+            taskurl = '{}:{}/login?role={}&mode=2Dshape&tasks={}'.format(SERVER_HOST, SERVER_PORT,
                 self.role_mapping[self.role], ';'.join(taskids))
             data = {'unit[data][taskurl]': taskurl, 'unit[data][confirmation_code]': code}
             r = requests.post(url, data=data)
@@ -124,9 +124,9 @@ painter_job_manager.setup()
 x = list(range(200))
 random.shuffle(x)
 
-for i in x:
-    taskid = str(12345 + i)
-    instructor_job_manager.add_row(taskid)
+# for i in x:
+#     taskid = str(12345 + i)
+#     instructor_job_manager.add_row(taskid)
 
 # TODO
 # set Max Judgments per Contributor in Quality Control to 2
@@ -184,6 +184,5 @@ def finished():
     return response
 
 
-
-# if __name__ == '__main__':
-#     # app.run()
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=DISPATCHER_2DSHAPE_PORT)
