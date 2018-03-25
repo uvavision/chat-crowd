@@ -7,14 +7,15 @@ import json
 import requests
 from queue import Queue
 from crowd_task_generator import get_confirmation_code
+import random
 
 instructor_config = {
-    "id": 1247844,
+    "id": 1248383,
     "title": "2Dshape_instructor_job",
     'instruction_path': "../main/static/cf_2Dshape_user.html",
 }
 painter_config = {
-    "id": 1247845,
+    "id": 1248384,
     "title": "2Dshape_painter_job",
     'instruction_path': "../main/static/cf_2Dshape_agent.html",
 }
@@ -27,7 +28,7 @@ class JobManager:
         self.config = {'instructor': instructor_config, 'painter': painter_config}[self.role]
         self.job_id = self.config['id']
         self.taskidQueue = Queue()
-        self.dispatch_size = 2
+        self.dispatch_size = 5
         self.role_mapping = {'instructor': 'user', 'painter': 'agent'}
 
     def setup(self):
@@ -120,7 +121,10 @@ painter_job_manager = JobManager('painter')
 instructor_job_manager.setup()
 painter_job_manager.setup()
 
-for i in range(10):
+x = list(range(200))
+random.shuffle(x)
+
+for i in x:
     taskid = str(12345 + i)
     instructor_job_manager.add_row(taskid)
 
@@ -170,6 +174,8 @@ def finished():
             painter_job_manager.add_row(request.form['task_id'])
         elif request.form['role'] == 'agent':
             instructor_job_manager.add_row(request.form['task_id'])
+        else:
+            print("unknow role")
     else:
         print("layout completed: " + request.form['task_id'])
 
