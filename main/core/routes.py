@@ -12,8 +12,10 @@ from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG, TOTAL, ROLE_NAME,
                     USER, AGENT, MESSAGE, MODE_2D, MODE_COCO, TASKS, SEP)
+from .utils import send_user_code, send_agent_code, get_confirmation_code
 
 from itertools import groupby
+
 
 def _init_login_by_form(form):
     session.clear()
@@ -171,18 +173,27 @@ def end():
     estimated_reward = 0
     code = None
     if is_pass:
-        code = str(int(task_id[::-1]) + 12345)
+        code = get_confirmation_code(task_id)
     if request.method == 'POST':
         # form = FeedbackForm()
         feedback = form.feedback.data
         db_crowd = get_crowd_db(is_debug)
         session['feedback'] = feedback
         insert_crowd(db_crowd, session)
+        role = session.get(ROLE)
+        if role == AGENT:
+            status_code, reason = send_agent_code(session[WORKER_ID], code)
+        elif role == USER:
+            status_code, reason = send_user_code(session[WORKER_ID], code)
+        else:
+            assert False
+
         return render_template('end.html', form=form, code=code,
                                n_task=n_task, message=MESSAGE,
                                current_reward=current_reward,
                                estimated_reward=estimated_reward,
-                               task_url_next=task_url_agent_next)
+                               task_url_next=task_url_agent_next,
+                               status_code=status_code, reason=reason)
     return render_template('end.html', form=form, code=code, n_task=n_task,
                            current_reward=current_reward,
                            estimated_reward=estimated_reward,

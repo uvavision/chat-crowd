@@ -5,24 +5,25 @@ from flask import request
 from flask import jsonify
 import requests
 from queue import Queue
-from crowd_task_generator import get_confirmation_code
+from main.core.utils import get_confirmation_code
 import random
-from server_config import SERVER_HOST, SERVER_PORT, DISPATCHER_2DSHAPE_PORT
+from .server_config import SERVER_HOST, SERVER_PORT, DISPATCHER_2DSHAPE_PORT
+from .crowdflower import CF_API_ENDPOINT, INSTRUCTOR_JOBID, PAINTER_JOBID, API_KEY
 
 instructor_config = {
-    "id": 1248383,
+    "id": INSTRUCTOR_JOBID,
     "title": "2Dshape_instructor_job",
     'instruction_path': "../main/static/cf_2Dshape_user.html",
 }
 painter_config = {
-    "id": 1248384,
+    "id": PAINTER_JOBID,
     "title": "2Dshape_painter_job",
     'instruction_path': "../main/static/cf_2Dshape_agent.html",
 }
 
 class JobManager:
     def __init__(self, role):
-        self.api_key = 'guEi5sp-kQsXArgiESzj'
+        self.api_key = API_KEY
         self.role = role
         assert self.role in ['instructor', 'painter']
         self.config = {'instructor': instructor_config, 'painter': painter_config}[self.role]
@@ -93,6 +94,14 @@ class JobManager:
         url = "https://api.crowdflower.com/v1/jobs/{}.json?key={}".format(self.job_id, self.api_key)
         data = {'job[auto_order]': 'true'}
         r = requests.put(url, data=data)
+        r.raise_for_status()
+
+    def pay_worker_bonus(self, worker_id, amount_in_cents):
+        url = (CF_API_ENDPOINT +
+               "{job_id}/workers/{worker_id}/bonus.json?key={api_key}".format(
+                   job_id=self.job_id, worker_id=worker_id, api_key=self.api_key))
+        data = {'amount': amount_in_cents}
+        r = requests.post(url, data=data)
         r.raise_for_status()
 
     def dispatch(self):
