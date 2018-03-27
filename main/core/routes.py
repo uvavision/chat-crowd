@@ -207,9 +207,10 @@ def history():
 
     db_anno = get_anno_db(session['is_debug'])
     anno = get_anno_data(db_anno, session)
-    # print(anno)
-    anno = '#CANVAS-' + anno['boxes'].replace("'", '"')
-    # print(anno)
+    if anno:
+        anno = '#CANVAS-' + anno['boxes'].replace("'", '"').replace(' ', '')
+    else:
+        anno = '#CANVAS-[]'
 
     db_chat = get_chat_db(session['is_debug'])
     history = get_chatdata(db_chat, session)
@@ -222,5 +223,6 @@ def history():
     for group in groups:
         msg = [g['msg'] for g in group]
         new_history.append({'role': group[0]['role'], 'username': group[0]['username'], 'msg': '\n'.join(msg)})
+
     anno = {'msg': anno}
     return render_template('history.html', task_id=task_id, anno=anno, history=history, role_mapping={'user': 'Instructor', 'agent': 'Painter'})

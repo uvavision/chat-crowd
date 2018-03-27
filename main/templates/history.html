@@ -35,7 +35,9 @@
 <body>
 <div class="container">
     <h3>Interactive Drawing History of Task {{ task_id }}</h3>
-{#    <img src="" data={{ anno['msg'] }}>#}
+    <h5> Ground-truth Drawing: </h5>
+    <img src="" data={{ anno['msg'] }}>
+    <h5> Drawing History:</h5>
     <div class="section">
         {% for hist in history %}
             <h5>{{ role_mapping[hist['role']] }} ({{ hist['username'] }}):</h5>
