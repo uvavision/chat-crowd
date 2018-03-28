@@ -12,7 +12,7 @@ from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG, TOTAL, ROLE_NAME,
                     USER, AGENT, MESSAGE, MODE_2D, MODE_COCO, TASKS, SEP)
-from .utils import send_user_code, send_agent_code, get_confirmation_code
+from .utils import send_user_code, send_agent_code, get_confirmation_code, workerid_valid
 
 from itertools import groupby
 
@@ -83,6 +83,10 @@ def login():
     if form.validate_on_submit():
         _init_login_by_form(form)
         workerid = session[WORKER_ID]
+        if not workerid_valid(workerid):
+            form.workerid.errors = ['Your Contributor ID was not found...']
+            return render_template('index.html', form=form, role=role,
+                           mode=mode, room=room, is_debug=is_debug)
         session[PASS] = False  # if test mode available, set FALSE as default
         session[DEBUG] = bool(int(is_debug)) if is_debug else False
         session[MODE] = mode if mode else MODE_WOZ_HUMAN
@@ -167,6 +171,7 @@ def end():
     task_id = session.get(TASK_ID, '')
     is_pass = session.get(PASS)
     is_debug = session.get(DEBUG, '')
+    workerid = session.get(WORKER_ID, '')
     task_url_agent_next = ""
     n_task = 1
     current_reward = 0
@@ -174,26 +179,25 @@ def end():
     code = None
     if is_pass:
         code = get_confirmation_code(task_id)
+        # role = session.get(ROLE)
+        # if role == AGENT:
+        #     status_code, reason = send_agent_code(session[WORKER_ID], code)
+        # elif role == USER:
+        #     status_code, reason = send_user_code(session[WORKER_ID], code)
+        # else:
+        #     assert False
+
     if request.method == 'POST':
         # form = FeedbackForm()
         feedback = form.feedback.data
         db_crowd = get_crowd_db(is_debug)
         session['feedback'] = feedback
         insert_crowd(db_crowd, session)
-        role = session.get(ROLE)
-        if role == AGENT:
-            status_code, reason = send_agent_code(session[WORKER_ID], code)
-        elif role == USER:
-            status_code, reason = send_user_code(session[WORKER_ID], code)
-        else:
-            assert False
-
         return render_template('end.html', form=form, code=code,
                                n_task=n_task, message=MESSAGE,
                                current_reward=current_reward,
                                estimated_reward=estimated_reward,
-                               task_url_next=task_url_agent_next,
-                               status_code=status_code, reason=reason)
+                               task_url_next=task_url_agent_next)
     return render_template('end.html', form=form, code=code, n_task=n_task,
                            current_reward=current_reward,
                            estimated_reward=estimated_reward,

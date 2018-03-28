@@ -31,3 +31,9 @@ def get_confirmation_code(task_id, is_hash=True):
         return hashlib.md5((str(task_id)).encode()).hexdigest()
     else:
         return str(int(task_id[::-1]) + 12345)
+
+def workerid_valid(workerid):
+    url = ('https://api.crowdflower.com/v1/jobs/{job_id}/workers/{worker_id}/notify.json?key={api_key}'.format(
+               job_id=INSTRUCTOR_JOBID, worker_id=workerid, api_key=API_KEY))
+    r = requests.post(url)
+    return r.status_code != 404

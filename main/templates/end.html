@@ -30,13 +30,22 @@
             </div>
           {% elif code %}
              <span class="red-text">
-               <!--<h4>PLEASE COPY <b class='blue-text'>{{code}}</b>-->
-               <!--to the Crowdflower form to get rewarded.</h4>-->
-                  We have sent the confirmation code to your dashboard via the Contribution ID you provided at Login page. Please copy the code to Crowdflower main task to get rewarded.
+               <h4>PLEASE COPY <b class='blue-text'>{{code}}</b>
+               to the Crowdflower form to get rewarded.</h4>
+                  <!--We have sent the confirmation code to your dashboard via the Contribution ID you provided at Login page. Please copy the code to Crowdflower main task to get rewarded.-->
              </span>
-            <span>
-                Confirmation code status: {{status_code}}, reason: {{reason}}
-            </span>
+            <!--{% if status_code == 200 %}-->
+            <!--<div class="green-text">-->
+                <!--<h4>PLEASE COPY <b class='blue-text'>{{code}}</b> to the Crowdflower form to get rewarded.-->
+            <!--</div>-->
+            <!--{% else %}-->
+            <!--<div>-->
+                <!--We need to send the confirmation code to your dashboard via the Contribution ID you provided at Login page. After you received the code please copy it to Crowdflower main task to get rewarded.-->
+            <!--</div>-->
+            <!--<div class="red-text">-->
+                <!--<h6>Status: </h6>We were unable to send the confirmation code based on provided Contributor ID <b class='blue-text'>{{workerid}}</b>: {{status_code}} - {{reason}}-->
+            <!--</div>-->
+            <!--{% endif %}-->
           {% else %}
               <span class="red-text">
                 <p>We thank you for your participation! </p>
