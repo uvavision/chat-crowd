@@ -62,8 +62,12 @@ class Canvas:
         return random.choice(available)
 
     def exec_instruction(self, inst):
+        assert inst.viable(self)
         if isinstance(inst, AddInstruction):
             self.objects.append(inst.obj)
+        elif isinstance(inst, PatternAddInstruction):
+            for obj in inst.objs:
+                self.objects.append(obj)
         elif isinstance(inst, RemoveInstruction):
             self.objects.remove(inst.target_obj)
         elif isinstance(inst, MoveInstruction):
@@ -137,6 +141,42 @@ class AddInstruction(Instruction):
         return "add a {} {} to {}".format(self.obj.color, self.obj.shape, self.get_loc_desc())
 
 
+class PatternAddInstruction(Instruction):
+    def __init__(self, ref_obj, relative_loc, abs_loc, new_objs):
+        super().__init__(ref_obj, relative_loc, abs_loc)
+        assert len(new_objs) == 3
+        rows = [obj.row for obj in new_objs]
+        cols = [obj.col for obj in new_objs]
+        obj_colors = [obj.color for obj in new_objs]
+        obj_shapes = [obj.shape for obj in new_objs]
+        assert obj_colors[0] == obj_colors[1] == obj_colors[2]
+        assert obj_shapes[0] == obj_shapes[1] == obj_shapes[2]
+        if rows[0] == rows[1] == rows[2]:
+            self.style = "row"
+            assert cols[0] + 1 == cols[1] and cols[1] + 1 == cols[2]
+        elif cols[0] == cols[1] == cols[2]:
+            self.style = 'column'
+            assert rows[0] + 1 == rows[1] and rows[1] + 1 == rows[2]
+        else:
+            assert False
+        assert self.style in ['row', 'column']
+        self.objs = new_objs
+
+    def viable(self, canvas):
+        # the position to put the new object should be empty
+        invalid_pos = [(obj.row, obj.col) for obj in canvas.objects]
+        for obj in self.objs:
+            if obj.row < 0 or obj.row > 4 or obj.col < 0 or obj.col > 4:
+                return False
+            if (obj.row, obj.col) in invalid_pos:
+                return False
+        return True
+
+    def get_desc(self):
+        # adding objects always requires specifying the location
+        return "add a {} of three {} {}s to {}".format(self.style, self.objs[0].color, self.objs[0].shape, self.get_loc_desc())
+
+
 class RemoveInstruction(Instruction):
     def __init__(self, ref_obj, relative_loc, abs_loc, target_obj):
         super().__init__(ref_obj, relative_loc, abs_loc)
@@ -198,7 +238,7 @@ def sample_relative_loc(canvas):
     return ref_obj, relative_loc, action_row, action_col
 
 
-def get_add_inst(canvas):
+def get_add_inst(canvas, single_obj_only=False):
     while True:
         loc = 'abs' if len(canvas.objects) == 0 else random.choice(['abs', 'relative'])
         abs_loc = ref_obj = relative_loc = None
@@ -207,11 +247,26 @@ def get_add_inst(canvas):
         if loc == 'relative':
             ref_obj, relative_loc, action_row, action_col = sample_relative_loc(canvas)
 
-        new_obj = Object(random.choice(colors), random.choice(shapes), action_row, action_col)
-        inst = AddInstruction(ref_obj, relative_loc, abs_loc, new_obj)
-        if inst.viable(canvas):
-            return inst
-
+        if single_obj_only or random.random() < 0.5:
+            new_obj = Object(random.choice(colors), random.choice(shapes), action_row, action_col)
+            inst = AddInstruction(ref_obj, relative_loc, abs_loc, new_obj)
+            if inst.viable(canvas):
+                return inst
+        else:
+            pattern_color = random.choice(colors)
+            pattern_shape = random.choice(shapes)
+            style = random.choice(['row', 'column'])
+            if style == 'row':
+                obj1 = Object(pattern_color, pattern_shape, action_row, action_col - 1)
+                obj2 = Object(pattern_color, pattern_shape, action_row, action_col)
+                obj3 = Object(pattern_color, pattern_shape, action_row, action_col + 1)
+            if style == 'column':
+                obj1 = Object(pattern_color, pattern_shape, action_row - 1, action_col)
+                obj2 = Object(pattern_color, pattern_shape, action_row, action_col)
+                obj3 = Object(pattern_color, pattern_shape, action_row + 1, action_col)
+            inst = PatternAddInstruction(ref_obj, relative_loc, abs_loc, [obj1, obj2, obj3])
+            if inst.viable(canvas):
+                return inst
 
 def get_remove_inst(canvas):
     assert len(canvas.objects) > 0
@@ -238,10 +293,10 @@ def get_move_inst(canvas):
     assert len(canvas.objects) > 0
     while True:
         remove_inst = get_remove_inst(canvas)
-        add_inst = get_add_inst(canvas)
+        add_inst = get_add_inst(canvas, single_obj_only=True)
         # object to be removed cannot be used as reference
         while remove_inst.target_obj == add_inst.ref_obj:
-            add_inst = get_add_inst(canvas)
+            add_inst = get_add_inst(canvas, single_obj_only=True)
 
         add_inst.obj.color = remove_inst.target_obj.color
         add_inst.obj.shape = remove_inst.target_obj.shape
@@ -257,14 +312,16 @@ def construct_next_instruction(canvas):
 
 
 if __name__ == '__main__':
+    task_id = '12555'
+    coll_chat.delete_many({'task_id': task_id})
     canvas = Canvas()
     for i in range(50):
         inst = construct_next_instruction(canvas)
         print("{}: {}".format(i, inst.get_desc()))
-        coll_chat.insert({'msg': inst.get_desc(), 'author': 'human', 'task_id': '12555',
+        coll_chat.insert({'msg': inst.get_desc(), 'author': 'human', 'task_id': task_id,
                           'username': 'aaa', 'worker_id': '123456', "role": 'user', 'turn': str(i), 'mode': '2Dshape',
                           'timestamp': str(datetime.datetime.now())})
         canvas.exec_instruction(inst)
-        coll_chat.insert({'msg': canvas.get_desc(), 'author': 'human', 'task_id': '12555',
+        coll_chat.insert({'msg': canvas.get_desc(), 'author': 'human', 'task_id': task_id,
                           'username': 'bbb', 'worker_id': '123456', "role": 'agent', 'turn': str(i), 'mode': '2Dshape',
                           'timestamp': str(datetime.datetime.now())})
