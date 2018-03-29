@@ -2,7 +2,8 @@ import json
 from tqdm import tqdm
 import os
 os.environ['domain'] = '2Dshape'
-from main import coll_anno
+from main import coll_anno, coll_cf_dispatch_semaphore
+from main.core.const import TASK_ID
 import numpy as np
 import random
 
@@ -71,14 +72,14 @@ def sample_2Dshape_pattern_layout():
         c3 = random.choice(['red', 'green', 'blue'])
 
     if same_shape:
-    	s1 = s2 = s3 = random.choice(['rectangle', 'circle', 'triangle'])
+        s1 = s2 = s3 = random.choice(['rectangle', 'circle', 'triangle'])
     else:
-    	s1 = random.choice(['rectangle', 'circle', 'triangle'])
-    	s2 = random.choice(['rectangle', 'circle', 'triangle'])
-    	s3 = random.choice(['rectangle', 'circle', 'triangle'])
+        s1 = random.choice(['rectangle', 'circle', 'triangle'])
+        s2 = random.choice(['rectangle', 'circle', 'triangle'])
+        s3 = random.choice(['rectangle', 'circle', 'triangle'])
 
     layout = [make_entry(p1, c1, s1), make_entry(p2, c2, s2), make_entry(p3, c3, s3)]
-    
+
     available_positions = list(set(range(25)) - set([p1, p2, p3]))
     
     num_shapes = random.choice(range(1, 3))
@@ -91,8 +92,9 @@ def sample_2Dshape_pattern_layout():
 
 if __name__ == '__main__':
     for i in range(100):
-        cocoid = 12345 + i
-        coll_anno.insert({"cocoid": cocoid, "boxes": sample_2Dshape_random_layout()})
-    for i in range(100):
-        cocoid = 12345 + 100 + i
-        coll_anno.insert({"cocoid": cocoid, "boxes": sample_2Dshape_pattern_layout()})
+        cocoid = 20000 + i
+        # coll_anno.insert({"cocoid": cocoid, "boxes": sample_2Dshape_random_layout()})
+        coll_cf_dispatch_semaphore.insert_one({TASK_ID: str(cocoid), "dispatch_semaphore": 1})
+    # for i in range(100):
+    #     cocoid = 12345 + 100 + i
+    #     coll_anno.insert({"cocoid": cocoid, "boxes": sample_2Dshape_pattern_layout()})

@@ -82,10 +82,10 @@
                       alert('please wait for the canvas...');
                     } else {
                       var text = $('#textInput').val();
-                      if (text.split(" ").length < 4) {
-                          alert("Your input is too brief. Please provide something informative. Thank you!")
-                          return;
-                      }
+                      // if (text.split(" ").length < 4) {
+                      //     alert("Your input is too brief. Please provide something informative. Thank you!")
+                      //     return;
+                      // }
                       var now = new Date(Date.now());
                       var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                       $('#textInput').val("");
@@ -113,16 +113,16 @@
         function next_task() {
           if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
             if (!task_end_signalled) {
-              socket.emit('end_task', {msg: "layout_completed"});
+              var now = new Date(Date.now());
+              var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+              socket.emit('text', {msg: "#END", t: t});
               task_end_signalled = true;
             }
             window.location.href = "{{ url_for('main.chat') }}";
+          } else if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed by the painter") {
+              window.location.href = "{{ url_for('main.chat') }}";
           } else {
               if (contributed) {
-                if (!task_end_signalled) {
-                  socket.emit('end_task', {msg: "layout_not_completed"});
-                  task_end_signalled = true;
-                }
                 window.location.href = "{{ url_for('main.chat') }}";
               } else {
                 if ("{{role}}" === "agent")
@@ -138,16 +138,16 @@
         function end_task() {
           if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed"){
             if (!task_end_signalled) {
-              socket.emit('end_task', {msg: "layout_completed"});
+              var now = new Date(Date.now());
+              var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+              socket.emit('text', {msg: "#END", t: t});
               task_end_signalled = true;
             }
             window.location.href = "{{ url_for('main.end') }}";
+          } else if ($("#textInput").attr("placeholder") === "DONE - the drawing has completed by the painter") {
+              window.location.href = "{{ url_for('main.end') }}";
           } else {
               if (contributed) {
-                if (!task_end_signalled) {
-                  socket.emit('end_task', {msg: "layout_not_completed"});
-                  task_end_signalled = true;
-                }
                 window.location.href = "{{ url_for('main.end') }}";
               } else {
                 if ("{{role}}" === "agent")
@@ -343,6 +343,7 @@
                   if (textInput.getAttribute("mode") === '2Dshape') {
                       var gt_layout = JSON.parse(textInput.getAttribute('data'));
                       if (shape_layout_match(gt_layout, canvas_data)) {
+                          // painter's view on 2Dshape task
                           document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
                           document.getElementById("textInput").disabled = true;
                           $("#submit_canvas").hide();
@@ -421,7 +422,8 @@
                              var gt_layout = JSON.parse(canvas.getAttribute('data'));
                              var current_layout = JSON.parse(data['msg']);
                              if (shape_layout_match(gt_layout, current_layout)) {
-                                 document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed");
+                                 // instructor's view on 2Dshape task
+                                 document.getElementById("textInput").setAttribute("placeholder", "DONE - the drawing has completed by painter");
                                  document.getElementById("textInput").disabled = true;
                              }
                          });

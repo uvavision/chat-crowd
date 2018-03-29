@@ -1,25 +1,29 @@
-import threading
-import atexit
-from flask import Flask
-from flask import request
-from flask import jsonify
 import requests
 from queue import Queue
+
+import os
+import time
+
+os.environ['domain'] = '2Dshape'
+
 from main.core.utils import get_confirmation_code
-import random
-from .server_config import SERVER_HOST, SERVER_PORT, DISPATCHER_2DSHAPE_PORT
-from .crowdflower import CF_API_ENDPOINT, INSTRUCTOR_JOBID, PAINTER_JOBID, API_KEY
+from main.core.data import get_chat_db, get_dispatch_semaphore, set_dispatch_semaphore
+from main.core.const import TASK_ID, ROLE, AGENT, USER
+from pymongo import DESCENDING
+from server_config import SERVER_HOST, SERVER_PORT
+from crowdflower import CF_API_ENDPOINT, INSTRUCTOR_JOBID, PAINTER_JOBID, API_KEY
 
 instructor_config = {
     "id": INSTRUCTOR_JOBID,
     "title": "2Dshape_instructor_job",
-    'instruction_path': "../main/static/cf_2Dshape_user.html",
+    'instruction_path': "main/static/cf_2Dshape_user.html",
 }
 painter_config = {
     "id": PAINTER_JOBID,
     "title": "2Dshape_painter_job",
-    'instruction_path': "../main/static/cf_2Dshape_agent.html",
+    'instruction_path': "main/static/cf_2Dshape_agent.html",
 }
+
 
 class JobManager:
     def __init__(self, role):
@@ -29,8 +33,9 @@ class JobManager:
         self.config = {'instructor': instructor_config, 'painter': painter_config}[self.role]
         self.job_id = self.config['id']
         self.taskidQueue = Queue()
-        self.dispatch_size = 5
+        self.dispatch_size = 2
         self.role_mapping = {'instructor': 'user', 'painter': 'agent'}
+        self.setup()
 
     def setup(self):
         self.update_title(self.config['title'])
@@ -64,7 +69,7 @@ class JobManager:
             cml = """<div class="html-element-wrapper">
             <a class="clicked validates-clicked" href="{{taskurl}}" target="_blank">Click Here to go to the task</a>
             </div>
-            <cml:text label="Confirmation Code" data-validates-regex="{{confirmation_code}}"
+            <cml:text label="Confirmation Code" data-validates-regex="{{confirmation_code}}$"
             validates="required ss-required regex" data-validates-regex-message="Please copy and paste the code here that can be found at the end of the Survey"
             default="Enter here..."
             instructions="Enter confirmation code in this field after completing"></cml:text>
@@ -78,7 +83,6 @@ class JobManager:
         data = {'job[max_judgments_per_unit]': '1'}
         r = requests.put(url, data=data)
         r.raise_for_status()
-
 
     def add_row(self, taskid):
         self.taskidQueue.put(taskid)
@@ -114,84 +118,39 @@ class JobManager:
             code = get_confirmation_code(taskids[0])
             url = "https://api.crowdflower.com/v1/jobs/{}/units.json?key={}".format(self.job_id, self.api_key)
             taskurl = '{}:{}/login?role={}&mode=2Dshape&tasks={}'.format(SERVER_HOST, SERVER_PORT,
-                self.role_mapping[self.role], ';'.join(taskids))
+                                                                         self.role_mapping[self.role],
+                                                                         ';'.join(taskids))
             data = {'unit[data][taskurl]': taskurl, 'unit[data][confirmation_code]': code}
             r = requests.post(url, data=data)
             r.raise_for_status()
             print("{} job manager dispatched tasks {}".format(self.role, ', '.join(taskids)))
 
 
-POOL_TIME = 5 #Seconds
-yourThread = threading.Thread()
-
-instructor_job_manager = JobManager('instructor')
-painter_job_manager = JobManager('painter')
-
-instructor_job_manager.setup()
-painter_job_manager.setup()
-
-x = list(range(200))
-random.shuffle(x)
-
-# for i in x:
-#     taskid = str(12345 + i)
-#     instructor_job_manager.add_row(taskid)
-
-# TODO
-# set Max Judgments per Contributor in Quality Control to 2
-# instructor_job_manager.launch_job()
-# painter_job_manager.launch_job()
-
-# https://stackoverflow.com/questions/14384739/how-can-i-add-a-background-thread-to-flask
-def create_app():
-    app = Flask(__name__)
-
-    def interrupt():
-        global yourThread
-        yourThread.cancel()
-
-    def job_manager_dispatch():
-        global instructor_job_manager
-        global painter_job_manager
-        global yourThread
-        instructor_job_manager.dispatch()
-        painter_job_manager.dispatch()
-        # Set the next thread to happen
-        yourThread = threading.Timer(POOL_TIME, job_manager_dispatch, ())
-        yourThread.start()
-
-    def job_manager_dispatch_start():
-        # Do initialisation stuff here
-        global yourThread
-        # Create your thread
-        yourThread = threading.Timer(POOL_TIME, job_manager_dispatch, ())
-        yourThread.start()
-
-    # Initiate
-    job_manager_dispatch_start()
-    # When you kill Flask (SIGTERM), clear the trigger for the next thread
-    atexit.register(interrupt)
-    return app
-
-app = create_app()
-
-@app.route('/finished', methods=['POST'])
-def finished():
-    task_url = None
-    if request.form['msg'] == 'layout_not_completed':
-        if request.form['role'] == 'user':
-            painter_job_manager.add_row(request.form['task_id'])
-        elif request.form['role'] == 'agent':
-            instructor_job_manager.add_row(request.form['task_id'])
+def fetch_tasks(instructor_jobs, painter_jobs, task_ids):
+    db_chat = get_chat_db(is_debug=False)
+    for task_id in task_ids:
+        task_semaphore = get_dispatch_semaphore(task_id)
+        if task_semaphore == 0:
+            continue
+        last_entry = db_chat.find({TASK_ID: task_id}).sort("timestamp", DESCENDING).limit(1)
+        if last_entry.count() == 0:
+            instructor_jobs.add_row(task_id)
+            set_dispatch_semaphore(task_id, 0)
         else:
-            print("unknow role")
-    else:
-        print("layout completed: " + request.form['task_id'])
-
-    response = jsonify(message="received")
-    response.status_code = 200
-    return response
+            if last_entry[0]['msg'].startswith('#END'):
+                continue
+            if last_entry[0][ROLE] == AGENT:
+                instructor_jobs.add_row(task_id)
+            else:
+                painter_jobs.add_row(task_id)
+            set_dispatch_semaphore(task_id, 0)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=DISPATCHER_2DSHAPE_PORT)
+    instructor_job_manager = JobManager('instructor')
+    painter_job_manager = JobManager('painter')
+    while True:
+        fetch_tasks(instructor_job_manager, painter_job_manager, ['20000', '20001'])
+        instructor_job_manager.dispatch()
+        painter_job_manager.dispatch()
+        time.sleep(2)
