@@ -8,7 +8,7 @@ from .data import get_chatdata, get_anno_data
 from .events import get_message
 from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser,
                     TestFormCOCOAgent, TestFormCOCOUser)
-from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test
+from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test, chatdata_flush
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG, TOTAL, ROLE_NAME,
                     USER, AGENT, MESSAGE, MODE_2D, MODE_COCO, TASKS, SEP)
@@ -176,6 +176,9 @@ def end():
     n_task = 1
     current_reward = 0
     estimated_reward = 0
+    db_chat = get_chat_db(session[DEBUG])
+    username = session.get(USERNAME, '')
+    chatdata_flush(workerid, db_chat, username)
     code = None
     if is_pass:
         code = get_confirmation_code(task_id)

@@ -27,6 +27,7 @@
     "db-name": "layout-2Dshape",
     "coll_domain_data": "data",
     "coll_chat_data": "chatdata",
+    "coll_chat_data_cache": "chatdata_cache",
     "coll_chat_data_test": "testchatdata",
     "coll_cf_data": "chatcf",
     "coll_cf_data_test": "testchatcf",

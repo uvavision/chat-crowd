@@ -6,7 +6,7 @@ from .. import get_crowd_db, get_chat_db, get_anno_db, add_bot_response
 from .data import MSG, TURN
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, ROLE_NAME)
 from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data,
-                   get_bot_response)
+                   get_bot_response, insert_chatdata_cache)
 import json
 import os
 import requests
@@ -92,7 +92,8 @@ def text(message):
     msg = message[MSG].strip()
     if msg:
         session[TURN] = session.get(TURN) + 1
-        insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human'})
+        # insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human'})
+        insert_chatdata_cache(session, {MSG: msg, 'author': 'human'})
         emit('message', {MSG: get_message(role, msg, session.get(USERNAME)),
              ROLE: role, MODE: mode}, room=session.get(TASK_ID))
         if role == AGENT:
@@ -124,8 +125,8 @@ def left(message):
 def complete(message):
     task_id = session.get(TASK_ID)
     role = session.get(ROLE)
-    db_chat = get_chat_db(session[DEBUG])
-    insert_chatdata(db_chat, session, {MSG: '#END_TASK'})
+    # db_chat = get_chat_db(session[DEBUG])
+    # insert_chatdata(db_chat, session, {MSG: '#END_TASK'})
     if os.environ['domain'] == '2Dshape':
         r = requests.post("{}:{}/finished".format(SERVER_HOST, DISPATCHER_2DSHAPE_PORT),
                           data={'task_id': task_id, 'role': role, "msg": message[MSG]})

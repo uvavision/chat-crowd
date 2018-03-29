@@ -34,6 +34,7 @@ mockdb = config["domain-db"]["db-name"]
 COLL_NAME = config["domain-db"]["coll_domain_data"]
 coll_data = cli[mockdb][COLL_NAME]
 coll_chat = cli[mockdb][config["domain-db"]["coll_chat_data"]]
+coll_chat_cache = cli[mockdb][config["domain-db"]["coll_chat_data_cache"]]
 coll_chat_test = cli[mockdb][config["domain-db"]["coll_chat_data_test"]]
 coll_crowd = cli[mockdb][config["domain-db"]["coll_cf_data"]]
 coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
@@ -60,6 +61,10 @@ def get_chat_db(is_debug=True):
     if is_debug:
         return coll_chat_test
     return coll_chat
+
+
+def get_chat_cache_db():
+    return coll_chat_cache
 
 
 def get_anno_db(is_debug=True):

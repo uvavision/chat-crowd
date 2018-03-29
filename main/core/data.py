@@ -13,7 +13,7 @@ import os
 from .const import (USERNAME, WORKER_ID, USER, AGENT, ROLE, TASK_ID, MSG,
                     FEEDBACK, TURN, MODE, TS, TEST, MODE_2D, MODE_COCO)
 from .utils import randomword
-from .. import TEST_DATA_FILE, coll_data, get_crowd_db, DOMAIN
+from .. import TEST_DATA_FILE, coll_data, get_crowd_db, DOMAIN, get_chat_cache_db, get_chat_db
 
 
 fmt = '%Y-%m-%d %H:%M:%S.%f'
@@ -67,6 +67,26 @@ def insert_chatdata(db_chat, session, d_info):
             r[k] = session.get(k)
     r.update({TS: get_ts_str()})
     db_chat.insert(r)
+
+
+def insert_chatdata_cache(session, d_info):
+    chatdata_cache_db = get_chat_cache_db()
+    insert_chatdata(chatdata_cache_db, session, d_info)
+
+
+def chatdata_flush(workerid, db_chat, username):
+    chatdata_cache_db = get_chat_cache_db()
+    # db_chat.insert_many(chatdata_cache_db.find({WORKER_ID: workerid}).sort("timestamp", 1))
+    to_save = []
+    for r in chatdata_cache_db.find({WORKER_ID: workerid, USERNAME: username}).sort("timestamp", 1):
+        data = list(db_chat.find({TASK_ID: r[TASK_ID]}).sort("timestamp", 1))
+        if len(data) == 0 or data[-1][ROLE] != r[ROLE]:
+            to_save.append(r)
+            # don't insert to db here in case there are multiple instructions
+            # db_chat.insert(r)
+    if len(to_save) > 0:
+        db_chat.insert_many(to_save)
+    chatdata_cache_db.delete_many({WORKER_ID: workerid, USERNAME: username})
 
 
 def insert_crowd(db_chat, session):
