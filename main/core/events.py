@@ -1,17 +1,36 @@
+import json
+import os
 from flask import session
 from flask_socketio import emit, join_room, leave_room
 import datetime
 from .. import socketio
 from .. import get_crowd_db, get_chat_db, get_anno_db, add_bot_response
 from .data import MSG, TURN
-from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE, ROLE_NAME)
+from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE,
+                    ROLE_NAME, canvas_token, DA)
 from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data,
                    get_bot_response, insert_chatdata_cache)
-import json
-import os
+from .interpreter import domain_entity_matcher, ner_matcher
 
-canvas_token = '#CANVAS-'
+
+def add_tag(text):
+    doc, lst = domain_entity_matcher(text)
+    # for ele in lst:
+    #     print(str(ele))
+    lst_out = [w.text for w in doc]
+    for _, start, end in lst:
+        lst_out[start] = '<span class="chip">' + lst_out[start]
+        lst_out[end-1] = lst_out[end-1] + '</span>'
+    _, lst_ner = ner_matcher(text)
+    for _, start, end, label in lst_ner:
+        lst_out[start] = '<span class="chip">' + lst_out[start]
+        lst_out[end-1] = lst_out[end-1] + '</span>'
+    return ' '.join(lst_out)
+
+
 def get_message(role, text, username="ADMIN"):
+    # if not text.startswith(canvas_token):
+    #     text = add_tag(text)
     role_name = ROLE_NAME[role]
     if role == AGENT:
         return '<div><b>{0}({2}): </b>{1}</div>'.format(role_name, text, username)
@@ -86,10 +105,12 @@ def text(message):
     role = session.get(ROLE)
     mode = session.get(MODE)
     msg = message[MSG].strip()
+    da = message[DA].strip()
     if msg:
         session[TURN] = session.get(TURN) + 1
-        # insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human'})
-        insert_chatdata_cache(session, {MSG: msg, 'author': 'human'})
+        print(msg)
+        insert_chatdata(db_chat, session, {MSG: msg, 'author': 'human', DA: da})
+        # insert_chatdata_cache(session, {MSG: msg, 'author': 'human', DA: da})
         emit('message', {MSG: get_message(role, msg, session.get(USERNAME)),
              ROLE: role, MODE: mode}, room=session.get(TASK_ID))
         if role == AGENT:
@@ -115,4 +136,3 @@ def left(message):
     leave_room(task_id)
     insert_chatdata(db_chat, session, {MSG: '#END'})
     emit('status', {MSG: role + ' has left the conversation.'}, room=task_id)
-

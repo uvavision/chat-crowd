@@ -7,7 +7,7 @@ from .. import get_chat_db, get_crowd_db, get_anno_db
 from .data import get_chatdata, get_anno_data
 from .events import get_message
 from .forms import (LoginForm, FeedbackForm, TestForm2DAgent, TestForm2DUser,
-                    TestFormCOCOAgent, TestFormCOCOUser)
+                    TestFormCOCOAgent, TestFormCOCOUser, DialogActForm)
 from .data import update_crowd, insert_chatdata, insert_crowd, is_pass_test, chatdata_flush
 from .const import (ROLE, DEBUG, TASK_ID, USERNAME, CONTEXT_ID, WORKER_ID,
                     ROOM, PASS, MODE, TURN, MSG, TOTAL, ROLE_NAME,
@@ -123,7 +123,9 @@ def chat():
     total = session[TOTAL]
     left = session[TOTAL] - len(session[TASKS])
     progress = 'task {} out of {}'.format(left, total)
+    form_da = DialogActForm()
     return render_template(CHAT_HTML, domain=DOMAIN, tasks=session[TASKS],
+                           form_da=form_da,
                            mode=mode, room=room, role_name=role_name,
                            role=role, username=username, progress=progress)
 

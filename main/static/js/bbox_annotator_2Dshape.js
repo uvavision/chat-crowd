@@ -610,7 +610,7 @@
       if (this.input_shape == 'triangle') {
         button_left = entry.width * 0.5 - 7;
       }
-      close_button = $('<div class="fa fa-times-circle"></div>').appendTo(box_element).css({
+      close_button = $('<div class="fa fa-times-circle red"></div>').appendTo(box_element).css({
         "position": "absolute",
         "top": "-10px",
         "left": button_left + "px",

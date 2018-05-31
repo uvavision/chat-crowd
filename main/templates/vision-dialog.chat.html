@@ -2,17 +2,11 @@
   <head>
     <base href="/">
     <title>Chat as {{role_name}}</title>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-
-{#    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">#}
-    <link href="{{url_for('static', filename='css/materialize-tags.css')}}" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
     <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="{{url_for('static', filename='css/app.css')}}" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
 
@@ -68,8 +62,7 @@
                     contributed = true;
                 }
                 Api.sendRequest(data.msg, data.role, data.mode);
-{#              var scrollingChat = document.querySelector('#scrollingChat');#}
-{#              scrollingChat.scrollTop = 1000000;#}
+
             });
             socket.on('left', function(data) {
                 socket.emit('left', {});
@@ -82,6 +75,7 @@
                       alert('please wait for the canvas...');
                     } else {
                       var text = $('#textInput').val();
+                      var da = $('#da').val();
                       // if (text.split(" ").length < 4) {
                       //     alert("Your input is too brief. Please provide something informative. Thank you!")
                       //     return;
@@ -89,23 +83,12 @@
                       var now = new Date(Date.now());
                       var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                       $('#textInput').val("");
-                      socket.emit('text', {msg: text, t: t});
+                      // $('#textInput').timedDisable(3);
+                      socket.emit('text', {msg: text, da:da, t: t});
                     }
                     // socket.emit('bot', {msg:text, t:t});
                   }
             });
-            $('#textInput1').keypress(function(e) {
-                var code = e.keyCode || e.which;
-                if (code == 13) {
-                    var text = $('#textInput1').val();
-                    var now = new Date(Date.now());
-                    var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
-                    $('#textInput1').val("");
-                    $('#textInput1').timedDisable(3);
-                    socket.emit('text', {msg:text, t:t});
-                }
-            });
-
         });
 
         var task_end_signalled = false;
@@ -132,7 +115,7 @@
               }
           }
             // socket.emit('end_task', {msg:"#END"});
-//            window.location.href = "{{ url_for('main.chat') }}";
+            // window.location.href = "{{ url_for('main.chat') }}";
         };
 
         function end_task() {
@@ -156,10 +139,10 @@
                   alert("please contribute at least one instruction");
               }
           }
-            <!--socket.emit('left', {}, function() {-->
-                <!--socket.disconnect();-->
-                <!--window.location.href = "{{ url_for('main.end') }}";-->
-            <!--});-->
+            // <!--socket.emit('left', {}, function() {-->
+            //     <!--socket.disconnect();-->
+            //     <!--window.location.href = "{{ url_for('main.end') }}";-->
+            // <!--});-->
         }
     </script>
 
@@ -167,90 +150,93 @@
 
   <body>
   {% if role == "agent" %}
-    <div class="center-align bg-header teal lighten-5 align-center">
+    <div class="container bg-header teal white-text">
+      <nav class="black">
+      <span class="teal white-text badge">
   {%  else %}
-    <div class="center-align bg-header blue lighten-5 align-center">
+    <div class="container bg-header blue darken-3 white-text">
+      <nav class="black">
+      <span class="blue darken-3 white-text badge">
   {% endif %}
-      Welcome <b>{{username}}</b>! You will play the role of <b>{{role_name}}</b> on {{progress}}.
-      {% if tasks == [] %}
-        <div>
-          {% if role == "agent" %}
-            Click <button class="btn teal" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
-          {% else %}
-            Click <button class="btn blue darken-3" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
-          {% endif %}
-        </div>
-      {% else %}
-        Click <button class="btn red lighten-1" id="end_task" href="#" onclick="next_task();" value="">Next Task</button> when the task is completed.
-      {% endif %}
-    </div>
-    <div id="contentParent" class="responsive-columns-wrapper">
-    <div><p></p></div>
-    <div><p></p></div>
-    <div><p></p></div>
-    <div><p></p></div>
+
+    <b>{{role_name.upper()}} VIEW </b></span> User <b>{{username}}</b> now plays the role of <b>{{role_name}}</b> on <b>{{mode}}</b> {{progress}}. </span>
+    <span>
+    {% if tasks == [] %}
         {% if role == "agent" %}
-              <div class="center-align">
-              </br>
-                  <div class="teal-text"><b>Drag your mouse and draw in the canvas below</b></div>
-              </br>
-                  <div id="bbox_annotator"></div>
+          Click <button class="btn teal" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
+        {% else %}
+          Click <button class="btn blue darken-3" id="end_task" href="#" onclick="end_task();" value="">SUBMIT</button> when the task is completed.
+        {% endif %}
+    {% else %}
+        Click <button class="btn red lighten-1" id="end_task" href="#" onclick="next_task();" value="">Next Task</button> when the task is completed.
+    {% endif %}
+    </span>
+  </nav>
+  </div>
+    <div id="contentParent" class="container responsive-columns-wrapper black white-text">
+      <div><p></p></div>
+      {% if role == "agent" %}
+        <div class="center-align">
+            <nav class="black "><b>Canvas for Layout Drawing</b></nav>
+            <div id="bbox_annotator"></div>
             {% if mode == 'COCO' %}
-                  <div class="fa fa-times-circle"> :Delete &nbsp; &nbsp; </div>
-                  <div class="fa fa-plus-circle"> :Move &nbsp;  &nbsp; </div>
-                  <div class="fa "> &#8689 &#8690: Resize </div>
+            <div class="fa fa-times-circle red-text"> : Delete </div>
+            <div class="fa fa-plus-circle red-text"> : Move</div>
+            <div class="fa red-text"> &#8689; &#8690; : Resize </div>
             {% endif %}
-              </div>
+            <button class="btn teal left-align" id="submit_canvas" href="#" value="">submit canvas</button>
+        </div>
       {% endif %}
       {% if role == "user" %}
-              <div class="center-align blue-text text-darken-2"><p><b>Image Layout Reference</b></p>
+              <div class="center-align white-text"><p><b>Image Layout Reference</b></p>
                   <canvas id="coco_image_anno"></canvas>
               </div>
       {% endif %}
       {% if mode !='test' %}
           <div id="chat-column-holder" class="responsive-column content-column">
-              <br>
-              <div class="center-align"><b>Interactive Drawing History</b></div>
-              <div class="chat-column">
-                <div id="scrollingChat"></div>
-                  {% if role == "user" %}
-                      <div class="input-field inputOutline">
-                          <i class="material-icons prefix">textsms</i>
-                          <input id="textInput" mode="{{ mode }}" placeholder="Type instruction here... (Press Enter to submit)"></input>
-                      </div>
-                  {% if mode == 'COCO' %}
-                      <div class="input-field">
-                          <button class="btn red lighten-1" id="finish_drawing" href="#" value="">
-                              The drawing is complete
-                          </button>
-                      </div>
-                  {% endif %}
-                  {% elif role == "agent" %}
-                      <div class="input-field inputOutline">
-                          <i class="material-icons prefix">textsms</i>
-                          <input id="textInput" mode="{{ mode }}" placeholder="Ask clarifying question here... (Press Enter to submit)"></input>
-                      </div>
-                      <div class="input-field">
-                          <button class="btn teal lighten-1" id="submit_canvas" href="#" value="">
-                              submit canvas
-                          </button>
-                      </div>
-                  {% endif %}
-
-{#          <div><span>waiting for </span><span id="message_turn">instruction</span><span>...</span></div>#}
-{#            <div class="blue-text lighten-1"><b>Type to continue or click <button id="left_room" href="#" onclick="left_room();" value="">here</button> to end the conversation. </b></div>#}
+              <nav class="center black white-text"><b>Chat History - Interactive Drawing</b></nav>
+              <div class="chat-column white">
+              <div id="scrollingChat"></div>
+              <!-- <div class="input-field inputOutline">
+                  <i class="material-icons prefix red-text">textsms</i>
+                  <div id="da" ></div>
+                  <input id="textInput" type="text" placeholder="Type here... (Press Enter to submit)"></input>
+              </div> -->
+                {% if mode == 'COCO' %}
+                    <button class="btn red lighten-1" id="finish_drawing" href="#" value="">drawing completed</button>
+                {% endif %}
+                <!-- <div class="input-field">
+                     <button class="btn teal lighten-1" id="submit_canvas" href="#" value="">
+                         submit canvas
+                     </button>
+                 </div> -->
+              </div>
+              <div class="row">
+                <div class="col s12">
+                  <div class="row">
+                    <div class="input-field col s4">
+                      <i class="material-icons red-text">label</i>
+                      {{ form_da.da(class_="") }}
+                    </div>
+                    <div class="input-field col s8">
+                      <i class="material-icons red-text prefix">textsms</i>
+                      <input type="text" id="textInput" mode={{mode}} class="left-align">
+                      <label for="textInput">Type here... (Press Enter to submit)</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
           </div>
         </div>
-
       {% endif %}
 
       <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
       <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-        {% if mode == '2Dshape' %}
-        <script src="{{ url_for('static', filename='js/bbox_annotator_2Dshape.js') }}"></script>
-        {% else %}
-        <script src="{{ url_for('static', filename='js/bbox_annotator_coco.js') }}"></script>
-        {% endif %}
+      {% if mode == '2Dshape' %}
+      <script src="{{ url_for('static', filename='js/bbox_annotator_2Dshape.js') }}"></script>
+      {% else %}
+      <script src="{{ url_for('static', filename='js/bbox_annotator_coco.js') }}"></script>
+      {% endif %}
       <script src="{{url_for('static', filename='js/common.js')}}"></script>
       <script src="{{url_for('static', filename='js/api.js')}}"></script>
       <script src="{{url_for('static', filename='js/conversation.js')}}"></script>
@@ -258,14 +244,10 @@
       <script src="{{url_for('static', filename='js/global.js')}}"></script>
 
       <script src="{{url_for('static', filename='js/jquery.titlealert.js')}}"></script>
-
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/typeahead.bundle.min.js"></script>
 
-      <script src="{{url_for('static', filename='js/materialize-tags.min.js')}}"></script>
+      <script src="{{url_for('static', filename='js/materialize.min.js')}}"></script>
       <script src="{{url_for('static', filename='js/app.js')}}" type="text/javascript"></script>
-
-{#      <script>document.getElementById("user_utterance").disabled = true;</script>#}
         <script>
             function shape_layout_match(gt_layout, current_layout) {
               for (var i = 0; i < gt_layout.length; ++i) {
@@ -320,10 +302,11 @@
                       var now = new Date(Date.now());
                       var t = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                       var text = JSON.stringify(annotator.entries);
-                      socket.emit('text', {msg: "#CANVAS-".concat(text), t: t});
-                      this.disabled = true;
-                      document.getElementById("textInput").setAttribute("placeholder", "DONE");
-                      document.getElementById("textInput").disabled = true;
+                      var da = $('#da').val();
+                      socket.emit('text', {msg: "#CANVAS-".concat(text), t: t, da:da});
+                      // this.disabled = true;
+                      // document.getElementById("textInput").setAttribute("placeholder", "DONE");
+                      // document.getElementById("textInput").disabled = true;
                     }
                   }
                 });
@@ -511,7 +494,7 @@
          $(this).attr('disabled', 'disabled');
          var disabledElem = $(this);
          var originalText = this.innerHTML; // Remember the original text content
-        //  var originalText = "";
+         //  var originalText = "";
          // append the number of seconds to the text
          disabledElem.val('Please wait for ' + seconds + 's');
          disabledElem.text( originalText + ' (' + seconds + 's)');
@@ -533,9 +516,9 @@
        });
      };
      $(function() {
-       $('#textInput1').timedDisable(3); // disable input box for n seconds
+       $('#textInput').timedDisable(3); // disable input box for n seconds
      });
-    //  document.getElementById("").disabled = true;
+
      $(function() {
        $('#end_task').timedDisable(10);
      });

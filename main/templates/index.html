@@ -2,83 +2,82 @@
     <head>
         <title>Chat Login</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
-        <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-        <link href="{{url_for('static', filename='css/materialize.css')}}" type="text/css" rel="stylesheet">
-        <link href="http://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet" type="text/css">
-        <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
         <script src="//cdn.transifex.com/live.js"></script>
     </head>
     <body>
-      <div class="container">
-        <h5>
-            Welcome! Click <a href="{{url_for('static', filename='cf_')}}{{mode}}_{{role}}.html" target="_blank">here</a> to view the instructions again.
-        </h5>
+      <div class="container black">
 
-        <!-- <blockquote>
-          Please fill the form below.<br>
-          {#Please fill the form below and click "start" to move on to the next step.<br>#}
-{#          If this is your first time doing this task, there will be a simple quiz. <br>#}
-{#          Once you pass the quiz, you will enter the conversation. <br>#}
-          Have fun contributing!
-        </blockquote> -->
+        <h5 class="center white-text">
+            Welcome! Click <a class="teal-text" href="{{url_for('static', filename='cf_')}}{{mode}}_{{role}}.html" target="_blank">here</a> to view the instructions again.
+        </h5><br>
 
         <form method="POST">
           {{ form.hidden_tag() }}
-          <label for="workerid">What is your Contributor ID? (<b class="red-text">REQUIRED for sending you confirmation code and payment.</b>)</label>
+          <div class="row center">
+          <div class="col s4">
+          <label for="workerid">What is your ID for the CrowdSourcing Account? </label>
           <div class='red-text'>{% for error in form.workerid.errors %}{{ error }}{% endfor %}</div>
-          {{ form.workerid() }}
+          {{ form.workerid(class="teal-text") }}
+         </div>
 
-          <label for="username" >What USERNAME do you want to use for the task?</label>
+          <div class="col s4">
+          <label for="username" >What USERNAME do you want for the task?</label>
           <div class='red-text'>{% for error in form.username.errors %}{{ error }}{% endfor %}</div>
-          {{ form.username() }}
+          {{ form.username(class="teal-text") }}
+          </div>
 
           {% if is_debug %}
+          <div class="col s4">
             <label for="task_id" >What is your Task ID (debug)?</label>
-              {{ form.task_id() }}
+              {{ form.task_id(class="teal-text") }}
             <div class='red-text'>{% for error in form.task_id.errors %}{{ error }}{% endfor %}</div>
-            <!-- {{ form.task_id(disabled=True) }} -->
-            <div>
+          </div>
+          {% endif %}
+          </div>
+          <div class="row">
+          {% if is_debug %}
+            <div class="col s3">
               <label for="mode">
-                ROLE:
+                ROLE for the task: <br>
                 {% for subfield in form.role %}
-                  <tr>
+                  <label>
                     {% if is_debug %}
-                      <td>{{subfield()}}</td>
-                      {% else %}
-                      <td>{{subfield(disabled=True)}}</td>
-                      {% endif %}
-                      <td>{{subfield.label()}}</td>
-                  </tr>
+                      {{subfield(class="with-gap")}}
+                    {% else %}
+                      {{subfield(disabled=True)}}
+                    {% endif %}
+                    <span>{{subfield.label()}}</span>
+                  </label>
                 {% endfor %}
               </label>
             </div>
-            <div>
+
+            <div class="col s3">
               <label for="mode">
-                MODE:
+                MODE of the task:<br>
                 {% for subfield in form.mode %}
-                  <tr>
+                  <label>
                     {% if is_debug %}
-                      <td>{{subfield()}}</td>
+                      {{subfield(class="with-gap")}}
                       {% else %}
-                      <td>{{subfield(disabled=True)}}</td>
+                      {{subfield(disabled=True)}}
                       {% endif %}
-                      <td>{{subfield.label()}}</td>
-                  </tr>
+                      <span>{{subfield.label()}}</span>
+                  </label>
                 {% endfor %}
               </label>
             </div>
           {% endif %}
+        </div>
 
-          <div>
-              <h5>Press {{ form.submit(class_="btn btn-primary") }} to enter the main chat page</h5>
+          <div class="row center">
+              <h5 class="white-text" >Press {{ form.submit(class_="btn btn-primary") }} to enter the main chat page</h5>
           </div>
         </form>
+
       </div>
       </body>
-      <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-      <script>if (!window.jQuery) { document.write('<script src="bin/jquery-2.1.1.min.js"><\/script>'); }
-      </script>
-      <script src={{url_for('static', filename='js/materialize.js')}}></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
 
 </html>

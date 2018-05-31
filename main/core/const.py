@@ -1,8 +1,8 @@
 AGENT = "agent"  # painter
 USER = "user"  # instructor
 
-ROLE_NAME = {AGENT: 'painter', USER: 'instructor'}
-# ROLE_NAME = {AGENT: 'designer', USER: 'director'}
+# ROLE_NAME = {AGENT: 'painter', USER: 'instructor'}
+ROLE_NAME = {AGENT: 'designer', USER: 'director'}
 MODE_COCO = 'COCO'
 MODE_2D = '2Dshape'
 
@@ -30,7 +30,9 @@ DATA = 'DATA'
 
 TOTAL = 'total'
 
-# NAME = 'Name'
+DA = 'da'
 
 
 MESSAGE = "Thank you for your feedback!"
+
+canvas_token = '#CANVAS-'

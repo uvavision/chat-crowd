@@ -3,9 +3,9 @@ from flask_socketio import SocketIO
 from pymongo import MongoClient
 import json
 import os
-
 from os import sys, path
-
+import spacy
+nlp_spacy = spacy.load('en_core_web_sm')
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 
@@ -14,11 +14,7 @@ APP_STATIC = os.path.join(APP_ROOT, 'static')
 APP_TEMPLATE = os.path.join(APP_ROOT, 'templates')
 APP_DATA = os.path.join(APP_ROOT, 'data')
 APP_DOMAIN = os.path.join(APP_ROOT, 'domains')
-
-# kubernete = 'http://173.193.99.224:30310'
-# local_url = 'http://0.0.0.0:7004'
-# MTS_API_URL = local_url
-# N_PER_AGENT = 3
+APP_GAZETTEER = os.path.join(APP_DATA, 'gazetteers')
 
 add_bot_response = False
 

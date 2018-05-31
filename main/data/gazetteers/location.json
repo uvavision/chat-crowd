@@ -1,0 +1,21 @@
+[
+  "up",
+  "down",
+  "left",
+  "right",
+  "east",
+  "west",
+  "south",
+  "north",
+  "top left",
+  "top right",
+  "bottom left",
+  "bottom right",
+  "center",
+  "bottom",
+  "top",
+  "top middle",
+  "bottom middle",
+  "left middle",
+  "right middle"
+]
