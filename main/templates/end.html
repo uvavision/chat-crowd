@@ -2,7 +2,7 @@
     <head>
         <base href="/">
         <title>Thank you!</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
         <script>
           // disable back button
           history.pushState(null, null, document.URL);
@@ -13,7 +13,7 @@
         </script>
     </head>
     <body>
-      <div class="container">
+      <div class="container black">
         <div class="section">
           {% if task_url_next %}
            <div>
@@ -30,8 +30,8 @@
             </div>
           {% elif code %}
              <span class="red-text">
-               <h4>PLEASE COPY <b class='blue-text'>{{code}}</b>
-               to the Crowdflower form to get rewarded.</h4>
+               <nav class="center-align">PLEASE COPY <b class='blue-text'>{{code}}</b>
+               to the task main page to get rewarded.</nav>
                   <!--We have sent the confirmation code to your dashboard via the Contribution ID you provided at Login page. Please copy the code to Crowdflower main task to get rewarded.-->
              </span>
             <!--{% if status_code == 200 %}-->
@@ -52,12 +52,15 @@
                 <p>Unfortunately, you did not pass our test. You are welcome to read our task description carefully and try again.</p>
               </span>
           {% endif %}
-
-          <blockquote class="col s4">Please provide us some feedback for the task! If you run into any issue with the task, let me know too. Thank you!</blockquote>
-          <form class=" col s10" method="POST">
-              {{ form.feedback(class_="materialize-textarea white")}}
-              {{ form.submit() }} <h6 class='teal-text'>{{message}}</h6>
-          </form>
+          <div class="row">
+            <div class="col s8 center-align">
+              <blockquote class="col s12 white-text">Please provide us some feedback for the task! If you run into any issue with the task, let us know too. Thank you!</blockquote>
+              <form class="col s10" method="POST">
+                  {{ form.feedback(class_="materialize-textarea black white-text")}}
+                  {{ form.submit() }} <h6 class='white-text'>{{message}}</h6>
+              </form>
+            </div>
+        </div>
         </div>
       </div>
     </body>

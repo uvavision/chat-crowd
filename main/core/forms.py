@@ -16,8 +16,10 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class LoginForm(FlaskForm):
-    workerid = StringField('worderid', id='workerid', validators=[Required()], render_kw={"placeholder": "Enter your contributor ID..."})
-    username = StringField('username', id="username", validators=[Required()], render_kw={"placeholder": "Enter your CrowdFlower UserName..."})
+    workerid = StringField('worderid', id='workerid', validators=[Required()])
+    username = StringField('username', id="username", validators=[Required()])
+    # workerid = StringField('worderid', id='workerid', validators=[Required()], render_kw={"placeholder": "Enter your contributor ID..."})
+    # username = StringField('username', id="username", validators=[Required()], render_kw={"placeholder": "Enter your CrowdFlower UserName..."})
     task_id = StringField('task_id', id="task_id", validators=[Required()], default="12445")
     tasks = StringField('tasks', id="tasks", validators=None, default="12445")
     role = RadioField('role', choices=[('user', 'instructor'), ('agent', 'painter')],
@@ -71,3 +73,17 @@ class FeedbackForm(FlaskForm):
     feedback = TextAreaField('feedback', id='feedback',
                              validators=[Required()])
     submit = SubmitField('Submit', id='feedback_submit')
+
+
+class DialogActForm(FlaskForm):
+    INFORM = 'inform'
+    CONFIRM = 'confirm'
+    REJECT = 'reject'
+    REQUEST = 'request'  # instruct
+    SELF_CORRECTION = 'self-correction'
+    ASK_Q = 'ask-question'
+    END = 'end-conversation'
+    DAS = [INFORM, CONFIRM, REQUEST, REJECT, SELF_CORRECTION]
+    choices = [(ele, ele.upper()) for ele in DAS]
+    choices = [("", 'Choose Dialog Act')] + choices
+    da = SelectField('da', choices=choices, id='da')

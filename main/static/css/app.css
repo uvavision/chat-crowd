@@ -8,6 +8,9 @@ body {
   margin: 0;
   padding: 0;
 }
+select { all: unset; }
+input { all: unset; }
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/all */
 p {
   margin-bottom: 30px;
   /*color: #989898;*/
@@ -181,17 +184,17 @@ div.padding {
   color: #fff;
   letter-spacing: 0.015rem;
   line-height: 1.3125rem;
-  background: #0d47a1; /* #00B4A0 */
-  border-radius: 1.25rem;
+  background: #546e7a; /* #00B4A0 */
+  border-radius: 1.0rem;
   border-bottom-right-radius: 0;
   text-align: left;
   display: inline-block;
-  margin-left: 2.5rem;
+  margin-left: 2.0rem;
   min-width: 2.5rem;
 }
 .from-user .message-inner p {
   margin: 0.3125rem;
-  padding: 0 0.9375rem;
+  padding: 0 0.5rem;
 }
 .from-user .message-inner:before, .from-user .message-inner:after {
   content: "";
@@ -295,7 +298,7 @@ input:-moz-placeholder {
   display: none;
 }
 .inputOutline {
-  display: block;
+  /* display: block; */
   border-bottom: 0.0625rem solid #aeaeae;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
