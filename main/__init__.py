@@ -23,8 +23,9 @@ config_file = path.join(APP_DOMAIN, 'app-{}.json'.format(os.environ['domain']))
 with open(config_file) as f:
     config = json.load(f)
 uri_local = 'mongodb://localhost'
-uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +
-              '&ssl_cert_reqs=CERT_NONE')
+# uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +
+#               '&ssl_cert_reqs=CERT_NONE')
+uri_remote = 'mongodb://18.215.169.227'
 cli = MongoClient(uri_remote)
 mockdb = config["domain-db"]["db-name"]
 COLL_NAME = config["domain-db"]["coll_domain_data"]
@@ -39,6 +40,41 @@ coll_anno = cli[mockdb][config["domain-db"]["coll_anno_data"]]
 
 
 DOMAIN = config["domain-name"]
+
+def reload_config(mode):
+    global coll_data
+    global coll_chat
+    global coll_chat_cache
+    global coll_chat_test
+    global coll_cf_dispatch_semaphore
+    global coll_crowd
+    global coll_crowd_test
+    global coll_anno
+    global config
+    global DOMAIN
+    os.environ['domain'] = mode
+    config_file = path.join(APP_DOMAIN, 'app-{}.json'.format(os.environ['domain']))
+    print(mode)
+    print(config_file)
+    with open(config_file) as f:
+        config = json.load(f)
+    uri_local = 'mongodb://localhost'
+    # uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +
+    #               '&ssl_cert_reqs=CERT_NONE')
+    uri_remote = 'mongodb://18.215.169.227'
+    cli = MongoClient(uri_remote)
+    mockdb = config["domain-db"]["db-name"]
+    COLL_NAME = config["domain-db"]["coll_domain_data"]
+    coll_data = cli[mockdb][COLL_NAME]
+    coll_chat = cli[mockdb][config["domain-db"]["coll_chat_data"]]
+    coll_chat_cache = cli[mockdb][config["domain-db"]["coll_chat_data_cache"]]
+    coll_cf_dispatch_semaphore = cli[mockdb][config["domain-db"]["coll_cf_dispatch_semaphore"]]
+    coll_chat_test = cli[mockdb][config["domain-db"]["coll_chat_data_test"]]
+    coll_crowd = cli[mockdb][config["domain-db"]["coll_cf_data"]]
+    coll_crowd_test = cli[mockdb][config["domain-db"]["coll_cf_data_test"]]
+    coll_anno = cli[mockdb][config["domain-db"]["coll_anno_data"]]
+
+    DOMAIN = config["domain-name"]
 
 socketio = SocketIO()
 
