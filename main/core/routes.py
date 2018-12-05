@@ -2,7 +2,7 @@ import os
 from flask import session, redirect, url_for, request, jsonify
 from flask import render_template, render_template_string
 from . import main
-from .. import coll_data, APP_TEMPLATE, DOMAIN, CHAT_HTML
+from .. import coll_data, APP_TEMPLATE, DOMAIN, CHAT_HTML, reload_config
 from .. import get_chat_db, get_crowd_db, get_anno_db
 from .data import get_chatdata, get_anno_data
 from .events import get_message
@@ -22,6 +22,8 @@ def _init_login_by_form(form):
     session[WORKER_ID] = form.workerid.data
     session[USERNAME] = form.username.data
     # session[USERNAME] = "username_default"
+    if form.mode.data == 'COCO':
+        form.task_id.data = '319714'
     session[TASK_ID] = form.task_id.data
     if not form.tasks.data:
         session[TASKS] = [form.task_id.data]
@@ -32,6 +34,7 @@ def _init_login_by_form(form):
     session[ROOM] = form.task_id.data
     session[MODE] = form.mode.data
     session[TURN] = 0
+    reload_config(session[MODE])
 
 
 @main.route('/', methods=['GET', 'POST'])
