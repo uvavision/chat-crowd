@@ -21,7 +21,8 @@ config_file = path.join(APP_DOMAIN, 'app-{}.json'.format(os.environ['domain']))
 with open(config_file) as f:
     config = json.load(f)
 uri_local = 'mongodb://localhost'
-uri_remote = 'mongodb://100.24.252.209'
+#uri_remote = 'mongodb://100.24.252.209'
+uri_remote = 'mongodb://localhost'
 cli = MongoClient(uri_remote)
 mockdb = config["domain-db"]["db-name"]
 COLL_NAME = config["domain-db"]["coll_domain_data"]
@@ -57,7 +58,7 @@ def reload_config(mode):
     uri_local = 'mongodb://localhost'
     # uri_remote = (config['compose-for-mongodb'][0]['credentials']['uri'] +
     #               '&ssl_cert_reqs=CERT_NONE')
-    uri_remote = 'mongodb://100.24.252.209'
+    uri_remote = 'mongodb://localhost'
     cli = MongoClient(uri_remote)
     mockdb = config["domain-db"]["db-name"]
     COLL_NAME = config["domain-db"]["coll_domain_data"]
