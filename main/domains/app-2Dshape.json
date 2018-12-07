@@ -1,27 +1,4 @@
 {
-  "compose-for-mongodb": [
-    {
-      "credentials": {
-        "db_type": "mongodb",
-        "name": "bmix-dal-yp-6c77a987-9cd1-45fd-9203-4d21101bfe4c",
-        "uri_cli": "mongo --ssl --sslAllowInvalidCertificates sl-us-south-1-portal.17.dblayer.com:28745/compose -u admin -p OSJREZRDECAZHLSV --authenticationDatabase admin",
-        "ca_certificate_base64": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURkVENDQWwyZ0F3SUJBZ0lFV1BFc0pUQU5CZ2txaGtpRzl3MEJBUTBGQURBOE1Ub3dPQVlEVlFRRERERnoKWm1WdVowQjFjeTVwWW0wdVkyOXRMV1pqTURsa01UazBORE14WlRRNVpEQXlZMlU0Wmpoak56ZzVOR1UwWW1SaQpNQjRYRFRFM01EUXhOREl3TURnd05Wb1hEVE0zTURReE5ESXdNREF3TUZvd1BERTZNRGdHQTFVRUF3d3hjMlpsCmJtZEFkWE11YVdKdExtTnZiUzFtWXpBNVpERTVORFF6TVdVME9XUXdNbU5sT0dZNFl6YzRPVFJsTkdKa1lqQ0MKQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFOa1F0NU1uV1o1emt6U0tiQ016ZmIzWgpkL0FLKzU1bEtuNVRweEtLM2dLYXlnWnowSnJ3UVBKWmJBUTdTS3M0Z1NZRGdkUlJsQWJuNjZRZUhqaGplc3FoCld6eDB2dHZMMHhPTWh2ZTNVWlp6K0FmUmIydXVjbS82VTJlZnNJV3FkVitSODh5QmRsNmFTZXlXWDYxK2N2ay8KQmFzUVM2d2FEWHRJQjBmL3JhR2Vqb0FLZ0lqN0U5ZSs1WUtUbnBrZVhiclZmWitRTUZXdWhWRUM2cDE2M0NkNwprYmJzSk1aWkZGQVFUUDBhZWNPK1BHQ1ZxU2pWZlRhalVRT21FL3J5QllneVViRTQya2dZRkc5aDdQZjV3bDdXCmpQYTRETHdmMm5SWXQ2QWpNNEI4NnUxZXJjNXdwLzRYdEFybVY4QUFwdnA1RXVWczdvNTdZcHVidFYzamRsRUMKQXdFQUFhTi9NSDB3SFFZRFZSME9CQllFRkd4M0IrOFM4V0lDMUpVbjN4ZmxlaGdTWG1hRU1BNEdBMVVkRHdFQgovd1FFQXdJQ0JEQWRCZ05WSFNVRUZqQVVCZ2dyQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3REFZRFZSMFRCQVV3CkF3RUIvekFmQmdOVkhTTUVHREFXZ0JSc2R3ZnZFdkZpQXRTVko5OFg1WG9ZRWw1bWhEQU5CZ2txaGtpRzl3MEIKQVEwRkFBT0NBUUVBMXRaVTlJR0hpZE11RHdUOHA5UitLa29UVWZvb1pqbTUxQzg3Wkl6UlVsczN6dUQ0cVRwcwpWakxPR2xWdkNTRVg1bXdEYlZoNUtuckpJczM3S29xYitrQVlIKzVDSmlOWnJ0VnZUM0RTSkhSNENSbmFoaVVJCmY0VEVOaTNaWHNUczNuT2prMjFvYURKZU0yb3o3ODhaMWNlekkyNWZHZk9LU0l1a2s3TllJUFFNd205QzZuZ3QKa01iTUlmQlJjT3ZhZk9MS0h1S2lEVW1kRkp1RTByZStaUHk0eU45S3BwdW5TSEo4ZmFqWVUyVEppR0FFK0x4UApUek5hdFppWHVnZjcyTkFKa25Yd3g1SW0wM3BOWXh0NTJxaWUyL2Z0bFlRK2VtL0RaVVFnN2FsY1FnNEl2NFJBClk0dG9LSFQ5S3dDUlpWaTI5NXlCOC9jeHBSYkJDTEVZU0E9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
-        "deployment_id": "58f12c1f7bf26300180025f5",
-        "uri": "mongodb://admin:OSJREZRDECAZHLSV@sl-us-south-1-portal.17.dblayer.com:28745,sl-us-south-1-portal.12.dblayer.com:28745/compose?authSource=admin&ssl=true"
-      },
-      "syslog_drain_url": null,
-      "volume_mounts": [],
-      "label": "compose-for-mongodb",
-      "provider": null,
-      "plan": "Standard",
-      "name": "Compose for MongoDB-6k",
-      "tags": [
-        "big_data",
-        "data_management",
-        "ibm_created"
-      ]
-    }
-  ],
   "domain-name": "vision-dialog-2Dshape",
   "domain-db": {
     "db-name": "layout-2Dshape",
@@ -35,8 +12,5 @@
     "coll_anno_data": "anno_data",
     "coll_anno_data_test": "test_anno_data"
   },
-  "app-name": "vision-dialog-2Dshape",
-  "description": "woz via crowd sourcing",
-  "website": "http://woz.mybluemix.net",
-  "repository": "https://github.com/uvavision/chat-crowd"
+  "app-name": "vision-dialog-2Dshape"
 }

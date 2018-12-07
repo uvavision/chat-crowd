@@ -24,6 +24,8 @@ def _init_login_by_form(form):
     # session[USERNAME] = "username_default"
     if form.mode.data == 'COCO':
         form.task_id.data = '319714'
+    else:
+        form.task_id.data = '12445'
     session[TASK_ID] = form.task_id.data
     if not form.tasks.data:
         session[TASKS] = [form.task_id.data]

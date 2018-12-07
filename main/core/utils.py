@@ -3,7 +3,6 @@ import string
 
 import hashlib
 import requests
-from crowdsourcing.crowdflower import CF_API_ENDPOINT, INSTRUCTOR_JOBID, PAINTER_JOBID, API_KEY
 
 def randomword(length=8):
     char_set = string.ascii_lowercase + string.digits + string.ascii_uppercase

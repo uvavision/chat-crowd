@@ -10,22 +10,6 @@ from .const import (ROLE, DEBUG, TASK_ID, USERNAME, AGENT, USER, MODE,
                     ROLE_NAME, canvas_token, DA)
 from .data import (insert_crowd, insert_chatdata, get_chatdata, get_anno_data,
                    get_bot_response, insert_chatdata_cache)
-from .interpreter import domain_entity_matcher, ner_matcher
-
-
-def add_tag(text):
-    doc, lst = domain_entity_matcher(text)
-    # for ele in lst:
-    #     print(str(ele))
-    lst_out = [w.text for w in doc]
-    for _, start, end in lst:
-        lst_out[start] = '<span class="chip">' + lst_out[start]
-        lst_out[end-1] = lst_out[end-1] + '</span>'
-    _, lst_ner = ner_matcher(text)
-    for _, start, end, label in lst_ner:
-        lst_out[start] = '<span class="chip">' + lst_out[start]
-        lst_out[end-1] = lst_out[end-1] + '</span>'
-    return ' '.join(lst_out)
 
 
 def get_message(role, text, username="ADMIN"):
