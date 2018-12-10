@@ -9,4 +9,4 @@ if __name__ == '__main__':
     os.environ['domain'] = args.domain
     from main import create_app, socketio
     app = create_app(debug=False)
-    socketio.run(app, host='0.0.0.0', port=80)
+    socketio.run(app, host='0.0.0.0', port=8080)
