@@ -16,7 +16,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class LoginForm(FlaskForm):
-    workerid = StringField('worderid', id='workerid', validators=[Required()])
+    workerid = StringField('workerid', id='workerid', validators=[Required()])
     username = StringField('username', id="username", validators=[Required()])
     # workerid = StringField('worderid', id='workerid', validators=[Required()], render_kw={"placeholder": "Enter your contributor ID..."})
     # username = StringField('username', id="username", validators=[Required()], render_kw={"placeholder": "Enter your CrowdFlower UserName..."})
