@@ -88,10 +88,10 @@ def login():
     if form.validate_on_submit():
         _init_login_by_form(form)
         workerid = session[WORKER_ID]
-        if not workerid_valid(workerid):
-            form.workerid.errors = ['Your Contributor ID was not found...']
-            return render_template('index.html', form=form, role=role,
-                           mode=mode, room=room, is_debug=is_debug)
+        # if not workerid_valid(workerid):
+        #     form.workerid.errors = ['Your Contributor ID was not found...']
+        #     return render_template('index.html', form=form, role=role,
+        #                    mode=mode, room=room, is_debug=is_debug)
         session[PASS] = False  # if test mode available, set FALSE as default
         session[DEBUG] = bool(int(is_debug)) if is_debug else False
         session[MODE] = mode if mode else MODE_WOZ_HUMAN
@@ -151,6 +151,7 @@ def test():
         print('@@ answer_data', answer_data, form_test.answers)
         if answer_data == form_test.answers:
             is_pass = True
+        is_pass = True
         if is_pass:
             session[PASS] = is_pass
             is_debug = session[DEBUG]
