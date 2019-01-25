@@ -13,7 +13,7 @@
         </script>
     </head>
     <body>
-      <div class="container black">
+      <div class="container white">
         <div class="section">
           {% if task_url_next %}
            <div>
@@ -54,10 +54,10 @@
           {% endif %}
           <div class="row">
             <div class="col s8 center-align">
-              <blockquote class="col s12 white-text">Please provide us some feedback for the task! If you run into any issue with the task, let us know too. Thank you!</blockquote>
+              <blockquote class="col s12 black-text">Please provide us some feedback for the task! If you run into any issue with the task, let us know too. Thank you!</blockquote>
               <form class="col s10" method="POST">
-                  {{ form.feedback(class_="materialize-textarea black white-text")}}
-                  {{ form.submit() }} <h6 class='white-text'>{{message}}</h6>
+                  {{ form.feedback(class_="materialize-textarea white black-text")}}
+                  {{ form.submit() }} <h6 class='black-text'>{{message}}</h6>
               </form>
             </div>
         </div>

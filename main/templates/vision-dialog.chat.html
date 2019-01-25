@@ -150,13 +150,13 @@
 
   <body>
   {% if role == "agent" %}
-    <div class="container bg-header teal white-text">
-      <nav class="black">
-      <span class="teal white-text badge">
+    <div class="container bg-header teal black-text">
+      <nav class="grey">
+      <span class="teal black-text badge">
   {%  else %}
-    <div class="container bg-header blue darken-3 white-text">
-      <nav class="black">
-      <span class="blue darken-3 white-text badge">
+    <div class="container bg-header blue darken-3 black-text">
+      <nav class="grey">
+      <span class="blue darken-3 black-text badge">
   {% endif %}
 
     <b>{{role_name.upper()}} VIEW </b></span> User <b>{{username}}</b> now plays the role of <b>{{role_name}}</b> on <b>{{mode}}</b> {{progress}}. </span>
@@ -173,11 +173,11 @@
     </span>
   </nav>
   </div>
-    <div id="contentParent" class="container responsive-columns-wrapper black white-text">
+    <div id="contentParent" class="container responsive-columns-wrapper white black-text">
       <div><p></p></div>
       {% if role == "agent" %}
         <div class="center-align">
-            <nav class="black "><b>Canvas for Layout Drawing</b></nav>
+            <nav class="grey "><b>Canvas for Layout Drawing</b></nav>
             <div id="bbox_annotator"></div>
             {% if mode == 'COCO' %}
             <div class="fa fa-times-circle red-text"> : Delete </div>
@@ -188,13 +188,13 @@
         </div>
       {% endif %}
       {% if role == "user" %}
-              <div class="center-align white-text"><p><b>Image Layout Reference</b></p>
+              <div class="center-align black-text"><p><b>Image Layout Reference</b></p>
                   <canvas id="coco_image_anno"></canvas>
               </div>
       {% endif %}
       {% if mode !='test' %}
           <div id="chat-column-holder" class="responsive-column content-column">
-              <nav class="center black white-text"><b>Chat History - Interactive Drawing</b></nav>
+              <nav class="center white black-text"><b>Chat History - Interactive Drawing</b></nav>
               <div class="chat-column white">
               <div id="scrollingChat"></div>
               <!-- <div class="input-field inputOutline">
