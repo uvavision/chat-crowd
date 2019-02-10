@@ -8,14 +8,14 @@ How to run?
 4) `python run.py`
 5) visit `http://localhost:8080`.
 
-## 2D Shape Dialog Collecting Interface
+## 2D Shape Dialog
 Painter's View
 ![painter view](https://s3.amazonaws.com/crowdflower-inst-imgs/2Dshape/painter.gif)
 
 Instructor's View
 ![instructor view](https://s3.amazonaws.com/crowdflower-inst-imgs/2Dshape/instructor.gif)
 
-## MS COCO Image Layout Dialog Collecting Interface
+## COCO Image Layout Dialog
 Painter's View
 ![painter view](https://s3.amazonaws.com/crowdflower-inst-imgs/COCO/drawingtool.gif)
 
