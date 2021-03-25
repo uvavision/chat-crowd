@@ -79,7 +79,7 @@ python-engineio==1.7.0
 python-Levenshtein==0.12.0
 python-socketio==1.8.0
 pytz==2017.3
-PyYAML==3.12
+PyYAML==5.4
 quantities==0.12.1
 regex==2017.4.5
 requests==2.18.4
