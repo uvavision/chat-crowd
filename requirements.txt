@@ -52,7 +52,7 @@ murmurhash==0.28.0
 neo4j-driver==1.5.3
 networkx==2.0
 nltk==3.2.4
-numpy==1.14.0
+numpy==1.22.0
 overrides==1.9
 pandas==0.19.2
 pathlib==1.0.1
