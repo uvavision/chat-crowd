@@ -98,7 +98,7 @@ thinc==6.10.1
 toolz==0.8.2
 tqdm==4.19.5
 typing==3.6.4
-ujson==1.35
+ujson==5.4.0
 Unidecode==1.0.22
 urllib3==1.22
 validators==0.12.0
